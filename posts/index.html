@@ -5,7 +5,7 @@ background: '/img/bg-post.jpg'
 ---
 
 {% for post in paginator.posts %}
-
+  <!-- 文章列表 -->
   <article class="post-preview">
     <a href="{{ post.url | prepend: site.baseurl | replace: '//', '/' }}">
       <h2 class="post-title">{{ post.title }}</h2>
@@ -30,7 +30,7 @@ background: '/img/bg-post.jpg'
 
 <!-- Pager -->
 {% if paginator.total_pages > 1 %}
-
+  <!-- 分页 -->
   <div class="clearfix">
 
     {% if paginator.previous_page %}
