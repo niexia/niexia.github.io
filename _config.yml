@@ -1,14 +1,14 @@
-title:             Clean Blog
-email:             your-email@example.com
+title:             Yangseas Blog
+email:             yangseas@qq.com
 description:       A Blog Theme by Start Bootstrap
-author:            Start Bootstrap
+author:            Yang Jin
 baseurl:           "/startbootstrap-clean-blog-jekyll"
 url:               "http://yangseas.github.io"
 
 # Social Profiles
-twitter_username:  SBootstrap
-github_username:   BlackrockDigital
-facebook_username: StartBootstrap
+#twitter_username:  SBootstrap
+github_username:   yangseas
+#facebook_username: StartBootstrap
 
 # Build settings
 markdown:          kramdown
