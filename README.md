@@ -2,7 +2,11 @@
 
 ### 说明
 
-Blog是基于Jekyll的，然后使用[GitHub Pages](https://pages.github.com/)进行发布,GitHub Pages为了提供对HTML内容的支持，选择了Jekyll作为模板系统。Jekyll是一个强大的静态模板系统，很适合作为个人博客使用。
+Blog是基于Jekyll，然后使用GitHub Pages进行发布.
+
+**GitHub Pages**
+
+[Github Pages](https://pages.github.com/) 是面向用户、组织和项目开放的公共静态页面搭建托管服 务，站点可以被免费托管在 Github 上，你可以选择使用 Github Pages 默 认提供的域名 github.io 或者自定义域名来发布站点。Github Pages 支持 自动利用 Jekyll 生成站点，也同样支持纯 HTML 文档，将你的 Jekyll 站 点托管在 Github Pages 上是一个不错的选择。
 
 **Jekyll**
 

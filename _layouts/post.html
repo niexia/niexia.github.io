@@ -17,9 +17,9 @@ layout: default
           {% if page.subtitle %}
           <h2 class="subheading">{{ page.subtitle }}</h2>
           {% endif %}
-          <span class="meta">Posted by
-            <a href="#">Start Bootstrap</a>
-            on {{ page.date | date: '%B %d, %Y' }}</span>
+          <span class="meta">写
+            <a href="#"></a>
+            于 {{ page.date | date: '%B %d, %Y' }}</span>
         </div>
       </div>
     </div>
@@ -37,10 +37,10 @@ layout: default
       <div class="clearfix">
 
         {% if page.previous.url %}
-        <a class="btn btn-primary float-left" href="{{ page.previous.url | prepend: site.baseurl | replace: '//', '/' }}" data-toggle="tooltip" data-placement="top" title="{{ page.previous.title }}">&larr; 上一页<span class="d-none d-md-inline"> Blogs</span></a>
+        <a class="btn btn-primary float-left" href="{{ page.previous.url | prepend: site.baseurl | replace: '//', '/' }}" data-toggle="tooltip" data-placement="top" title="{{ page.previous.title }}">&larr; 上一篇<span class="d-none d-md-inline"> Blog</span></a>
         {% endif %}
         {% if page.next.url %}
-        <a class="btn btn-primary float-right" href="{{ page.next.url | prepend: site.baseurl | replace: '//', '/' }}" data-toggle="tooltip" data-placement="top" title="{{ page.next.title }}">下一页<span class="d-none d-md-inline"> Blogs</span> &rarr;</a>
+        <a class="btn btn-primary float-right" href="{{ page.next.url | prepend: site.baseurl | replace: '//', '/' }}" data-toggle="tooltip" data-placement="top" title="{{ page.next.title }}">下一篇<span class="d-none d-md-inline"> Blog</span> &rarr;</a>
         {% endif %}
 
       </div>
