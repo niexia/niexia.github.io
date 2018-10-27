@@ -2,7 +2,7 @@ title:             Yangseas Blog
 email:             yangseas@qq.com
 description:       A Blog Theme by Start Bootstrap
 author:            Yang Jin
-baseurl:           "/startbootstrap-clean-blog-jekyll"
+baseurl:           "/"
 url:               "http://yangseas.github.io"
 
 # Social Profiles
