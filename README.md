@@ -63,6 +63,10 @@ Jekyll的核心其实就是一个文本的转换引擎，用你最喜欢的标�
 
 如果在使用过程中有遇到bug或者issue,请到这里[提issue](https://github.com/yangseas/yangseas.github.io/issues)
 
+### 如果你提交之后发现没有更新
+那么就是GitHub Pages 执行构建的时候失败了。这个时候GitHub会给你github上面的邮箱发邮件通知你，告诉你失败的原因，注意查看邮件
+>Tip: We strongly recommend `running Jekyll locally` so you can easily debug and fix build errors before pushing to GitHub. To learn more about troubleshooting options, see "Troubleshooting GitHub Pages builds."
+
 ### 感谢
 
 这个模板fork自[BlackrockDigital/startbootstrap-clean-blog-jekyll](https://github.com/BlackrockDigital/startbootstrap-clean-blog-jekyll)，感谢这个作者
@@ -72,3 +76,4 @@ Jekyll的核心其实就是一个文本的转换引擎，用你最喜欢的标�
 - [用Jekyll搭建的Github Pages个人博客](https://www.jianshu.com/p/88c9e72978b4)
 - [Github Pages 搭建笔记](https://www.jianshu.com/p/ec7953b9e5ab)
 - [window下Jekyll建站过程](https://blog.csdn.net/m0_37996098/article/details/78478764)
+
