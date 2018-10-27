@@ -4,7 +4,7 @@
 
 Blog是基于[jekyll](http://jekyllcn.com/)创建的，然后使用[GitHub Pages](https://pages.github.com/)进行发布
 
-[博客预览](http://yanseas.github.io)
+[博客预览](http://yangseas.github.io)
 
 ### 使用它
 
