@@ -13,6 +13,7 @@ Blog是基于[jekyll](http://jekyllcn.com/)创建的，然后使用[GitHub Pages
 3. 然后将这些文件push到你的usename.github.io这个res就行（请先了解GitHub pages）
 
 **_config.yml的说明**
+
 |参数|说明|
 |:--------------|:--------------|
 |title|首页展示的标题|
