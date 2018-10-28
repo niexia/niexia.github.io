@@ -1,8 +1,8 @@
 # Site settings
-title:             Yangseas Blog
-email:             yangseas@qq.com
-description:       完美生活 至爱音乐
-author:            Yang Jin
+title:             Yangseas Blog        #标题
+email:             yangseas@qq.com      #联系邮箱
+description:       完美生活 至爱音乐     
+author:            Yang Jin             
 baseurl:           ""
 url:               "http://yangseas.github.io"
 

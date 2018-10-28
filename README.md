@@ -69,7 +69,8 @@ Jekyll的核心其实就是一个文本的转换引擎，用你最喜欢的标�
 
 ### 感谢
 
-这个模板fork自[BlackrockDigital/startbootstrap-clean-blog-jekyll](https://github.com/BlackrockDigital/startbootstrap-clean-blog-jekyll)，感谢这个作者
+1. 这个模板fork自[BlackrockDigital/startbootstrap-clean-blog-jekyll](https://github.com/BlackrockDigital/startbootstrap-clean-blog-jekyll)，感谢这个作者
+2. 还有[huxpro.github.io](https://github.com/huxpro/huxpro.github.io)，里面的很多功能真的很棒
 
 ### 参考
 - [Jekyll中文文档](http://jekyllcn.com/)
