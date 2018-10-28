@@ -1,5 +1,5 @@
 {% if site.featured-tags %}
-<section>
+<div class="row">
   {% if include.bottom %}
   <hr class="hidden-sm hidden-xs">
   {% endif %}
@@ -11,12 +11,13 @@
     url_encode/decode is for escaping otherwise extra <a> will get generated
       but it will break sort...
     {% endcomment %}
-    {% for tag in site.tags %}{% if tag[1].size => site.featured-condition-size %}
+    {% for tag in site.tags %}
+    {% if tag[1].size = site.featured-condition-size || tag[1].size > site.featured-condition-size%}
     <a data-sort="{{ site.posts.size | minus: tag[1].size | prepend: '0000' | slice: -4, 4 }}" href="{{ site.baseurl }}/posts/?tag={{ tag[0] | url_encode }}"
       title="{{ tag[0] }}" rel="{{ tag[1].size }}">{{ tag[0] }}</a>
     {% endif %}{% endfor %}
     {% endcapture %}
     {{ tags | split:'</a>' | sort | join:'</a>' }}
   </div>
-</section>
+</div>
 {% endif %}
