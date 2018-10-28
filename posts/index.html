@@ -26,7 +26,7 @@ background: '/assets/img/bg-post.jpg'
     {{ tags | split:'</a>' | sort | join:'</a>' }}
   </div>
 
-        <!-- Article List -->
+  <!-- Article List -->
   <div class="mini-post-list js-result d-none">
   {%- assign _sorted_list = site.posts -%}
   {%- assign _sorted_list = _sorted_list | sort: 'date' -%}
@@ -58,11 +58,11 @@ background: '/assets/img/bg-post.jpg'
     <div class="post-preview item" data-tags="{{ _tags }}">
         <a href="{{ _article.url | prepend: site.baseurl }}">
             <h2 class="post-title">
-                        {{ _article.title }}
+              {{ _article.title }}
             </h2>
             {% if _article.subtitle %}
             <h3 class="post-subtitle">
-                {{ _article.subtitle }}
+              {{ _article.subtitle }}
             </h3>
             {% endif %}
         </a>
