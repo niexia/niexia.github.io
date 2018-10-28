@@ -6,15 +6,15 @@ author:            Yang Jin
 baseurl:           ""
 url:               "http://yangseas.github.io"
 
-# SNS settings
-weibo_name: YJTTII
-zhihu_name:  niexia
-github_username:   yangseas
+# SNS settings  你可能不清楚你的name具体指什么?先点击我的连接参考
+weibo_name: YJTTII                      #微博
+zhihu_name:  niexia                     #知乎
+github_username:   yangseas             #github
 
 # Building settings
 highlighter: rouge
 paginate: 10
-paginate_path:     "/posts/page:num/"
+paginate_path:  "/posts/page:num/"
 plugins:
   - jekyll-feed
   - jekyll-paginate
@@ -33,8 +33,9 @@ kramdown:
       line_numbers: true
       start_line: 1
 
-      # Featured Tags
+# Featured Tags
 featured-tags: true                     # whether or not using Feature-Tags
 featured-condition-size: 1              # A tag will be featured if the size of it is more than this condition value
 
-
+# HOME lists
+listCount: 8                            # 首页展示几篇
