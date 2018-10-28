@@ -1,23 +1,20 @@
 {% if site.featured-tags %}
-<div class="row">
+<section>
   {% if include.bottom %}
   <hr class="hidden-sm hidden-xs">
   {% endif %}
   <h5><a href="{{'/posts/' | prepend: site.baseurl }}">FEATURED TAGS</a></h5>
   <div class="tags">
     {% capture tags %}
-    {% comment %}
-    there must be no space between for and if otherwise this tricky sort won't work.
-    url_encode/decode is for escaping otherwise extra <a> will get generated
-      but it will break sort...
-    {% endcomment %}
     {% for tag in site.tags %}
-    {% if tag[1].size == site.featured-condition-size || tag[1].size > site.featured-condition-size%}
     <a data-sort="{{ site.posts.size | minus: tag[1].size | prepend: '0000' | slice: -4, 4 }}" href="{{ site.baseurl }}/posts/?tag={{ tag[0] | url_encode }}"
-      title="{{ tag[0] }}" rel="{{ tag[1].size }}">{{ tag[0] }}</a>
-    {% endif %}{% endfor %}
+      title="{{ tag[0] }}" rel="{{ tag[1].size }}">
+      {{ tag[0] }}
+    <sup>{{tag[1].size}}</sup>
+    </a>
+    {% endfor %}
     {% endcapture %}
     {{ tags | split:'</a>' | sort | join:'</a>' }}
   </div>
-</div>
+</section>
 {% endif %}
