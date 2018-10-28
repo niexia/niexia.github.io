@@ -1,3 +1,4 @@
+# Site settings
 title:             Yangseas Blog
 email:             yangseas@qq.com
 description:       完美生活 至爱音乐
@@ -5,14 +6,14 @@ author:            Yang Jin
 baseurl:           ""
 url:               "http://yangseas.github.io"
 
-# Social Profiles
-#twitter_username:  SBootstrap
+# SNS settings
+weibo_name: YJTTII
+zhihu_name:  niexia
 github_username:   yangseas
-#facebook_username: StartBootstrap
 
-# Build settings
-markdown:          kramdown
-paginate:          5
+# Building settings
+highlighter: rouge
+paginate: 10
 paginate_path:     "/posts/page:num/"
 plugins:
   - jekyll-feed
