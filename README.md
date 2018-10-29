@@ -46,7 +46,7 @@ Jekyll的核心其实就是一个文本的转换引擎，用你最喜欢的标�
 **你需要**
 1. download或者clone这个res<br/>
 2. 修改`_config.yml`里面的配置<br/>
-3. 然后将这些文件push到你的usename.github.io这个res就行（请先了解GitHub pages），然后通过http://username.github.io进行访问
+3. 然后将这些文件push到你的usename.github.io这个res就行（请先了解GitHub pages），然后通过`http://username.github.io`进行访问
 4. 本地我没有安装jekyll，如果你想本地调试，请参考一下的参考中的连接查看如何操作。
 
 **_config.yml的说明**
