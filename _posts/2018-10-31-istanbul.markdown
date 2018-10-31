@@ -5,7 +5,7 @@ subtitle:   "配置完成了，我怎么写一篇自己的Blog"
 date:       2018-10-31 18:00:00              
 author:     "YangJin"                        
 background: '/assets/img/posts/03.jpg'       
-published: fase
+published: false
 tags:                                        
     - Tool
     - 测试
