@@ -1,7 +1,7 @@
 ---
 layout:     post                             
 title:      "Istanbul不是伊斯坦布尔"            
-subtitle:   "配置完成了，我怎么写一篇自己的Blog"
+subtitle:   "JavaScript程序代码覆盖率工具"
 date:       2018-10-31 18:00:00              
 author:     "YangJin"                        
 background: '/assets/img/posts/03.jpg'       
