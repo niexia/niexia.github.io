@@ -17,9 +17,7 @@ layout: default
           {% if page.subtitle %}
           <h2 class="subheading">{{ page.subtitle }}</h2>
           {% endif %}
-          <span class="meta">写
-            <a href="#"></a>
-            于 {{ page.date | date: '%B %d, %Y' }}</span>
+          <span class="meta">{{ page.author }}写<a href="#"></a>于{{ page.date | date: '%B %d, %Y' }}</span>
         </div>
       </div>
     </div>
