@@ -1,0 +1,26 @@
+---
+layout:     post                             
+title:      "Istanbul不是伊斯坦布尔"            
+subtitle:   "配置完成了，我怎么写一篇自己的Blog"
+date:       2018-10-31 18:00:00              
+author:     "YangJin"                        
+background: '/assets/img/posts/03.jpg'       
+published: fase
+tags:                                        
+    - Tool
+    - 测试
+---
+### Istanbul(伊斯坦布尔)
+
+在看一些开源代码的时候，经常会看到`istanbul`，不知道代码和伊斯坦布尔有什么关系???
+>Istanbul是JavaScript程序代码覆盖率工具
+
+测试的时候，我们往往会关心，是否所有的代码都执行到了。
+
+这个指标就是"[代码覆盖率(code coverage)](https://zh.wikipedia.org/wiki/%E4%BB%A3%E7%A2%BC%E8%A6%86%E8%93%8B%E7%8E%87)"。它有四个测量维度
+- 行覆盖率（line coverage）：是否每一行都执行？
+- 函数覆盖率（function coverage）：是否每个函数都调用了？
+- 分支覆盖率（branch coverage）：是否每个if代码块都执行了？
+- 语句覆盖率（statement coverage）：是否每个语句都执行了？
+
+因为土耳其地毯世界闻名，而地毯是用来覆盖的，所以这个工具以土耳其最大的城市伊斯坦布尔来命名。
