@@ -17,3 +17,4 @@
 - [vue-resource](https://github.com/vuejs/vue-resource)
 - [jQuery](http://jquery.com),
 - [marked.js](https://github.com/chjj/marked)
+
