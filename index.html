@@ -36,7 +36,7 @@
               class="item__tag"
               v-for="label in post.labels" 
               :key="label.name" 
-              :style="{color: label.color}">
+              :style="{color: '#' + label.color}">
               <router-link :to="{name: 'labelPost', params: {name: label.name}}">
                 {{label.name}}
               </router-link>

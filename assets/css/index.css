@@ -50,20 +50,18 @@ body {
 .postBox .post__item .item__tag {
   display: inline-block;
   border-radius: 2px;
-  box-shadow: inset 0 -1px 0 rgba(27,31,35,.12);
+  box-shadow: 0 0 1px rgba(27,31,35,.22);
   font-size: 12px;
   font-weight: 600;
   height: 15px;
   line-height: 15px;
   padding: .15em 4px;
   margin-right: 1em;
-
-  background-color: #cfd3d7;
+  background-color: #edf3f9;
   color: #000000;
 }
-.postBox .post__item .item__tag:hover {
-  transition: font-size 0.8 ease;
-  font-size: 14px;
+.postBox .post__item .item__tag:first-child {
+  margin-left: 1px;
 }
 .postBox .post__item .item__preview {
   font-style: italic;
