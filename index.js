@@ -1,39 +1,39 @@
-// Vue.config.debug = true;
 var CACHE = {};
 var PostList = Vue.extend({
   template: '#postList',
   data: function() {
     return {
       posts: [],
-      prev: 0,
-      next: 0,
-      home: true,
+      prePage: 0,
+      nextPage: 0,
+      isHome: true,
       label: ''
     };
   },
-  route: {
-    data: function() {
+  mounted() {
+    this.handleGetPostList();
+  },
+  methods: {
+    handleGetPostList: function() {
       document.getElementById('content').style.opacity = 0.6;
-      var _self = this,
-        params = this.$route.params,
-        page = params['page'] || 1,
+      var  params = this.$route.params,
+        page = params.page || 1,
         label = '',
-        home = true;
-      if (params.hasOwnProperty('name')) {
-        label = params['name'];
-        home = false;
+        isHome = true;
+      if (params.name) {
+        label = params.name;
+        isHome = false;
       }
       var cache = CACHE[label + 'Page' + page];
       if (cache) {
-        _self.$data.posts = cache.posts;
-        _self.$data.prev = cache.prev;
-        _self.$data.next = cache.next;
-        _self.$data.home = cache.home;
-        _self.$data.label = cache.label;
+        this.posts = cache.posts;
+        this.prePage = cache.prePage;
+        this.nextPage = cache.nextPage;
+        this.isHome = cache.isHome;
+        this.label = cache.label;
         document.getElementById('content').style.opacity = 1;
         return;
       }
-
       this.$http({
         url:
           'https://api.github.com/repos/' +
@@ -44,29 +44,28 @@ var PostList = Vue.extend({
         data: {
           creator: config['user'],
           page: page,
-          per_page: config['per_page'],
           labels: label
         },
         method: 'GET'
       }).then(
         function(response) {
-          console.log('----------');
           console.log(response);
           var data = response.data,
-            link = response.headers('Link'),
-            prev = false,
-            next = false;
+            link = '',
+            // link = response.headers('Link'),
+            prePage = false,
+            nextPage = false;
           if (link && link.indexOf('rel="prev"') > 0) {
-            prev = parseInt(page) - 1;
+            prePage = parseInt(page) - 1;
           }
           if (link && link.indexOf('rel="next"') > 0) {
-            next = parseInt(page) + 1;
+            nextPage = parseInt(page) + 1;
           }
-          _self.$data.posts = data;
-          _self.$data.prev = prev;
-          _self.$data.next = next;
-          _self.$data.home = home;
-          _self.$data.label = label;
+          this.posts = data;
+          this.prePage = prePage;
+          this.nextPage = nextPage;
+          this.isHome = isHome;
+          this.label = label;
           title = config['blogname'];
           if (page != 1) {
             title = 'Page ' + page + config['sep'] + title;
@@ -77,12 +76,11 @@ var PostList = Vue.extend({
           document.title = title;
           document.getElementById('content').style.opacity = 1;
           document.getElementById('loading').style.display = 'none';
-
           CACHE[label + 'Page' + page] = {
             posts: data,
-            prev: prev,
-            next: next,
-            home: home,
+            prePage: prePage,
+            nextPage: nextPage,
+            isHome: isHome,
             label: label
           };
           for (var i in data) {
@@ -93,7 +91,6 @@ var PostList = Vue.extend({
             }
           }
         },
-        function(response) {}
       );
     }
   }
@@ -106,8 +103,11 @@ var PostDetail = Vue.extend({
       post: []
     };
   },
-  route: {
-    data: function() {
+  mounted() {
+    this.handleGetPostListDetail();
+  },
+  methods: {
+    handleGetPostListDetail: function () {
       var id = this.$route.params['id'],
         cache = CACHE['Post' + id];
       if (cache) {
@@ -131,42 +131,46 @@ var PostDetail = Vue.extend({
         function(response) {
           var data = response.data;
           data.body = marked(data.body);
-          _self.$data.post = data;
+          this.post = data;
           document.title = data.title + config['sep'] + config['blogname'];
           document.getElementById('content').style.opacity = 1;
           document.getElementById('loading').style.display = 'none';
         },
-        function(response) {}
       );
     }
   }
 });
 
-var App = Vue.extend({});
-var router = new VueRouter();
-
-router.map({
-  '/': {
+// 定义路由
+var routes = [
+  {
+    path: '/',
+    name: 'PostsList',
     component: PostList
-  },
-  '/page/:page': {
-    name: 'page',
+  }, {
+    path: '/page/:page',
+    name: 'PagePosts',
     component: PostList
-  },
-  '/post/:id': {
-    name: 'post',
+  }, {
+    path: '/page/:name',
+    name: 'LabelPost',
+    component: PostList
+  }, {
+    path: '/label/:name/page/:page',
+    name: 'PageLabelPost',
+    component: PostList
+  }, {
+    path: '/page/:id',
+    name: 'PostDetail',
     component: PostDetail
-  },
-  '/label/:name': {
-    name: 'label',
-    component: PostList
-  },
-  '/label/:name/page/:page': {
-    name: 'labelPaged',
+  }, {
+    path: '*',
+    name: 'default',
     component: PostList
   }
-});
+];
+var router = new VueRouter({routes});
+new Vue({
+  router
+}).$mount('#app')
 
-window.onload = function() {
-  router.start(App, '#content');
-};
