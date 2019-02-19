@@ -1,92 +1,79 @@
 @import './reset.css';
-
+@import './animate.css';
 body {
   line-height: 1.8;
   color: rgba(0, 0, 0, .8);
   font-family: "Hiragino Sans GB", "Microsoft YaHei", STHeiti, "WenQuanYi Micro Hei", Helvetica, Arial, sans-serif;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  -moz-font-feature-settings: "liga"on;
   background-color: #fff;
 }
-
 #app {
   margin-left: auto;
   margin-right: auto;
   max-width: 700px;
   min-height: 100%;
 }
-
-#container {
+.view__wrapper {
   overflow: auto;
   padding-bottom: 100px;
 }
-
-#content {
-  opacity: 0;
+.view__wrapper .view__header {
+  position: relative;
+  padding-bottom: 10px;
+  margin-top: 50px;
+  margin-bottom: 20px;
+  border-bottom: 1px beige solid;
+}
+.view__wrapper .view__header .header__title {
+  font-size: 30px;
+}
+.view__wrapper .view__header .header__bio {
+  font-size: 14px;
+  color: #bdbdbd;
+}
+.view__wrapper .view__content{
   transition: all .5s;
   -webkit-transition: all .5s;
 }
 
-#loading {
-  animation: breathe 1s infinite alternate;
-  -webkit-animation: breathe 1s infinite alternate;
+/* postList */
+.postBox .post__item {
+  margin-bottom: 15px;
 }
-
-@keyframes breathe {
-  0% {
-    opacity: .2;
-  }
-
-  100% {
-    opacity: 1;
-  }
+.postBox .post__item .item__title {
+  font-size: 26px;
+  line-height: 1.3;
+  margin-bottom: 10px;
 }
-
-@-webkit-keyframes breathe {
-  0% {
-    opacity: .2;
-  }
-
-  100% {
-    opacity: 1;
-  }
+.postBox .post__item .item__title:hover {
+  color: #008EB9;
 }
+.postBox .post__item .item__tag {
+  display: inline-block;
+  border-radius: 2px;
+  box-shadow: inset 0 -1px 0 rgba(27,31,35,.12);
+  font-size: 12px;
+  font-weight: 600;
+  height: 15px;
+  line-height: 15px;
+  padding: .15em 4px;
+  margin-right: 1em;
 
-.header {
-  position: relative;
-  padding-bottom: 10px;
-  margin-top: 80px;
-  margin-bottom: 20px;
+  background-color: #cfd3d7;
+  color: #000000;
 }
-
-.header:after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  height: 1px;
-  width: 120px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
-  transition: width .5s;
-  -webkit-transition: width .5s;
+.postBox .post__item .item__tag:hover {
+  transition: font-size 0.8 ease;
+  font-size: 14px;
 }
-
-.header:hover:after {
-  width: 200px;
+.postBox .post__item .item__preview {
+  font-style: italic;
+  color: #a3a3a3;
 }
-
-.header h1 {
-  font-size: 32px;
-}
-
-.header p {
-  color: rgba(0, 0, 0, .5);
-}
-
-.post {
-  margin-bottom: 20px;
+.postBox .post__item .item__time {
+  font-family: Lora,'Times New Roman',serif;
+  color: #ccc;
+  font-size: 16px;
+  font-style: italic;
 }
 
 .post .title {

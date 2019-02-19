@@ -15,7 +15,6 @@ var PostList = Vue.extend({
   },
   methods: {
     handleGetPostList: function() {
-      document.getElementById('content').style.opacity = 0.6;
       var  params = this.$route.params,
         page = params.page || 1,
         label = '',
@@ -31,7 +30,6 @@ var PostList = Vue.extend({
         this.nextPage = cache.nextPage;
         this.isHome = cache.isHome;
         this.label = cache.label;
-        document.getElementById('content').style.opacity = 1;
         return;
       }
       this.$http({
@@ -49,7 +47,6 @@ var PostList = Vue.extend({
         method: 'GET'
       }).then(
         function(response) {
-          console.log(response);
           var data = response.data,
             link = '',
             // link = response.headers('Link'),
@@ -62,6 +59,7 @@ var PostList = Vue.extend({
             nextPage = parseInt(page) + 1;
           }
           this.posts = data;
+          console.log(data);
           this.prePage = prePage;
           this.nextPage = nextPage;
           this.isHome = isHome;
@@ -74,8 +72,6 @@ var PostList = Vue.extend({
             title = label + config['sep'] + title;
           }
           document.title = title;
-          document.getElementById('content').style.opacity = 1;
-          document.getElementById('loading').style.display = 'none';
           CACHE[label + 'Page' + page] = {
             posts: data,
             prePage: prePage,
@@ -114,10 +110,8 @@ var PostDetail = Vue.extend({
         var data = cache.post;
         data.body = marked(data.body);
         this.$data.post = data;
-        document.getElementById('content').style.opacity = 1;
         return;
       }
-      var _self = this;
       this.$http({
         url:
           'https://api.github.com/repos/' +
@@ -132,9 +126,8 @@ var PostDetail = Vue.extend({
           var data = response.data;
           data.body = marked(data.body);
           this.post = data;
+          console.log(data);
           document.title = data.title + config['sep'] + config['blogname'];
-          document.getElementById('content').style.opacity = 1;
-          document.getElementById('loading').style.display = 'none';
         },
       );
     }
@@ -149,19 +142,19 @@ var routes = [
     component: PostList
   }, {
     path: '/page/:page',
-    name: 'PagePosts',
+    name: 'pagePost',
     component: PostList
   }, {
-    path: '/page/:name',
-    name: 'LabelPost',
+    path: '/page/label/:name',
+    name: 'labelPost',
     component: PostList
   }, {
     path: '/label/:name/page/:page',
-    name: 'PageLabelPost',
+    name: 'labelPagePost',
     component: PostList
   }, {
-    path: '/page/:id',
-    name: 'PostDetail',
+    path: '/page/detail/:id',
+    name: 'postDetail',
     component: PostDetail
   }, {
     path: '*',

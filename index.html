@@ -8,15 +8,14 @@
 </head>
 <body>
   <div id="app">
-    <div id="container">
-      <header class="header">
-        <h1><a href="">YangJin Blog</a></h1>
-        <p>A github issues based blog.</p>
+    <div class="view__wrapper">
+      <header class="view__header">
+        <h1 class="header__title"><a href="">YangJin Blog</a></h1>
+        <p class="header__bio">前端开发工程师 努力搬砖 不想坑 什么时候也造个轮子</p>
       </header>
-      <div id="loading">Loading... </div>
-      <div id="content">
+      <main class="view__content">
         <router-view></router-view>
-      </div>
+      </main>
     </div>
   </div>
   <footer class="footer">
@@ -24,34 +23,47 @@
   </footer>
   <!-- postList template -->
   <script type="text/template" id="postList">
-    <div class="postBox">
-      <div class="posts">
-        <div class="post" v-for="post in posts">
-          <h2>
-            <router-link :to="{ name: 'post', params: { id: post.number } }">{{ post.title }}</router-link>
+    <div class="contentPost">
+      <div class="postBox">
+        <div class="post__item" v-for="post in posts">
+          <h2 class="item__title">
+            <router-link :to="{name: 'postDetail', params: {id: post.number}}">
+              {{ post.title }}
+            </router-link>
           </h2>
-          <ul class="tags" v-for="label in post.labels">
-            <li class="tag">
-              <router-link :to="{ name: 'label', params: { name: label.name } }">{{ label.name}}</router-link>
+          <ul>
+            <li 
+              class="item__tag"
+              v-for="label in post.labels" 
+              :key="label.name" 
+              :style="{color: label.color}">
+              <router-link :to="{name: 'labelPost', params: {name: label.name}}">
+                {{label.name}}
+              </router-link>
             </li>
           </ul>
-          <span class="time">{{new Date(post.created_at).toLocaleDateString()}}</span>
+          <div class="item__preview">
+            {{post.body}}
+          </div>
+          <p class="item__time">
+            Posted By YangJin on {{post.created_at}}
+          </p>
         </div>
       </div>
-      <div class="pagination" v-if="isHome">
+      <div class="paginationBox" v-if="isHome">
         <span v-show="prePage">
-          <router-link :to="{ name: 'page', params: { page: prePage }}">prePage</router-link>
+          <router-link :to="{ name: 'pagePost', params: { page: prePage }}">prePage</router-link>
         </span>
         <span v-show="nextPage">
-          <router-link :to="{ name: 'page', params: { page: nextPage }}">nextPage</router-link>
+          <router-link :to="{ name: 'pagePost', params: { page: nextPage }}">nextPage</router-link>
         </span>
       </div>
-      <div class="pagination" v-else>
+      <div class="paginationBox" v-else>
         <span v-show="prePage">
-          <router-link :to="{ name: 'labelPaged', params: { name:label, page: prePage }}">prePage</router-link>
+          <router-link :to="{ name: 'labelPagePost', params: { name:label, page: prePage }}">prePage</router-link>
         </span>
         <span v-show="nextPage">
-          <router-link :to="{ name: 'labelPaged', params: { name:label, page: nextPage }}">nextPage</router-link>
+          <router-link :to="{ name: 'labelPagePost', params: { name:label, page: nextPage }}">nextPage</router-link>
         </span>
       </div>
     </div>
@@ -60,17 +72,15 @@
   <script type="text/template" id="postDetail">
     <article class="post">
       <h2>
-        <router-link :to="{ name: 'post', params: { id: post.number }}">{{ post.title }}</router-link>
+        <router-link :to="{ name: 'postDetail', params: { id: post.number }}">{{ post.title }}</router-link>
       </h2>
       <ul class="tags" v-for="label in post.labels">
         <li class="tag">
-          <router-link :to="{ name: 'label', params: { name: label.name }}">{{label.name}}</router-link>
+          <router-link :to="{ name: 'labelPost', params: { name: label.name }}">{{label.name}}</router-link>
         </li>
       </ul>
       <span class="time">{{new Date(post.created_at).toLocaleDateString()}}</span>
-      <div class="content">
-        {{{ post.body }}}
-      </div>
+      <div class="content" v-html="post.body"></div>
     </article>
   </script>
   <script src="https://unpkg.com/vue@2.6.6/dist/vue.js"></script>
