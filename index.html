@@ -17,15 +17,15 @@
         <router-view></router-view>
       </main>
     </div>
+    <footer class="view__footer">
+      <p class="copyright text-muted">
+        Copyright &copy;Yang Jin<br>
+        Powered by <a href="http://yangseas.github.io">YangJin Blog</a> |
+        <iframe style="margin-left: 2px; margin-bottom:-5px;" frameborder="0" scrolling="0" width="100px" height="20px" src="https://ghbtns.com/github-btn.html?user=yangseas&repo=yangseas.github.io&type=star&count=true">
+        </iframe>
+      </p>
+    </footer>
   </div>
-  <footer class="footer">
-    <p class="copyright text-muted">
-      Copyright &copy;Yang Jin<br>
-      Powered by <a href="http://yangseas.github.io">YangJin Blog</a> |
-      <iframe style="margin-left: 2px; margin-bottom:-5px;" frameborder="0" scrolling="0" width="100px" height="20px" src="https://ghbtns.com/github-btn.html?user=yangseas&repo=yangseas.github.io&type=star&count=true">
-      </iframe>
-    </p>
-  </footer>
   <!-- postList template -->
   <script type="text/template" id="postList">
     <div class="contentPost">
@@ -76,17 +76,17 @@
   </script>
   <!-- postDetail template -->
   <script type="text/template" id="postDetail">
-    <article class="post">
-      <h2>
+    <article class="detailBox">
+      <h2 class="post__title">
         <router-link :to="{ name: 'postDetail', params: { id: post.number }}">{{ post.title }}</router-link>
+        <i class="post__tag" v-for="label in post.labels" :key="label.name" :style="{backgroundColor: '#' + label.color}">
+          <router-link :to="{name: 'labelPost', params: {name: label.name}}">
+            {{label.name}}
+          </router-link>
+        </i>
       </h2>
-      <ul class="tags" v-for="label in post.labels">
-        <li class="tag">
-          <router-link :to="{ name: 'labelPost', params: { name: label.name }}">{{label.name}}</router-link>
-        </li>
-      </ul>
-      <span class="time">{{new Date(post.created_at).toLocaleDateString()}}</span>
-      <div class="content" v-html="post.body"></div>
+      <span class="post__time">{{new Date(post.created_at).toLocaleDateString()}}</span>
+      <div class="post__content" v-html="post.body"></div>
     </article>
   </script>
   <script src="https://unpkg.com/vue@2.6.6/dist/vue.js"></script>

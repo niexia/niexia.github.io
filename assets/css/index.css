@@ -1,18 +1,24 @@
 @import './reset.css';
 @import './animate.css';
+
 body {
   line-height: 1.8;
   color: rgba(0, 0, 0, .8);
   font-family: "Hiragino Sans GB", "Microsoft YaHei", STHeiti, "WenQuanYi Micro Hei", Helvetica, Arial, sans-serif;
   background-color: #fff;
 }
+
+/* layout */
 #app {
+  display: flex;
+  flex-direction: column;
   margin-left: auto;
   margin-right: auto;
   max-width: 700px;
   min-height: 100%;
 }
 .view__wrapper {
+  flex: 1;
   overflow: auto;
   padding-bottom: 100px;
 }
@@ -33,6 +39,18 @@ body {
 .view__wrapper .view__content{
   transition: all .5s;
   -webkit-transition: all .5s;
+}
+.view__footer {
+  flex-shrink: 0;
+  margin-top: -100px;
+  height: 100px;
+  text-align: center;
+  font-size: 12px;
+  font-family: Palatino, Optima, Georgia, serif;
+  font-style: italic;
+  padding-top: 40px;
+  letter-spacing: 1px;
+  color: rgba(0, 0, 0, 0.5);
 }
 
 /* postList */
@@ -69,54 +87,51 @@ body {
   font-style: italic;
 }
 
-.post .title {
-  font-size: 22px;
+/* postDetail */
+.detailBox .post__title {
+  font-size: 26px;
 }
-
-.post .tags {
+.detailBox .post__tag {
   display: inline-block;
+  height: 15px;
+  line-height: 15px;
+  padding: .15em 4px;
+  margin-right: 1em;
+  vertical-align: middle;
+  border-radius: 2px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
 }
-
-.post .tag {
-  display: inline-block;
-  margin-right: 5px;
-  font-size: 14px;
+.detailBox .post__tag:hover {
+  color: #000;
 }
-
-.post .time {
-  font-size: 14px;
-  font-style: italic;
-  color: rgba(0, 0, 0, 0.5);
+.detailBox .post__time {
+  font-size: 16px;
 }
-
-.post .content {
+.detailBox .post__content {
   margin-top: 20px;
   margin-bottom: 20px;
 }
-
-.post .content p {
+.detailBox .post__content p {
   margin-bottom: 20px;
 }
-
-.post .content a {
+.detailBox .post__content a {
   color: rgba(0, 0, 0, .7);
   border-bottom: 1px dashed rgba(0, 0, 0, .5);
 }
-
-.post .content a:hover {
+.detailBox .post__content a:hover {
   color: rgba(0, 0, 0, .8);
   border-bottom: 1px solid rgba(0, 0, 0, .8);
 }
-
-.post .content code {
+.detailBox .post__content code {
   margin: 0 6px;
   padding: 0 6px;
   color: black;
   background: rgba(240, 240, 240, 1);
   font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
-
-.post .content pre {
+.detailBox .post__content pre {
   position: relative;
   padding: 20px 20px 10px;
   margin-bottom: 20px;
@@ -129,37 +144,21 @@ body {
   -o-tab-size: 4;
   tab-size: 4;
 }
-
-.post .content pre:before {
+.detailBox .post__content pre:before {
   content: '--CODE--';
   position: absolute;
   right: 10px;
   top: 6px;
   color: rgba(0, 0, 0, 0.5);
 }
-
-.post .content pre code {
+.detailBox .post__content pre code {
   padding: 0;
   margin: 0;
 }
 
+/* page */
 .pagination {
   text-transform: uppercase;
   font-size: 12px;
   color: rgba(0, 0, 0, 0.5);
-}
-
-.footer {
-  margin-top: -100px;
-  height: 100px;
-  text-align: center;
-  font-size: 12px;
-  font-family: Palatino, Optima, Georgia, serif;
-  font-style: italic;
-  letter-spacing: 1px;
-  color: rgba(0, 0, 0, 0.5);
-}
-
-.footer p {
-  padding-top: 40px;
 }
