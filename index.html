@@ -11,7 +11,7 @@
     <div class="view__wrapper">
       <header class="view__header">
         <h1 class="header__title"><a href="">YangJin Blog</a></h1>
-        <p class="header__bio">前端开发工程师 努力搬砖 不想坑 什么时候也造个轮子</p>
+        <p class="header__bio">前端开发工程师 努力搬砖 什么时候也造个轮子</p>
       </header>
       <main class="view__content">
         <router-view></router-view>
@@ -19,7 +19,12 @@
     </div>
   </div>
   <footer class="footer">
-    <p>Powered by <a href="https://github.com/yangseas" target="_blank">YangJin</a></p>
+    <p class="copyright text-muted">
+      Copyright &copy;Yang Jin<br>
+      Powered by <a href="http://yangseas.github.io">YangJin Blog</a> |
+      <iframe style="margin-left: 2px; margin-bottom:-5px;" frameborder="0" scrolling="0" width="100px" height="20px" src="https://ghbtns.com/github-btn.html?user=yangseas&repo=yangseas.github.io&type=star&count=true">
+      </iframe>
+    </p>
   </footer>
   <!-- postList template -->
   <script type="text/template" id="postList">
@@ -43,10 +48,11 @@
             </li>
           </ul>
           <div class="item__preview">
-            {{post.body}}
+            <p v-if="post.body.length < 200">{{post.body.replace(/[`#->\*\[\]]/g, '')}}</p>
+            <p v-else>{{post.body.substr(0, 200).replace(/[`#->\*\[\]]/g, '')}}...</p>
           </div>
           <p class="item__time">
-            Posted By YangJin on {{post.created_at}}
+            Posted By YangJin on {{formatDate(new Date(post.created_at), 'yyyy-MM-dd hh:mm:ss')}}
           </p>
         </div>
       </div>
