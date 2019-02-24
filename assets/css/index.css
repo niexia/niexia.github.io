@@ -10,7 +10,12 @@ body {
 
 /* layout */
 #app {
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
   flex-direction: column;
   margin-left: auto;
   margin-right: auto;
@@ -18,11 +23,19 @@ body {
   min-height: 100%;
 }
 .view__wrapper {
+  -webkit-box-flex: 1;
+  -ms-flex: 1;
   flex: 1;
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
   flex-direction: column;
 }
 .view__wrapper .view__header {
+  -ms-flex-negative: 0;
   flex-shrink: 0;
   position: relative;
   padding-bottom: 10px;
@@ -37,18 +50,33 @@ body {
   color: #bdbdbd;
 }
 .view__wrapper .view__content{
+  -webkit-box-flex: 1;
+  -ms-flex: 1;
   flex: 1;
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
   flex-direction: column;
   transition: all .5s;
   -webkit-transition: all .5s;
 }
 .view__wrapper .view__content > div {
+  -webkit-box-flex: 1;
+  -ms-flex: 1;
   flex: 1;
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
   flex-direction: column;
 }
 .view__footer {
+  -ms-flex-negative: 0;
   flex-shrink: 0;
   height: 100px;
   text-align: center;
@@ -62,6 +90,8 @@ body {
 
 /* postList */
 .postBox {
+  -webkit-box-flex: 1;
+  -ms-flex: 1;
   flex: 1;
 }
 .postBox .post__item {
@@ -109,8 +139,15 @@ body {
 
 /* postDetail */
 .detailBox {
+  -webkit-box-flex: 1;
+  -ms-flex: 1;
   flex: 1;
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
   flex-direction: column;
 }
 .detailBox .post__title {
@@ -135,6 +172,8 @@ body {
   font-size: 16px;
 }
 .detailBox .post__content {
+  -webkit-box-flex: 1;
+  -ms-flex: 1;
   flex: 1;
   margin-top: 20px;
   margin-bottom: 20px;
@@ -190,9 +229,17 @@ body {
 
 /* loading */
 .loadingBox {
+  -webkit-box-flex: 1;
+  -ms-flex: 1;
   flex: 1;
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
   justify-content: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
   align-items: center;
   position: relative;
 }
