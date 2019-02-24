@@ -1,4 +1,18 @@
-var CACHE = {};
+Date.prototype.Format = function (format) {
+  var o = {
+    "M+": this.getMonth() + 1,
+    "d+": this.getDate(),
+    "h+": this.getHours(),
+    "m+": this.getMinutes(),
+    "s+": this.getSeconds(),
+    "q+": Math.floor((this.getMonth() + 3) / 3),
+    "S": this.getMilliseconds()
+  };
+  if (/(y+)/.test(format)) format = format.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+  for (var k in o)
+    if (new RegExp("(" + k + ")").test(format)) format = format.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+  return format;
+}
 
 var PostList = Vue.extend({
   template: '#postList',
@@ -7,9 +21,15 @@ var PostList = Vue.extend({
       posts: [],
       prePage: 0,
       nextPage: 0,
-      isHome: true,
-      label: ''
+      notLabel: true,
+      label: '',
+      loading: false
     };
+  },
+  watch: {
+    '$route': function(to, from) {
+      this.handleGetPostList();
+    }
   },
   mounted: function() {
     this.handleGetPostList();
@@ -18,79 +38,45 @@ var PostList = Vue.extend({
     handleGetPostList: function() {
       var params = this.$route.params;
       var page = params.page || 1;
-      var isHome = true;
+      var notLabel = true;
       var label = '';
-      var cache = CACHE[label + '-' + page];
+      this.loading = true;
       if (params.name) {
         label = params.name;
-        isHome = false;
-      }
-      if (cache) {
-        this.posts = cache.posts;
-        this.prePage = cache.prePage;
-        this.nextPage = cache.nextPage;
-        this.isHome = cache.isHome;
-        this.label = cache.label;
-        return;
+        notLabel = false;
       }
       this.$http.get('https://api.github.com/repos/' + config['user'] + '/' + config['repo'] + '/issues',
         {
           params: {
             creator: config['user'],
             page: page,
-            labels: label
+            per_page: config['per_page'],
+            labels: label,
           }
         }).then(function(response) {
         console.log(response);
+        console.log(response.headers.map['link'])
         var data = response.data;
         var prePage = false;
         var nextPage = false;
-        var link = response.headers['Link'];
+        var link = (response.headers.map['link'] || [])[0];
         if (link && link.indexOf('rel="prev"') > 0) prePage = parseInt(page) - 1;
         if (link && link.indexOf('rel="next"') > 0) nextPage = parseInt(page) + 1;
         this.posts = data;
         console.log(data);
         this.prePage = prePage;
         this.nextPage = nextPage;
-        this.isHome = isHome;
+        this.notLabel = notLabel;
         this.label = label;
+        this.loading = false;
         var title = config['blogname'];
         if (page != 1) title = 'Page ' + page + config['sep'] + title;
         if (label) title = label + config['sep'] + title;
         document.title = title;
-        CACHE[label + '-' + page] = {
-          posts: data,
-          prePage: prePage,
-          nextPage: nextPage,
-          isHome: isHome,
-          label: label
-        };
-        data.forEach(function(post) {
-          if (!CACHE['post' + post.id]) {
-            CACHE['post'+ post.id] = {
-              post: post
-            }
-          }
-        })
       }).catch(function(error) {
         throw error;
       })
-    },
-    formatDate: function(date, format) {
-      var o = {
-        "M+": date.getMonth() + 1,
-        "d+": date.getDate(),
-        "h+": date.getHours(),
-        "m+": date.getMinutes(),
-        "s+": date.getSeconds(),
-        "q+": Math.floor((date.getMonth() + 3) / 3),
-        "S": date.getMilliseconds()
-      };
-      if (/(y+)/.test(format)) format = format.replace(RegExp.$1, (date.getFullYear() + "").substr(4 - RegExp.$1.length));
-      for (var k in o)
-        if (new RegExp("(" + k + ")").test(format)) format = format.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
-      return format;
-    },
+    }
   }
 });
 
@@ -98,7 +84,8 @@ var PostDetail = Vue.extend({
   template: '#postDetail',
   data: function() {
     return {
-      post: []
+      post: [],
+      loading: false,
     };
   },
   mounted: function () {
@@ -107,18 +94,14 @@ var PostDetail = Vue.extend({
   methods: {
     handleGetPostListDetail: function () {
       var id = this.$route.params['id'];
-      var cache = CACHE['post' + id];
-      if (cache) {
-        var data = cache.post;
-        data.body = marked(data.body);
-        this.$data.post = data;
-        return;
-      }
+      this.loading = true;
       this.$http.get('https://api.github.com/repos/' + config['user'] + '/' + config['repo'] + '/issues/' + id
         ).then(function(response) {
+        console.log(response);
         var data = response.data;
         data.body = marked(data.body);
         this.post = data;
+        this.loading = false;
         document.title = data.title + config['sep'] + config['blogname'];
       }).catch(function (error) {
         throw error;
