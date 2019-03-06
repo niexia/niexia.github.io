@@ -106,7 +106,6 @@ var PostDetail = Vue.extend({
         var data = response.data;
         data.body = marked(data.body);
         this.post = data;
-        console.log(data);
         this.loading = false;
         document.title = data.title + config['sep'] + config['blogname'];
       }).catch(function (error) {
