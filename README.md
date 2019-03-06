@@ -8,9 +8,6 @@
 
 ### Blog
 
-- [SPA]()
-- [前端路由]()
-
 ### 感谢
 - [vue.js](https://github.com/vuejs/vue)
 - [vue-router](https://github.com/vuejs/vue-router)
