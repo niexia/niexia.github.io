@@ -1,6 +1,6 @@
 ### Yang Jin
 
-> 现在是一个前端工程师，努力学习工程化、Vue 源码以及 express。
+现在是一个前端工程师，努力学习工程化、Vue 源码以及 express。
 
 ### Blog
 
