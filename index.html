@@ -10,9 +10,16 @@
 <body>
   <div id="app">
     <div class="view__wrapper">
-      <header class="view__header">
-        <h1 class="header__title"><a href="">YangJin Blog</a></h1>
-        <p class="header__bio">前端开发工程师 努力搬砖 什么时候也造个轮子</p>
+      <header class="view__header" v-show="headerVisible">
+        <a class="header_logo" href="#/">
+          <img src="https://avatars1.githubusercontent.com/u/28384700?v=4"></img>
+        </a>
+        <h1 class="header__name">Yang Jin</h1>
+        <p class="header__bio">frontend developer. seas the world</p>
+        <div class="header__social">
+          <a href="https://github.com/yangseas"><i class="fab fa-github"></i></a>
+          <a href="https://www.zhihu.com/people/niexia/activities">知</a>
+        </div>
       </header>
       <main class="view__content">
         <router-view></router-view>
@@ -35,25 +42,27 @@
       </div>
       <div class="postBox" v-else>
         <div class="post__item" v-for="post in posts">
-          <h2 class="item__title">
-            <router-link :to="{name: 'postDetail', params: {id: post.number}}">
-              {{ post.title }}
-            </router-link>
-          </h2>
-          <ul>
-            <li 
-              class="item__tag"
-              v-for="label in post.labels" 
-              :key="label.name" 
-              :style="{backgroundColor: '#' + label.color}">
-              <router-link :to="{name: 'labelPost', params: {name: label.name}}">
-                {{label.name}}
+          <div class="item__header">
+            <p :class="['item__title', post.labels.length > 0 && 'with-tags']">
+              <router-link :to="{name: 'postDetail', params: {id: post.number}}">
+                {{ post.title }}
               </router-link>
-            </li>
-          </ul>
+            </p>
+            <ul class="item__tagBox">
+              <li 
+                class="item__tag"
+                v-for="label in post.labels" 
+                :key="label.name" 
+                :style="{backgroundColor: '#' + label.color}">
+                <router-link :to="{name: 'labelPost', params: {name: label.name}}">
+                  {{label.name}}
+                </router-link>
+              </li>
+            </ul>
+          </div>
           <div class="item__preview">
-            <p v-if="post.body.length < 200">{{post.body.replace(/[`#->\*\[\]]/g, '')}}</p>
-            <p v-else>{{post.body.substr(0, 200).replace(/[`#->\*\[\]]/g, '')}}...</p>
+            <p v-if="post.body.length < 120">{{post.body.replace(/[`#->\*\[\]]/g, '')}}</p>
+            <p v-else>{{post.body.substr(0, 120).replace(/[`#->\*\[\]]/g, '')}}...</p>
           </div>
           <p class="item__time">
             Posted By YangJin on {{(new Date(post.created_at)).Format('yyyy-MM-dd hh:mm:ss')}}
@@ -85,17 +94,24 @@
         <i class="fas fa-spinner fa-spin fa-lg"></i>
       </div>
       <div class="detailBox" v-else>
+        <div class="post__return" @click="handleReturn"><i class="far fa-arrow-alt-circle-left"></i></div>
         <h2 class="post__title">
           <router-link :to="{ name: 'postDetail', params: { id: post.number }}">{{ post.title }}</router-link>
-          <i class="post__tag" v-for="label in post.labels" :key="label.name" :style="{backgroundColor: '#' + label.color}">
+        </h2>
+        <span class="post__time">Updated at {{(new Date(post.updated_at)).Format('yyyy-MM-dd hh:mm:ss')}}</span>
+        <div class="post__content markdown-body" v-html="post.body"></div>
+        <div class="post__tagBox" v-show="post.labels && post.labels.length">
+          <i class="fas fa-tag"></i>
+          <i v-for="label in post.labels" :key="label.name">
             <router-link :to="{name: 'labelPost', params: {name: label.name}}">
               {{label.name}}
             </router-link>
           </i>
-        </h2>
-        <span class="post__time">{{(new Date(post.created_at)).Format('yyyy-MM-dd hh:mm:ss')}}</span>
-        <div class="post__content" v-html="post.body"></div>
-        <div class="post__comment"><a :href="post.comments_url"><i class="fas fa-comment"></i> 添加评论</a></div>
+        </div>
+        <div class="post__comment">
+          <i class="far fa-comment-alt"></i>
+          <a :href="post.html_url+'#new_comment_field'" target="_blank">添加评论</a>
+        </div>
       </div>
     </div>
   </script>
@@ -103,7 +119,6 @@
   <script src="https://unpkg.com/vue-router@3.0.2/dist/vue-router.js"></script>
   <script src="https://unpkg.com/vue-resource@1.5.1/dist/vue-resource.min.js" charset="utf-8"></script>
   <script src="https://unpkg.com/marked@0.6.0/lib/marked.js" charset="utf-8"></script>
-  <script src="config.js" charset="utf-8"></script>
   <script src="index.js" charset="utf-8"></script>
 </body>
 </html>
