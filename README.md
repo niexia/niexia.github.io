@@ -1,20 +1,6 @@
-### Yang Jin
+#### 个人博客
 
-现在是一个前端工程师，努力学习工程化、Vue 源码以及 express。
+欢迎添加评论
 
-### Blog
-
-- [webpack实现多客户配置](https://github.com/yangseas/yangseas.github.io/issues/7)
-
-### Project
-
-- [admin-system](https://github.com/yangseas/admin-system)
-
-
-### 感谢
-- [vue.js](https://github.com/vuejs/vue)
-- [vue-router](https://github.com/vuejs/vue-router)
-- [vue-resource](https://github.com/vuejs/vue-resource)
-- [jQuery](http://jquery.com),
-- [marked.js](https://github.com/chjj/marked)
+喜欢这个模板的话，请 `clone` 或者 `fork`，然后自己修改一些配置。现在的配置不是很方便，你可能需要看 `index.js` 和 `index.html` 然后修改。后面学一下做成自动配置的
 
