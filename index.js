@@ -1,3 +1,11 @@
+var config = {
+  blogname: 'YangJin Blog', // 博客名称
+  sep: ' | ', // document.title 的分割
+  user: 'niexias', // GitHub账号
+  repo: 'niexias.github.io', // GitHub res名称
+  per_page: 15 // 每页多少篇博客
+};
+
 Date.prototype.Format = function (format) {
   var o = {
     "M+": this.getMonth() + 1,
@@ -32,6 +40,7 @@ var PostList = Vue.extend({
     }
   },
   mounted: function() {
+    this.$root.headerVisible = true;
     this.handleGetPostList();
   },
   methods: {
@@ -54,8 +63,6 @@ var PostList = Vue.extend({
             labels: label,
           }
         }).then(function(response) {
-        console.log(response);
-        console.log(response.headers.map['link'])
         var data = response.data;
         var prePage = false;
         var nextPage = false;
@@ -63,7 +70,6 @@ var PostList = Vue.extend({
         if (link && link.indexOf('rel="prev"') > 0) prePage = parseInt(page) - 1;
         if (link && link.indexOf('rel="next"') > 0) nextPage = parseInt(page) + 1;
         this.posts = data;
-        console.log(data);
         this.prePage = prePage;
         this.nextPage = nextPage;
         this.notLabel = notLabel;
@@ -89,15 +95,14 @@ var PostDetail = Vue.extend({
     };
   },
   mounted: function () {
+    this.$root.headerVisible = false;
     this.handleGetPostListDetail();
   },
   methods: {
     handleGetPostListDetail: function () {
       var id = this.$route.params['id'];
       this.loading = true;
-      this.$http.get('https://api.github.com/repos/' + config['user'] + '/' + config['repo'] + '/issues/' + id
-        ).then(function(response) {
-        console.log(response);
+      this.$http.get('https://api.github.com/repos/' + config['user'] + '/' + config['repo'] + '/issues/' + id).then(function(response) {
         var data = response.data;
         data.body = marked(data.body);
         this.post = data;
@@ -106,6 +111,13 @@ var PostDetail = Vue.extend({
       }).catch(function (error) {
         throw error;
       })
+    },
+    handleReturn: function () {
+      if (window.history.length > 0) {
+        window.history.back();
+      } else {
+        window.location.hash = '#/'
+      }
     }
   }
 });
@@ -142,6 +154,10 @@ var router = new VueRouter({
   routes: routes
 });
 new Vue({
-  router: router
+  router: router,
+  data: {
+    config: config,
+    headerVisible: true
+  }
 }).$mount('#app')
 
