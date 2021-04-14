@@ -6,13 +6,13 @@
 
 ### 目录
 
-- [Webpack实现多用户配置](https://github.com/niexias/niexias.github.io/issues/7)
-- [Generator与异步编程](https://github.com/niexias/niexias.github.io/issues/34)
-- [了解前端模块化](https://github.com/niexias/niexias.github.io/issues/36)
-- [浏览器页面渲染机制](https://github.com/niexias/niexias.github.io/issues/37)
-- [Q&A 你是否知道 JS](https://github.com/niexias/niexias.github.io/issues/39)
-- [浏览器的回流和重绘](https://github.com/niexias/niexias.github.io/issues/40)
-- [理解 scrollTop，offsetTop 和 clientTop 等](https://github.com/niexias/niexias.github.io/issues/41)
+- [Webpack实现多用户配置](https://github.com/niexia/niexia.github.io/issues/7)
+- [Generator与异步编程](https://github.com/niexia/niexia.github.io/issues/34)
+- [了解前端模块化](https://github.com/niexia/niexia.github.io/issues/36)
+- [浏览器页面渲染机制](https://github.com/niexia/niexia.github.io/issues/37)
+- [Q&A 你是否知道 JS](https://github.com/niexia/niexia.github.io/issues/39)
+- [浏览器的回流和重绘](https://github.com/niexia/niexia.github.io/issues/40)
+- [理解 scrollTop，offsetTop 和 clientTop 等](https://github.com/niexia/niexia.github.io/issues/41)
 
 ### 使用
 
@@ -23,4 +23,4 @@
 
 可以根据自己需要选择一项。
 
-最后，如果你喜欢这个[博客模板](https://niexias.github.io/#/)，可以 `fork`，并修改一下配置参数即可，请先了解相关 [GitHub Pages](https://pages.github.com/) 的相关知识。
+最后，如果你喜欢这个[博客模板](https://niexia.github.io/#/)，可以 `fork`，并修改一下配置参数即可，请先了解相关 [GitHub Pages](https://pages.github.com/) 的相关知识。
