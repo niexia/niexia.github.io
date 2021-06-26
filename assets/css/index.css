@@ -253,9 +253,7 @@ body {
 
 /* loading */
 .loadingBox {
-  -webkit-box-flex: 1;
-  -ms-flex: 1;
-  flex: 1;
+  min-height: 10rem;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
