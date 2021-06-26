@@ -1,9 +1,14 @@
 var config = {
-  blogname: 'YangJin Blog', // 博客名称
-  sep: ' | ', // document.title 的分割
-  user: 'niexia', // GitHub账号
-  repo: 'niexia.github.io', // GitHub res名称
-  per_page: 15 // 每页多少篇博客
+  /** 博客名称 */
+  blogname: 'YangJin Blog',
+  /** document.title 的分割 */
+  sep: ' - ',
+  /** GitHub账号 */
+  user: 'niexia', 
+  /** GitHub res 名称 */
+  repo: 'niexia.github.io',
+  /** 每页多少篇博客 */
+  per_page: 15,
 };
 
 Date.prototype.Format = function (format) {
@@ -23,6 +28,7 @@ Date.prototype.Format = function (format) {
 }
 
 var PostList = Vue.extend({
+  name: 'post',
   template: '#postList',
   data: function() {
     return {
@@ -80,13 +86,15 @@ var PostList = Vue.extend({
         if (label) title = label + config['sep'] + title;
         document.title = title;
       }).catch(function(error) {
-        throw error;
+        this.loading = false;
+        alert(error.body.message);
       })
     }
   }
 });
 
 var PostDetail = Vue.extend({
+  name: 'post-detail',
   template: '#postDetail',
   data: function() {
     return {
@@ -102,14 +110,16 @@ var PostDetail = Vue.extend({
     handleGetPostListDetail: function () {
       var id = this.$route.params['id'];
       this.loading = true;
-      this.$http.get('https://api.github.com/repos/' + config['user'] + '/' + config['repo'] + '/issues/' + id).then(function(response) {
+      this.$http.get('https://api.github.com/repos/' + config['user'] + '/' + config['repo'] + '/issues/' + id)
+      .then(function(response) {
         var data = response.data;
         data.body = marked(data.body);
         this.post = data;
         this.loading = false;
         document.title = data.title + config['sep'] + config['blogname'];
       }).catch(function (error) {
-        throw error;
+        this.loading = false;
+        alert(error.body.message)
       })
     },
     handleReturn: function () {
@@ -122,7 +132,42 @@ var PostDetail = Vue.extend({
   }
 });
 
-// 定义路由
+var Project = Vue.extend({
+  name: 'project',
+  template: '#project',
+  data: function () {
+    return {
+      projects: [],
+      loading: false,
+    };
+  },
+  mounted: function () {
+    this.getProjectList();
+  },
+  methods: {
+    getProjectList: function() {
+      /**
+       * GitHub Api 没有提供相关的 restful api 直接去获取 pinned 的项目
+       * 这个接口通过直接获取用户的首页信息，通过 dom 去查找对应的 pinned 进行返回
+       * https: //stackoverflow.com/questions/43352056/how-do-i-make-an-api-call-to-github-for-a-users-pinned-repositories
+       */
+      this.loading = true;
+      this.$http.get('https://gh-pinned-repos-5l2i19um3.vercel.app/', {
+        params: {
+          username: config.user
+        }
+      }).then(function (response) {
+        this.projects = response.body;
+        this.loading = false;
+        document.title = 'project' + config['sep'] + config['blogname'];
+      }).catch(function (error) {
+        this.loading = false;
+        alert('Failed to get project list')
+      })
+    }
+  },
+})
+
 var routes = [
   {
     path: '/',
@@ -145,14 +190,20 @@ var routes = [
     name: 'postDetail',
     component: PostDetail
   }, {
+    path: '/project',
+    name: 'project',
+    component: Project
+  }, {
     path: '*',
     name: 'default',
     component: PostList
   }
 ];
+
 var router = new VueRouter({
   routes: routes
 });
+
 new Vue({
   router: router,
   data: {

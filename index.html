@@ -9,38 +9,41 @@
 </head>
 <body>
   <div id="app">
-    <div class="view__wrapper">
-      <header class="view__header" v-show="headerVisible">
-        <a class="header_logo" href="#/">
-          <img src="https://avatars1.githubusercontent.com/u/28384700?v=4"></img>
-        </a>
-        <h1 class="header__name">Yang Jin</h1>
-        <p class="header__bio">frontend developer. seas the world</p>
-        <div class="header__social">
-          <a href="https://github.com/niexia"><i class="fab fa-github"></i></a>
-          <a href="https://www.zhihu.com/people/niexia/activities">知</a>
-        </div>
-      </header>
-      <main class="view__content">
-        <router-view></router-view>
-      </main>
+    <div class="view__header">
+      <a href="#/" class="header_logo">
+        <img src="assets/img/android-chrome-512x512.png" alt="logo">
+      </a>
+      <nav class="header__nav" v-show="headerVisible">
+        <router-link to="/">Blog</router-link>
+        <router-link to="project">Project</router-link>
+        <a href="https://github.com/niexia" target="_blank"><i class="fab fa-github"></i></a>
+      </nav>
     </div>
-    <footer class="view__footer">
-      <p class="copyright text-muted">
-        Copyright &copy;Yang Jin<br>
-        Powered by <a href="http://niexia.github.io">YangJin Blog</a> |
-        <iframe style="margin-left: 2px; margin-bottom:-5px;" frameborder="0" scrolling="0" width="100px" height="20px" src="https://ghbtns.com/github-btn.html?user=niexia&repo=niexia.github.io&type=star&count=true">
-        </iframe>
-      </p>
-    </footer>
+    <div class="view__wrapper">
+      <router-view class="view__content"></router-view>
+      <div class="view__footer">
+        <p class="copyright text-muted">
+          Copyright &copy;Yang Jin<br>
+          Powered by <a href="http://niexia.github.io">YangJin Blog</a> |
+          <iframe style="margin-left: 2px; margin-bottom:-5px;" frameborder="0" scrolling="0" width="100px"
+            height="20px"
+            src="https://ghbtns.com/github-btn.html?user=niexia&repo=niexia.github.io&type=star&count=true">
+          </iframe>
+        </p>
+      </div>
+    </div>
   </div>
   <!-- postList template -->
   <script type="text/template" id="postList">
-    <div class="contentPost">
+    <div class="post">
       <div class="loadingBox" v-if="loading">
         <i class="fas fa-spinner fa-spin fa-lg"></i>
       </div>
       <div class="postBox" v-else>
+        <div class="catalog">
+          <h3 class="catalog__title">Blog</h3>
+          <h5 class="catalog__hint">Personal blog by Yang Jin</h5>
+        </div>
         <div class="post__item" v-for="post in posts">
           <div class="item__header">
             <p :class="['item__title', post.labels.length > 0 && 'with-tags']">
@@ -111,6 +114,32 @@
         <div class="post__comment">
           <i class="far fa-comment-alt"></i>
           <a :href="post.html_url+'#new_comment_field'" target="_blank">添加评论</a>
+        </div>
+      </div>
+    </div>
+  </script>
+  <!-- project template -->
+  <script type="text/template" id="project">
+    <div class="project">
+      <div class="loadingBox" v-if="loading">
+        <i class="fas fa-spinner fa-spin fa-lg"></i>
+      </div>
+      <div class="postBox" v-else>
+        <div class="catalog">
+          <h3 class="catalog__title">Project</h3>
+          <h5 class="catalog__hint">List of projects that i like</h5>
+        </div>
+        <div class="post__item" v-for="project in projects">
+          <div class="item__header">
+            <p class="item__title">
+              <a :href="project.link" target="_blank">
+                {{ project.repo }}
+              </a>
+            </p>
+          </div>
+          <div class="item__preview">
+            <p>{{ project.description }}</p>
+          </div>
         </div>
       </div>
     </div>
