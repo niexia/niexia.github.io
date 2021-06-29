@@ -23,4 +23,10 @@
 
 可以根据自己需要选择一项。
 
-最后，如果你喜欢这个[博客模板](https://niexia.github.io/#/)，可以 `fork`，并修改一下配置参数即可，请先了解相关 [GitHub Pages](https://pages.github.com/) 的相关知识。
+### 喜欢这个模板
+
+最后，如果你喜欢这个[博客模板](https://niexia.github.io/#/) 🎉    
+1. 可以 `fork` 我这个定义好的模板[issues-blog-template](https://github.com/niexia/issues-blog-template)，只需要一些简单的配置就可以开始啦！
+2. 或者安装 `portable-cli`，然后通过 `portable-cli create blog yourProjectName` 来完成创建
+
+可以先了解相关 [GitHub Pages](https://pages.github.com/) 的相关知识。
