@@ -23,7 +23,7 @@
 
 可以根据自己需要选择一项。
 
-### blog 模板
+### Blog 模板
 
 最后，如果你喜欢这个[博客模板](https://niexia.github.io/#/)，可以通过一下方式直接使用。可以先了解相关 [GitHub Pages](https://pages.github.com/) 的相关知识
 - `fork` 我这个定义好的模板[issues-blog-template](https://github.com/niexia/issues-blog-template)，只需要一些简单的配置就可以开始啦！
