@@ -1,6 +1,6 @@
 var config = {
   /** 博客名称 */
-  blogname: 'YangJin Blog',
+  blogname: "YangJin's Blog",
   /** document.title 的分割 */
   sep: ' - ',
   /** GitHub账号 */
@@ -8,7 +8,7 @@ var config = {
   /** GitHub res 名称 */
   repo: 'niexia.github.io',
   /** 每页多少篇博客 */
-  per_page: 15,
+  per_page: 10,
 };
 
 Date.prototype.Format = function (format) {
@@ -152,12 +152,11 @@ var Project = Vue.extend({
        * https: //stackoverflow.com/questions/43352056/how-do-i-make-an-api-call-to-github-for-a-users-pinned-repositories
        */
       this.loading = true;
-      this.$http.get('https://gh-pinned-repos-5l2i19um3.vercel.app/', {
-        params: {
-          username: config.user
-        }
-      }).then(function (response) {
-        this.projects = response.body;
+      this.$http.get('https://api.github.com/users/niexia/repos?per_page=100').then(function (response) {
+        this.projects = response.body
+          .filter(item => item.stargazers_count >= 2 && !item.archived)
+          .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
+          .sort((a, b) => b.stargazers_count - a.stargazers_count)
         this.loading = false;
         document.title = 'project' + config['sep'] + config['blogname'];
       }).catch(function (error) {

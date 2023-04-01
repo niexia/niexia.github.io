@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>YangJin Blog</title>
+  <title>Blog</title>
   <link rel="shortcut icon" href="favicon.ico">
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
   <link rel="stylesheet" href="assets/css/index.css" media="screen" charset="utf-8">
@@ -10,9 +10,7 @@
 <body>
   <div id="app">
     <div class="view__header">
-      <a href="#/" class="header_logo">
-        <img src="assets/img/android-chrome-512x512.png" alt="logo">
-      </a>
+      <a href="#/" class="header_logo">👨🏻‍💻</a>
       <nav class="header__nav" v-show="headerVisible">
         <router-link to="/">Blog</router-link>
         <router-link to="project">Project</router-link>
@@ -42,7 +40,7 @@
       <div class="postBox" v-else>
         <div class="catalog">
           <h3 class="catalog__title">Blog</h3>
-          <h5 class="catalog__hint">Personal blog by Yang Jin</h5>
+          <h5 class="catalog__hint">个人博客，主要是工作、生活思考总结相关，偶尔也记录一些遇到的问题，不定时更新。</h5>
         </div>
         <div class="post__item" v-for="post in posts">
           <div class="item__header">
@@ -127,13 +125,13 @@
       <div class="postBox" v-else>
         <div class="catalog">
           <h3 class="catalog__title">Project</h3>
-          <h5 class="catalog__hint">List of projects that i like</h5>
+          <h5 class="catalog__hint">正在聚焦的、有趣的项目，包括整理的笔记教程、工具开发等。</h5>
         </div>
         <div class="post__item" v-for="project in projects">
           <div class="item__header">
             <p class="item__title">
-              <a :href="project.link" target="_blank">
-                {{ project.repo }}
+              <a :href="project.html_url" target="_blank">
+                {{ project.name }}
               </a>
             </p>
           </div>
