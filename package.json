@@ -15,7 +15,8 @@
     "@types/mdx": "^2.0.13",
     "next": "15.3.4",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "sugar-high": "^0.9.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
