@@ -1,0 +1,133 @@
+浏览器的内核是指支持浏览器运行的最核心的程序，分为两个部分的，一是渲染引擎，另一个是 JS 引擎。目前市面上常见的浏览器内核可以分为这四种：Trident（IE）、Gecko（火狐）、Blink（Chrome、Opera）、Webkit（Safari）。这里面大家最耳熟能详的可能就是 Webkit 内核了。
+
+## 页面加载过程
+
+页面的加载过程，主要有五个步骤：
+
+- DNS 查询
+- TCP 连接
+- HTTP 请求即响应
+- 服务器响应
+- 客户端渲染
+
+浏览器得到的其实就是一堆 HMTL 格式的字符串，因为只有 HTML 格式浏览器才能正确解析，这是 W3C 标准的要求。最后将它们渲染出来。
+
+## 浏览器的渲染过程
+
+把 HTML、CSS、JavaScript 等数据作为输入，经过渲染模块的处理，最终输出为屏幕上的像素。
+
+渲染模块在执行过程中会分为很多子节点，接下来看看：
+
+### 构建 DOM 树
+
+无法直接理解和使用 HTML，所以需要将 HTML 转换为浏览器能够理解的结构——DOM 树。
+
+![javascript-browser-render-eg1](https://user-images.githubusercontent.com/28384700/69311865-5dea7500-0c68-11ea-9917-69270c08eccb.png)
+
+### 样式计算（Recalculate Style）
+
+计算出 DOM 节点中每个元素的具体样式，这个阶段大体可分为三步来完成：
+
+1. 把 CSS 转换为浏览器能够理解的结构，会把获取到的 CSS 文本都转成 styleSheets，可以在控制台输入 `document.styleSheets` 查看。
+
+![javascript-browser-render-eg2](https://user-images.githubusercontent.com/28384700/69311874-63e05600-0c68-11ea-8022-e9b08ca0036f.png)
+
+2. 转换样式表中的属性值，使其标准化：
+
+```css
+body { font-size: 20px }
+p {color:blue;}
+span  {display: none}
+
+/* 标准化为 */
+body { font-size: 20px }
+p {color:rgb(0, 128, 0);}
+span  {display: none}
+```
+
+3. 计算出 DOM 树中每个节点的具体样式
+
+```css
+body { font-size: 20px }
+p {color:blue;}
+span  {display: none}
+div {font-weight: bold;color:red}
+div  p {color:green;}
+```
+
+```html
+<body>
+  <p><span>重点介绍</span>渲染流程</p>
+  <div>
+    <p>green</p>
+    <div>red</div>
+  </div>
+</body>
+```
+
+那就就会得到这样的树：
+
+![javascript-browser-render-eg3](https://user-images.githubusercontent.com/28384700/69311883-6a6ecd80-0c68-11ea-913f-8a0a8b85befb.png)
+
+### 布局阶段
+
+有 DOM 树和 DOM 树中元素的样式，接下来就要计算可见元素的位置，这就是布局。
+
+1. 创建布局树，构建一棵只包含可见元素的布局树。
+
+![javascript-browser-render-eg4](https://user-images.githubusercontent.com/28384700/69311896-7064ae80-0c68-11ea-837c-5502837bdb1d.png)
+
+2. 布局计算，计算布局树中节点的坐标位置，并将计算结果写回到布局树中。
+
+### 分层
+
+有了布局树，接下来并不是直接绘制，而是需要先分层。因为页面中有很多复杂的效果，如一些复杂的 3D 变换、页面滚动，或者使用 z-indexing 做 z 轴排序等。为了显示这些效果，需要为特定节点生成专用图层，并生成一棵对应的**图层树**（Layer Tree）。就类似于 PS 中的图层。
+
+![javascript-browser-render-eg5](https://user-images.githubusercontent.com/28384700/69311907-75296280-0c68-11ea-9eae-7d3d12af0f3c.png)
+
+### 图层绘制
+
+在完成图层树的构建之后，渲染引擎会对图层树中的每个图层进行绘制。
+
+### 栅格化（raster）
+
+当图层的绘制列表准备好之后，主线程会把该绘制列表提交（commit）给合成线程。
+
+用户最先看到的页面是视口（viewport）部分，把图层分成块，合成线程会按照视口附近的图块来优先生成位图，实际生成位图的操作是由栅格化来执行的。
+
+**所谓栅格化，是指将图块转换为位图。**
+
+通常栅格化的过程还需要 GPU 加速生成，使用 GPU 生成位图的过程叫做快速栅格化或者 GPU 栅格化。GPU 生成的位图块保存在 GPU 的内存中。
+
+### 合成和显示
+
+所有图块都被光栅化，合成线程就会生成一个绘制图块的命令 `DrawQuad`，然后将该命令提交给浏览器进程。浏览器进程根据 `DrawQuad` 命令，将页面内容绘制到内存中，最后将内容显示到屏幕上。
+
+这就是整个完整的流程，从 HTML 到 DOM、样式计算、布局、图层、图层绘制、栅格化、合成和显示。
+
+![javascript-browser-render-eg6](https://user-images.githubusercontent.com/28384700/69311912-7a86ad00-0c68-11ea-9e3f-a3e7443cb027.png)
+
+## 最后再看看重排和重绘
+
+重排（reflow)和重绘（repaint）对性能优化有很多的影响，这里理解它们的影响范围，更详细的可以看[浏览器的回流和重绘](https://github.com/niexias/niexias.github.io/issues/40)。
+
+### 重排 - 更新了元素的几何属性
+
+通过 JavaScript 或者 CSS 修改元素的几何位置属性，例如改变元素的宽度、高度等，那么浏览器会触发重新布局，解析之后的一系列子阶段，这个过程就叫重排。
+
+![javascript-browser-render-eg7](https://user-images.githubusercontent.com/28384700/69311920-81adbb00-0c68-11ea-8334-d10be05b3c4b.png)
+
+无疑，重排需要更新完整的渲染流水线，所以开销也是最大的。
+
+### 重绘 - 更新了元素的绘制属性
+
+比如通过 JavaScript 更改某些元素的背景颜色，那么布局阶段将不会被执行，因为并没有引起几何位置的变换，所以就直接进入了绘制阶段，然后执行之后的一系列子阶段，这个过程就叫重绘。
+
+![javascript-browser-render-eg8](https://user-images.githubusercontent.com/28384700/69311928-87a39c00-0c68-11ea-8871-b393a5ac123f.png)
+
+相较于重排操作，重绘省去了布局和分层阶段，所以执行效率会比重排操作要高一些。
+
+## 参考
+
+- [导航流程：从输入URL到页面展示，这中间发生了什么？](https://time.geekbang.org/column/article/117637)
+

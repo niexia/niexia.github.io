@@ -1,0 +1,114 @@
+# exec、test 和 match 
+
+我们知道 `exec` 和 `test` 都是 RegExp 实例的方法，看看如何使用它们，另外 `exec` 和 `match` 有什么区别？
+
+## exec
+
+`exec()` 专门为**捕获组**而设计的。
+
+`exec` 接受一个参数，即要应用模式的字符串，然后返回包含第一个匹配项信息的数组，没有任何匹配项时返回 `null`。
+
+返回的虽然是个数组，但是包含两个额外的属性：`index` 和 `input`。
+
+1. `index`：表示匹配项在字符串中的位置。
+2. `input`：表示正在应用正则表达式的字符串。
+
+**在数组中，第一项是整个模式匹配的字符串，其他项是与模式中的捕获组匹配的字符串（如果没有捕获组，则数组只包含一项）**。
+
+```js
+var str = 'mom and dad and bady';
+var pattern = /mom( and dad( and bady)?)?/gi;
+
+var result = pattern.exec(str);
+
+console.log(result.index) // 0
+console.log(result.input) // "mom and dad and bady"
+console.log(result[0])    // "mom and dad and bady"
+console.log(result[1])    // " and dad and bady"
+console.log(result[2])    // " and bady"
+```
+
+**注意**：**对于 `exec` 而言，即使子啊模式中设置了全局标志 `g`，它每次只返回一个匹配项，每次调用 `exec` 都会在字符串中继续查找新的匹配项，直至字符串的末尾**。在不设置全局标志的情况下，在同一个字符串上多次调用 `exec` 始终返回第一个匹配项的信息。
+
+```js
+var str = "cat,bat,eat"
+var pattern1 = /.at/
+
+var result = pattern1.exec(str);
+console.log(result.index)       // 0
+console.log(result[0])          // cat
+console.log(pattern1.lastIndex) // 0
+
+var result = pattern1.exec(str);
+console.log(result.index)       // 0
+console.log(result[0])          // cat
+console.log(pattern1.lastIndex) // 0
+
+var str = "cat,bat,eat"
+var pattern2 = /.at/g
+
+var result = pattern2.exec(str);
+console.log(result.index)       // 0
+console.log(result[0])          // cat
+console.log(pattern2.lastIndex) // 3
+
+var result = pattern2.exec(str);
+console.log(result.index)       // 4
+console.log(result[0])          // bat
+console.log(pattern2.lastIndex) // 7
+```
+
+## test
+
+`test` 方法接受一个字符串参数，在模式与该参数匹配的情况下返回 `true`；否则返回 `false`。
+
+如果只想知道目标字符串与某个模式是否皮撇，但是不需要知道其文本内容的情况下，使用这个方法很方便。因此 `test` 常用来做判断。
+
+```js
+var str = "0933-2331-9732"
+var pattern = /\d{4}-\d{4}-\d{4}/
+
+if (pattern.test(str)) {
+  console.log('号码格式正确');
+}
+```
+
+## exec 和 match 的区别
+
+说到 `exec()` 很容易就想到字符串的一个方法 `match()`，它们之间有什么区别呢？
+
+```js
+var str = "cat,bat,eat"
+var pattern = /.at/
+
+pattern.exec(str)
+str.match(pattern)
+```
+
+**它们的区别有 2 点：首先这两个方法属于不同的类，另外重要的一点是跟 `g` 有关**。
+
+- 没有 `g` 的情况下，它们返回的结果是一致的
+- 设置了 `g` 之后，`exec` 只返回第一个匹配项，而 `match` 会所有匹配项组成的一个数组，同时，返回的数组不再带有 `index` 和 `input` 属性。
+
+```js
+var str = "cat,bat,eat"
+var pattern = /.at/
+
+pattern.exec(str)  // ['cat']
+str.match(pattern) // ['cat']
+```
+
+![javascript-regexp-exec1](https://user-images.githubusercontent.com/28384700/67258710-7a0dc180-f4c4-11e9-859b-0b34c8974724.png)
+
+```js
+
+var str = "cat,bat,eat"
+var pattern = /.at/g
+
+pattern.exec(str)  // ['cat']
+str.match(pattern) // ['cat','bat,'eat']
+```
+
+![javascript-regexp-exec2](https://user-images.githubusercontent.com/28384700/67258717-8265fc80-f4c4-11e9-9b23-2e13854fbfee.png)
+
+

@@ -1,0 +1,104 @@
+记录一些“常用”的使用方式
+
+## .gitignore
+
+有些时候，你必须把某些文件放到 git 工作目录中，但又不能提交它们，例如打包生成的 `dist` 文件。在 git 工作区的根目录下创建一个特殊的 `.gitignore` 文件，然后把要忽略的文件名填进去，git 就会自动忽略这些文件。
+
+这里可以看一下 element 的 `.gitignore`
+
+```
+node_modules
+.DS_Store
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+lerna-debug.log
+npm-debug.log.*
+yarn-debug.log.*
+yarn-error.log.*
+lerna-debug.log.*
+lib
+.idea
+.vscode
+examples/element-ui
+examples/pages/en-US
+examples/pages/zh-CN
+examples/pages/es
+examples/pages/fr-FR
+fe.element/element-ui
+.npmrc
+coverage
+waiter.config.js
+build/bin/algolia-key.js
+.envrc
+```
+
+### 忽略原则
+
+-  忽略操作系统自动生成的文件；
+-  忽略编译生成的中间文件、可执行文件等，也就是如果一个文件是通过另一个文件自动生成的，那自动生成的文件就没必要放进版本库；
+-  忽略你自己的带有敏感信息的配置文件，比如存放口令的配置文件。
+
+### 文件提交不了
+
+如果配置了 `.gitignore` 之后，发现有某个文件添加不进去，原因是被忽略了。例如你现在要添加 `node_modules`，那么就会提示已经被忽略，当然可以通过加上 `-f` 来强制添加。
+
+```
+$ git add node_modules
+The following paths are ignored by one of your .gitignore files:
+node_modules
+Use -f if you really want to add them.
+```
+
+另外还可以通过 `git check-ignore` 检查被哪条定义的规则忽略了：
+
+```
+$ git check-ignore -v node_modules
+.gitignore:2:node_modules/      node_modules
+```
+
+### 已经提交过的如何忽略
+
+之前在提交代码时，`.gitignore` 没有填写完整，例如导致 `npm run build` 生成的 `dist` 文件被提交了。然后每次重新打包项目，`dist` 都会更新，将 `dist` 填写到`.gitignore` 规则中,但是运行 `git status` 的时候，依然能看到这些文件。
+
+这时因为 `.gitignore` 文件只能作用于 `Untracked Files`，也就是那些从来没有被 git 记录过的文件（自添加以后，从未 `add` 及 `commit` 过的文件）。而 `dist` 已经被我们提交过来，git 已经追踪。这时候再修改 `.gitignore` 是无效的。
+
+解决方法是：
+
+```
+git rm -r --cached dist
+```
+
+然后更新 `.gitignore` 忽略掉目标文件，最后再提交即可。
+
+## 查看 commit 中修改的文件
+
+- `git log --name-status`：每次修改的文件列表、状态（新增编辑等）
+
+![image](https://user-images.githubusercontent.com/28384700/87530299-ba504800-c6c2-11ea-9753-496334a96bf3.png)
+- `git log --name-only`：每次修改的文件列表
+
+![image](https://user-images.githubusercontent.com/28384700/87530450-eec40400-c6c2-11ea-876d-c8719ea22e8e.png)
+- `git log --stat`：每次修改的文件列表和文件修改的统计
+
+![image](https://user-images.githubusercontent.com/28384700/87530576-187d2b00-c6c3-11ea-93ef-284bbce85a68.png)
+- `git show`：最近的一次修改的文件具体内容
+
+![image](https://user-images.githubusercontent.com/28384700/87530948-9b05ea80-c6c3-11ea-991b-401ebbc6771d.png)
+- `git show -x`: 查看最近几次修改的文件具体内容，例如查看最近两次修改内容 `git show -2`
+
+![image](https://user-images.githubusercontent.com/28384700/87531261-0780e980-c6c4-11ea-8590-efebd61d17b2.png)
+- `git show commitid`：查看某个 commit id 对应修改的文件具体内容，例如 `git show 4f5e3f4`
+
+![image](https://user-images.githubusercontent.com/28384700/87531416-444ce080-c6c4-11ea-868e-c8acbc8d84c2.png)
+- `git whatchanged`：每次修改的文件列表
+
+![image](https://user-images.githubusercontent.com/28384700/87531768-c5a47300-c6c4-11ea-9522-02b7133958ef.png)
+- `git whatchanged --stat`：每次修改的文件列表和文件修改的统计
+
+![image](https://user-images.githubusercontent.com/28384700/87531828-db199d00-c6c4-11ea-931c-af3011f04ae0.png)
+
+## 参考
+
+- [git忽略已经被提交的文件，以及如何恢复追踪](https://www.cnblogs.com/zhangceblogs/p/9020499.html)
+- [忽略特殊文件](https://www.liaoxuefeng.com/wiki/896043488029600/900004590234208)

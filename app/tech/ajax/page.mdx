@@ -1,0 +1,142 @@
+# Ajax
+
+2005 年 Jesse James Garrett 发表了一篇在线文章 “Ajax：A new Approach to Web application”。他在这篇文章中介绍了一种新的技术，就叫 Ajax（ Asynchronous Javascript + XML）。这一技术能够解决向服务器发送额外的数据请求而无需卸载页面，会带来更好的体验。
+
+Ajax 的核心就是 XMLHttpRequest 对象（简称 XHR），这是微软首先引入的一个特性，其他的浏览器提供商后来都提供了相同的实现。XHR 为想服务器发送请求和解析服务器响应提供了流畅的接口。能够以异步的方式从服务器取得更多的信息，意味着用户单击之后，可以不必刷新页面也能取得数据。
+
+如果提交数据之后，页面刷新了，那得多烦。
+
+接下看看怎么实现一个 Ajax。
+
+## XMLHttpRequest 对象
+
+使用 XHR 对象时，要调用的第一方法就是 `open()`。
+
+### open
+
+`open()` 方法接收 3 个参数：
+
+1. 要发送的请求类型（get、post 等）；
+2. 请求的 URL；
+3. 表示是否是异步发送的布尔值。
+
+例如：
+
+```js
+var xhr = new XMLHttpRequest();
+xhr.open('get', 'example.php', false);
+```
+
+这段代码会启动一个针对 example.php 的 GET 请求。这里还需要注意两点：一是 URL 相对于执行代码的当前页面（当然也可以使用绝对路径）；二是调用 `open()` 方法**并不会真正的发送请求，而只是启动一个请求以备发送**。
+
+关于第一点，浏览器规定，只能向同一个域中使用相同端口和协议的 URL 发送请求。如果 URL 与启动请求的页面有任何差别，都会引发安全错误，**也就是跨域了**！
+
+要发送特定的请求，还需要调用 `send()` 方法。
+
+### send
+
+要发送上面的请求，需要这样调用：
+
+```js
+var xhr = new XMLHttpRequest();
+xhr.open('get', 'example.php', false); // 发送的是同步请求
+xhr.send(null);
+```
+
+`send()` 方法接收一个参数：请求主体发送的数据。如果不需要通过请求主体发送数据，则必须传入 `null`，因为这个参数对有些浏览器来说是必须的。
+
+**调用 `send()` 之后，请求就会被分派到服务器。**
+
+这里发送的是一个同步请求，JavaScript 代码会等到服务器响应之后再继续执行。
+
+### HXR 的属性
+
+收到响应之后，响应的数据会自动填充到 XHR 对象的属性，相关属性有：
+
+- responseText：作为响应主体被返回的文本；
+- responseXML：如果响应的内容类型是“text/html”或“application/xml”，这个属性中将保存包含着响应数据的 XML DOM 文档；
+- status：响应的 HTTP 状态；
+- statusText：响应的状态说明。
+
+接收到响应之后，应该先检查 `status` 属性，以确定响应已经成功返回。一般来说，可以将状态码为 200 作为成功的标志。此时 `responseText` 属性也已经包含响应内容。此外，状态码 304 表示请求资源并没有修改，可以直接使用浏览器中缓存的版本。
+
+```js
+var xhr = new XMLHttpRequest();
+xhr.open('get', 'example.php', false); // 发送同步请求
+xhr.send(null);
+if (xhr.status >= 200 && xhr.status < 300 || xhr.status === 304) {
+  alert(xhr.responseText);
+} else {
+  alert("Request was unsuccessful：" + xhr.status);
+}
+```
+
+### 异步请求
+
+前面这样发送同步请求没有问题，但是大多数情况下，我们还是发送异步请求，才能让 JavaScript 继续执行而不必等待响应。可以通过检查 XHR 对象的 `readyState` 属性，该属性表示请求/响应过程的当前活动阶段。这个属性可取值如下：
+
+- 0：未初始化。尚未调用 `open()` 方法；
+- 1：启动。已经调用 `open()` 方法，但尚未调用 `send()` 方法；
+- 2：发送。已经调用 `send()` 方法，但尚未收到响应；
+- 3：接收。已经接受到部分响应数据；
+- 4：完成。已经接受到全部响应数据，而且已经可以在客户端使用了。
+
+知道 `readyState` 的值发生变化，就会触发一次 `readystatechange` 事件。所以我们可以通过这个事件来检查状态变化后的 `readyState` 的值。只要 `readyState` 等于 4 就说明所有的数据已经准备就绪了。
+
+不过，必须在调用 `open()` 方法之前指定 `onreadystatechange` 事件的处理方法才能确保跨浏览器兼容性。看一个例子：
+
+```js
+var xhr = new XMLHttpRequest();
+xhr.onreadystatechange = function() {
+  if (xhr.readyState === 4) { // 状态只能通过 xhr 本身获取，事件没有 event 对象
+    if (xhr.status >= 200 && xhr.status < 300 || xhr.status === 304) {
+      alert(xhr.responseText);
+    } else {
+      alert("Request was unsuccessful：" + xhr.status);
+    }
+  }
+};
+xhr.open('get', 'example.php', true); // 发送异步请求
+xhr.send(null);
+```
+
+## 实现一个 Ajax
+
+通过上面的知识，可以自己实现一个简单的 Ajax 请求的方法了。
+
+```js
+function success(text) {
+  var textarea = document.getElementById('test-response-text');
+  textarea.value = text;
+}
+
+function fail(code) {
+  var textarea = document.getElementById('test-response-text');
+  textarea.value = 'Error code: ' + code;
+}
+
+var request = new XMLHttpRequest(); // 新建 XMLHttpRequest 对象
+
+request.onreadystatechange = function () { // 状态发生变化时，函数被回调
+  if (request.readyState === 4) { // 成功完成
+    // 根据 HTTP 状态判断响应结果
+    if (request.status === 200) {
+      // 成功，通过 responseText 拿到响应的文本
+      return success(request.responseText);
+    } else {
+      // 失败，根据响应码判断失败原因
+      return fail(request.status);
+    }
+  } else { // HTTP请求还在继续
+    // ...
+  }
+}
+
+// 发送请求:
+request.open('get', 'example.php', true); 
+request.send(null);
+```
+
+## 参考
+
+- [JavaScript 高级程序设计](https://www.douban.com/link2/?url=https%3A%2F%2Fbook.douban.com%2Fsubject%2F10546125%2F&query=%E9%AB%98%E7%BA%A7%E7%A8%8B%E5%BA%8F%E8%AE%BE%E8%AE%A1&cat_id=1001&type=search&pos=15)
