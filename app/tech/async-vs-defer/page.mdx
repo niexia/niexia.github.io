@@ -1,0 +1,57 @@
+看一下这张图，已经说明了普通 script，async 和 defer。
+
+![image](https://user-images.githubusercontent.com/28384700/69857141-3760b580-12ca-11ea-8c16-7ce9e98ba6d4.png)
+
+## 普通 script
+
+一个普通的 script 标签如下：
+
+```html
+<script src="foo.js"></script>
+```
+
+当解析 HTML 遇到 `<script>` 的时候：
+
+1. 停止解析；
+2. 请求下载 `foo.js`（如果它是外部引入的，不是内联脚本内联脚本） ；
+3. 执行 `foo.js`；
+4. 执行完成之后，继续解析 HTML
+
+## async
+
+```html
+<script src="foo.js" async></script>
+```
+
+添加 `async` 之后，解析遇到这个 `<script>` 时：
+
+1. 并行的请求下载 `foo.js`，不停止解析；
+2. 下载完成之后，停止解析，立即执行下载的脚本；
+3. 执行完成之后，继续解析。
+
+值得注意的是，`async` 脚本会在脚本加载后立即执行，因此不能保证执行顺序（最后包含的脚本可能会在第一个脚本文件之前执行）。
+
+## defer
+
+```html
+<script src="foo.js" defer></script>
+```
+
+添加 `defer` 之后，解析遇到这个 `<script>` 时：
+
+1. 并行的请求下载 `foo.js`，不停止解析；
+2. 只有解析完成之后，在 `DOMContentLoaded` 实践前执行。
+
+与 `async` 不同，`defer` 保证按照它们在页面中出现的顺序执行。
+
+## 总结
+
+- async 会阻止 document 的解析；
+- defer 会在 DOMContentLoaded 前依次执行；
+- async 则是下载完立即执行，不一定是在 DOMContentLoaded 前；
+- async 因为顺序无关，所以很适合像 Google Analytics 这样的无依赖脚本；
+
+## 参考
+
+- [Script Tag - async & defer](https://stackoverflow.com/questions/10808109/script-tag-async-defer)
+- [彻底搞懂 async & defer](https://github.com/xiaoyu2er/blog/issues/8)

@@ -1,0 +1,667 @@
+作为一个前端工程师，当我们需要用到类似 `ElementUI` , `lodash` 之类的库的时候，只需要执行 `npm install`，然后引入就可以开始愉快的写代码了。它们都极大地提高了我们的工作效率，但是这一切是从什么开始的呢？
+
+这些都要从 `Modular design (模块化设计)` 说起。
+
+说到模块化，我们经常能关联出以下这些熟悉的名词，当然有一些是比较老的方式了，你甚至没有用过。什么原因导致了区别于旧规范而产生出来的新的规范？也许我们可以从它们之间的区别，或者说改变中体会到它们的新意味着什么。
+
+- IIFE [Immediately Invoked Function Expression]
+- Common.js
+- AMD
+- CMD
+- ES6 Module
+
+## IIFE
+
+[IIFE](https://developer.mozilla.org/zh-CN/docs/Glossary/%E7%AB%8B%E5%8D%B3%E6%89%A7%E8%A1%8C%E5%87%BD%E6%95%B0%E8%A1%A8%E8%BE%BE%E5%BC%8F) 是 `Immediately Invoked Function Expression(立即调用函数表达式)` 的缩写。它是一个在定义时就会立即执行的 `JavaScript` 函数。
+
+```js
+(function () {
+    statements
+})();
+```
+
+这是一个被称为**自执行匿名函数**的设计模式，主要包含两部分。
+
+1. 第一部分是包围在 圆括号运算符 () 里的一个匿名函数，这个匿名函数拥有独立的词法作用域。这不仅避免了外界访问此 IIFE 中的变量，而且又不会污染全局作用域。
+2. 第二部分再一次使用 () 创建了一个立即执行函数表达式，JavaScript 引擎到此将直接执行函数
+
+最开始，我们对于模块化的概念，是从文件开始区分的。在一个简易的项目中，我们的编程习惯是通过一个 HTML 文件加上若干个 JavaScript 文件来区分不同模块的，就像下面这样：
+
+```
+|--index.html
+|--footer.js
+|--header.js
+|--main.js
+```
+
+然后简单的看看里面的内容
+
+### index.html
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>index</title>
+  <script src="header.js"></script>
+  <script src="main.js"></script>
+  <script src="footer.js"></script>
+</head>
+<body>
+  
+</body>
+</html>
+```
+
+### 其他三个 JavaScript 文件
+
+在不同的 js 文件中我们定义不同的变量
+
+```js
+// header.js
+var header = '这是头部';
+
+// main.js
+var main = '这是内容';
+
+// footer.js
+var footer = '这是底部';
+```
+
+像这样通过不同文件来声明变量的方式，实际上没有做到将变量区分开来。因为它们都绑定到了全局 `window` 对象上，我们尝试将它们在控制台中输出验证一下：
+
+```js
+window.header
+// "这是头部"
+window.main
+// "这是内容"
+window.footer
+// "这是底部"
+```
+
+这简直是异常噩梦，你可能还没有意识到这会导致什么严重的后果。现在我们试着改一下 `footer.js`，给 `header` 变量进行赋值：
+
+```js
+// footer.js
+var footer = '这是底部';
+header = '头部改变了';
+```
+
+然后再将 `window.header` 打印出来，它已经被改变了：
+
+```js
+window.header
+// "头部改变了"
+```
+
+想想这是多么可怕，因为我们根本无法知道和预料在什么时候什么地方，某个之前定义的变量被改变了。
+
+也就是说简单的通过文件是不能将变量区分的。
+
+那么，重要的是我们应该怎么解决这问题？我们都知道，JavaScript 具有函数作用域的概念，也就是说，我们可以使用一个函数将这些变量包裹起来，那么这些变量就不会直接被声明到 `window` 对象上了:
+
+现在我们把 `header.js` 修改成：
+ 
+```js
+
+function createHeader() {
+  var header = '这是头部';
+}
+
+createHeader();
+```
+
+现在我们在 `window` 里面找不到 `header`，因为它们被隐藏在了 `createHeader` 中，但是 `createHeader` 仍旧污染了我们的 `window`：
+
+```js
+window.header
+// undefined
+window.createHeader
+// ƒ createHeader() {
+//   var header = '这是头部';
+// }
+```
+
+也就是说这个方案并不是很完美，怎么改进呢？
+
+答案就是 IIFE，我们可以定义一个**立即执行的匿名函数**来解决这个问题：
+
+```js
+(function() {
+  var header = '这是头部';
+})()
+```
+
+因为是一个匿名的函数，执行完后很快就会被释放，这种机制不会污染全局对象。
+
+虽然看起来有些麻烦，但它确实解决了我们将变量分离开来的需求，不是吗？然而在今天，几乎没有人会用这样方式来实现模块化编程。
+
+后来又发生了什么呢？
+
+## CommonJS
+
+CommonJS 是以在浏览器环境之外构建 JavaScript 生态系统为目标而产生的项目，比如在服务器和桌面环境中。
+
+这个项目最开始是由 Mozilla 的工程师 Kevin Dangoor 在2009年1月创建的，当时的名字是 ServerJS。
+
+> 我在这里描述的并不是一个技术问题，而是一件重大的事情，让大家走到一起来做决定，迈出第一步，来建立一个更大更酷的东西。 —— Kevin Dangoor's [What Server Side JavaScript needs](https://www.blueskyonmars.com/2009/01/29/what-server-side-javascript-needs/)
+
+2009年8月，这个项目改名为 CommonJS，以显示其 API 的更广泛实用性。CommonJS 是一套规范，它的创建和核准是开放的。这个规范已经有很多版本和具体实现。CommonJS 并不是属于 ECMAScript TC39 小组的工作，但 TC39 中的一些成员参与 CommonJS 的制定。
+
+CommonJS 规范是为了解决 JavaScript 的作用域问题而定义的模块形式，可以使每个模块它自身的命名空间中执行。该规范的主要内容是，模块必须通过 `module.exports` 导出对外的变量或接口，通过 `require()` 来导入其他模块的输出到当前模块作用域中。
+
+一个简单的例子:
+
+```js
+// moduleA.js
+module.exports = function( value ){
+    return value * 2;
+}
+// moduleB.js
+var multiplyBy2 = require('./moduleA');
+var result = multiplyBy2(4);
+```
+
+值得注意的是，这里所说的 CommonJS 是一套通用的**规范**，与之对应的有非常多不同的实现。
+
+这里，我们关注 Node.js 的实现。
+
+### Node.js Modules
+
+Node 模块采用 CommonJS 模块规范。
+
+每个文件就是一个模块，有自己的作用域。在一个文件里面定义的变量、函数、类都是私有的，对其他文件不可见。
+
+```js
+// example.js
+var x = 5;
+var addX = function (value) {
+  return value + x;
+};
+module.exports.x = x;
+module.exports.addX = addX;
+
+// main.js
+var example = require('./example.js');
+console.log(example.x); // 5
+console.log(example.addX(1)); // 6
+```
+
+上面代码中，变量 `x` 和函数 `addX`，是当前文件 `example.js` 私有的，其他文件不可见。如果想在多个文件分享变量，必须定义为 `global` 对象的属性。
+
+```js
+global.warning = true;
+```
+
+上面定义的 `warning` 变量，可以被所有文件读取。当然，这样写法是不推荐的。
+
+根据 CommonJS 的规定，在每个模块内部：
+
+- `module` 变量代表当前模块，这个变量是一个对象。
+- `exports` 即 `module.exports` 属性是对外的接口，加载某个模块，其实就是加载该模块的 `module.exports` 属性。
+- `require` 方法用于加载模块。
+
+CommonJS 模块具有以下**特点**：
+
+- 所有代码都运行在模块作用域，不会污染全局作用域。
+- 模块可以多次加载，但是**只会在第一次加载时运行一次**，然后运行结果就被缓存了，以后再加载，就直接读取缓存结果。要想让模块再次运行，必须清除缓存。
+- 模块加载的顺序，按照其在代码中出现的顺序。
+- CommonJS规范**加载模块是同步的**，也就是说，只有加载完成，才能执行后面的操作。
+
+#### module 对象
+
+Node 内部提供一个 `Module` 构建函数。所有模块都是 `Module` 的实例。
+
+```js
+function Module(id, parent) {
+  this.id = id;
+  this.exports = {};
+  this.parent = parent;
+  // ...
+```
+
+每个模块内部，都有一个 `module` 对象，代表当前模块。它有以下属性。
+
+- `module.id` 模块的识别符，通常是带有绝对路径的模块文件名。
+- `module.filename` 模块的文件名，带有绝对路径。
+- `module.loaded` 返回一个布尔值，表示模块是否已经完成加载。
+- `module.parent` 返回一个对象，表示调用该模块的模块。
+- `module.children` 返回一个数组，表示该模块要用到的其他模块。
+- `module.exports` 表示模块对外输出的值。
+
+#### module.exports 属性
+
+`module.exports` 属性表示当前模块对外输出的接口，其他文件加载该模块，实际上就是读取`module.exports` 变量。
+
+#### exports 变量
+
+为了方便，Node 为每个模块提供一个 `exports` 变量，指向 `module.exports`。这等同在每个模块头部，有一行这样的命令。
+
+```js
+var exports = module.exports;
+```
+
+造成的结果是，在对外输出模块接口时，可以向exports对象添加方法。
+
+```js
+exports.area = function (r) {
+  return Math.PI * r * r;
+};
+
+exports.circumference = function (r) {
+  return 2 * Math.PI * r;
+};
+
+```
+
+值得注意的是不能直接将 `exports` 变量指向一个值，因为这样等于切断了`exports` 与`module.exports` 的联系。
+
+下面两种写法都是无效的：
+
+```js
+// 无效，因为 exports 不再指向 module.exports 了
+exports = function(x) {console.log(x)}; 
+```
+
+```js
+// 无效， hello 函数是无法对外输出的，因为module.exports被重新赋值了。
+exports.hello = function() {
+  return 'hello';
+};
+module.exports = 'Hello world';
+```
+
+#### require
+
+`require` 命令的基本功能是，读入并执行一个 JavaScript 文件，然后返回该模块的 `exports` 对象。如果没有发现指定模块，会报错。
+
+```js
+// example.js
+var invisible = function () {
+  console.log("invisible");
+}
+
+exports.message = "hi";
+exports.say = function () {
+  console.log(message);
+}
+```
+
+运行下面的命令，可以输出exports对象。
+
+```js
+var example = require('./example.js');
+example
+// {
+//   message: "hi",
+//   say: [Function]
+// }
+```
+
+`require` 是怎么实现的？这样的方式有什么弊端？
+
+每个模块实例都有一个 require 方法。
+
+```js
+Module.prototype.require = function(path) {
+  return Module._load(path, this);
+};
+```
+
+由此可知，`require` 并不是全局性命令，而是每个模块提供的一个内部方法，也就是说，只有在模块内部才能使用 `require` 命令。另外，`require` 其实内部调用 `Module._load` 方法。
+
+```js
+Module._load = function(request, parent, isMain) {
+  // 1. 检查 Module._cache，是否缓存之中有指定模块
+  // 2. 如果缓存之中没有，就创建一个新的 Module 实例
+  // 3. 将它保存到缓存
+  // 4. 使用 module.load() 加载指定的模块文件，
+  //    读取文件内容之后，使用 module.compile() 执行文件代码
+  // 5. 如果加载/解析过程报错，就从缓存删除该模块
+  // 6. 返回该模块的 module.exports
+};
+```
+
+上面的第4步，采用module.compile()执行指定模块的脚本：
+
+```js
+Module.prototype._compile = function(content, filename) {
+  var self = this;
+  var args = [self.exports, require, self, filename, dirname];
+  return compiledWrapper.apply(self.exports, args);
+};
+```
+
+上面的代码基本等同于下面的形式：
+
+```js
+(function (exports, require, module, __filename, __dirname) {
+  // 模块源码
+});
+```
+
+也就是说，模块的加载实质上就是，注入 exports、require、module 三个全局变量，然后执行模块的源码，然后将模块的 module.exports 变量的值输出。
+
+Module._compile 方法是同步执行的，所以 Module._load 要等它执行完成，才会向用户返回module.exports 的值。
+
+看一下 `require` 的简易实现，
+
+```js
+function require(/* ... */) {
+  const module = { exports: {} };
+  ((module, exports) => {
+    // 模块代码在这。在这个例子中，定义了一个函数。
+    function someFunc() {}
+    exports = someFunc;
+    // 此时，exports 不再是一个 module.exports 的快捷方式，
+    // 且这个模块依然导出一个空的默认对象。
+    module.exports = someFunc;
+    // 此时，该模块导出 someFunc，而不是默认对象。
+  })(module, module.exports);
+  return module.exports;
+}
+```
+
+回答刚才的问题：
+
+- require 是怎么实现的？
+   
+执行 `require` 的时候，创建一个 `module` 实例，将它注入并执行模块源码，最后将 `module.exports` 返回。也就是将被引用的 `module` 拷贝一份到当前 `module` 中。
+
+- 这样的方式有什么弊端？
+
+CommonJS 这一标准的初衷是为了让 JavaScript 在多个环境下都实现模块化，但是 Node.js 中的实现依赖了 Node.js 的环境变量：`module`，`exports`，`require`，`global`，浏览器没法用啊，所以后来出现了 `Browserify` 这样的实现。
+
+说完了服务端的模块化，接下来我们聊聊，在浏览器这一端的模块化，又经历了些什么呢？
+
+## RequireJS & AMD（Asynchronous Module Definition）
+
+在浏览器环境下，如果也使用 CommonJS，会存在什么问题呢？上面说到 CommonJS 规范加载模块是同步的。在 `require()` 的实现中，你已经发现这其实是一个复制的过程，将被 `require` 的内容，赋值到一个 `module` 对象的属性上，然后返回这个对象的 `exports` 属性。
+
+由于 Node.js 主要用于服务器编程，模块文件一般都已经存在于本地硬盘，所以加载起来比较快，不用考虑非同步加载的方式，所以 CommonJS 规范比较适用。但是，如果是浏览器环境，要从服务器端加载模块
+，如果还是使用 CommonJS，则可能导致阻塞，使得我们后面的步骤无法进行。
+
+**所以在浏览器环境下，模块化必须使用异步的方式。**
+
+在这样的背景下，RequireJS 出现了。
+
+RequireJS 是一个工具库，主要用于客户端的模块管理。它可以让客户端的代码分成一个个模块，实现异步或动态加载，从而提高代码的性能和可维护性。它的模块管理遵守 AMD 规范（Asynchronous Module Definition）。
+
+RequireJS 就是为了解决这两个问题：
+
+1. 实现js文件的异步加载，避免网页失去响应；
+2. 管理模块之间的依赖性，便于代码的编写和维护。
+
+RequireJS 的基本思想是，通过 `define` 方法，将代码定义为模块；通过 `require` 方法，实现代码的模块加载。
+
+### require.js 的加载
+
+使用 require.js 的第一步，是先去官方网站下载最新版本。下载后，假定把它放在js子目录下面，就可以加载了：
+
+```js
+<script src="js/require.js" defer async="true" ></script>
+```
+
+加载 `require.js` 以后，下一步就要加载我们自己的代码了。假定我们自己的代码文件是 `main.js`，也放在js目录下面。那么，只需要写成下面这样就行了：
+
+```js
+<script src="js/require.js" data-main="js/main"></script>
+```
+
+`data-main` 属性的作用是，指定网页程序的主模块。在上例中，就是 js 目录下面的 `main.js`，这个文件会第一个被 `require.js` 加载。由于 `require.js` 默认的文件后缀名是 `.js`，所以可以把`main.js` 简写成 `main`。
+
+下面来看看 `main.js` 的内容。
+
+如果我们的代码不依赖任何其他模块，那么可以直接写入javascript代码。
+
+```js
+// main.js
+alert('这是AMD');
+```
+
+但这样的话，就没必要使用 `require.js` 了。真正常见的情况是，主模块依赖于其他模块，这时就要使用 AMD 规范定义的的 `require()` 函数。
+
+```js
+// main.js
+require(['moduleA', 'moduleB', 'moduleC'], function (moduleA, moduleB, moduleC){
+　// some code here
+});
+```
+
+require()函数接受两个参数:
+
+1. 第一个参数是一个数组，表示所依赖的模块，上例就是['moduleA', 'moduleB', 'moduleC']，即主模块依赖这三个模块；
+2. 二个参数是一个回调函数，当前面指定的模块都加载成功后，它将被调用。加载的模块会以参数形式传入该函数，从而在回调函数内部就可以使用这些模块。
+
+下面，我们看一个实际的例子。
+
+假定主模块依赖 jquery、underscore 这两个模块，则 main.js 可以这样写：
+
+```js
+require(['jquery', 'underscore'], function ($, _){
+　// some code here
+});
+```
+
+### require.config()
+
+上一节最后的示例中，主模块的依赖模块是['jquery', 'underscore']。默认情况下，`require.js` 假定这三个模块与 `main.js` 在同一个目录，文件名分别为 `jquery.js`，`underscore.js`，然后自动加载。
+
+使用 `require.config()` 方法，我们可以对模块的加载行为进行自定义。`require.config()` 就写在主模块（`main.js`）的头部。参数就是一个对象，这个对象的 `paths` 属性指定各个模块的加载路径。
+
+```js
+require.config({
+  paths: {
+    "jquery": "jquery.min",
+    "underscore": "underscore.min"
+  }
+})
+```
+
+上面的代码给出了三个模块的文件名，路径默认与 `main.js` 在同一个目录（js子目录）。如果这些模块在其他目录，比如 `js/lib` 目录，则有两种写法。一种是逐一指定路径。另一种则是直接改变基目录（baseUrl）。
+
+```js
+// 写法1
+require.config({
+　paths: {
+　　"jquery": "lib/jquery.min",
+　　"underscore": "lib/underscore.min"
+　}
+});
+
+// 写法2
+require.config({
+  baseUrl: "js/lib",
+　paths: {
+　　"jquery": "jquery.min",
+　　"underscore": "underscore.min"
+　}
+});
+```
+
+如果某个模块在另一台主机上，也可以直接指定它的网址，例如：
+
+```js
+require.config({
+　paths: {
+　　"jquery": "https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min"
+　}
+});
+```
+
+### define 定义模块
+
+模块必须采用特定的define()函数来定义。如果一个模块不依赖其他模块，那么可以直接定义在define()函数之中。
+
+```js
+// math.js
+define(function (){
+　var add = function (x,y){
+　　return x+y;
+  };
+　return {
+　　add: add
+　};
+});
+
+// 加载方法如下
+// main.js
+require(['math'], function (math){
+　alert(math.add(1,1));
+});
+```
+如果这个模块还依赖其他模块，那么define()函数的第一个参数，必须是一个数组，指明该模块的依赖性。
+
+```js
+define(['myLib'], function(myLib){
+　function foo(){
+　　myLib.doSomething();
+　}
+　return {
+　　foo : foo
+　};
+});
+```
+
+当require()函数加载上面这个模块的时候，就会先加载myLib.js文件。
+
+通过上面的语法说明，我们会发现一个很明显的问题，在使用 RequireJS 声明一个模块时，必须指定所有的依赖项 ，这些依赖项会被当做形参传到 factory 中，对于依赖的模块会提前执行（在 RequireJS 2.0 也可以选择延迟执行），这被称为：依赖前置。
+
+这会带来什么问题呢？
+
+加大了开发过程中的难度，无论是阅读之前的代码还是编写新的内容，也会出现这样的情况：引入的另一个模块中的内容是条件性执行的。
+
+## SeaJS & CMD（Common Module Definition）
+
+针对 AMD 规范中可以优化的部分，CMD 规范出现了，而 [SeaJS](https://github.com/seajs/seajs) 则是它的具体实现之一，与 AMD 十分相似。
+
+CMD 规范的前身是Modules/Wrappings规范。
+
+SeaJS 更多地来自 Modules/2.0 的观点，同时借鉴了 RequireJS 的不少东西，比如将 Modules/Wrappings 规范里的 module.declare 改为 define 等。SeaJS 遵循的CMD（Common Module Definition）。
+
+### 定义模块
+
+在 CMD 规范中，一个模块就是一个文件。代码的书写格式如下：
+
+```js
+define(factory)
+```
+
+- factory 为对象、字符串时，表示模块的接口就是该对象、字符串。
+- factory 为函数时，表示是模块的构造方法。执行该构造方法，可以得到模块向外提供的接口。factory默认会传入三个参数：require、exports 和 module。
+
+```js
+// factory 为对象
+define({ "foo": "bar" });
+
+// factory 为函数
+define(function(require, exports, module) {
+  // 模块代码
+});
+```
+
+factory 的参数使用:
+
+```js
+// 所有模块都通过 define 来定义
+define(function(require, exports, module) {
+  // 通过 require 引入依赖，获取模块 a 的接口
+  var a = require('./a');
+
+  // 调用模块 a 的方法
+  a.doSomething();
+
+  // 通过 exports 对外提供接口foo 属性
+  exports.foo = 'bar';
+
+  // 对外提供 doSomething 方法
+  exports.doSomething = function() {};
+
+  // 错误用法！！!
+  exports = {
+    foo: 'bar',
+    doSomething: function() {}
+  };
+
+  // 正确写法，通过module.exports提供整个接口
+  module.exports = {
+    foo: 'bar',
+    doSomething: function() {}
+  };
+});
+```
+
+### 与 AMD 的主要区别
+
+```js
+// AMD 的一个例子，当然这是一种极端的情况
+define(["header", "main", "footer"], function(header, main, footer) { 
+    if (xxx) {
+      header.setHeader('new-title')
+    }
+    if (xxx) {
+      main.setMain('new-content')
+    }
+    if (xxx) {
+      footer.setFooter('new-footer')
+    }
+});
+
+ // 与之对应的 CMD 的写法
+define(function(require, exports, module) {
+    if (xxx) {
+      var header = require('./header')
+      header.setHeader('new-title')
+    }
+    if (xxx) {
+      var main = require('./main')
+      main.setMain('new-content')
+    }
+    if (xxx) {
+      var footer = require('./footer')
+      footer.setFooter('new-footer')
+    }
+});
+```
+
+我们可以很清楚的看到，CMD 规范中，只有当我们用到了某个外部模块的时候，它才会去引入，这回答了我们上一小节中遗留的问题，这也是它与 AMD 规范最大的不同点：**CMD 推崇依赖就近 + 延迟执行**。
+
+我们能够看到，按照 CMD 规范的依赖就近的规则定义一个模块，会导致模块的**加载逻辑偏重**，有时你并不知道当前模块具体依赖了哪些模块或者说这样的依赖关系并不直观。按需执行依赖虽然避免浪费，但是require 时才解析的行为对性能有影响。
+
+而且对于 AMD 和 CMD 来说，都只是适用于浏览器端的规范，而 Node.js module 仅仅适用于服务端，都有各自的局限性。
+
+## ECMAScript6 Module
+
+ECMAScript6 标准增加了 JavaScript 语言层面的模块体系定义，作为浏览器和服务器通用的模块解决方案它可以取代我们之前提到的 `AMD` ，`CMD` , `CommonJS`。
+
+它凭借什么做到这一点呢？
+
+- 与 CommonJS 一样，具有紧凑的语法，对循环依赖以及单个 exports 的支持。
+- 与 AMD 一样，直接支持异步加载和可配置模块加载。
+
+除此之外，它还有更多的优势：
+
+- 语法比 CommonJS 更紧凑。
+- 结构可以静态分析（用于静态检查，优化等）。
+- 对循环依赖的支持比 CommonJS 好。
+
+如果你想搞清楚 ES6 Module，理解它的设计目标是很有帮助的，它的主要目标是：
+
+- 默认导出是被推荐的
+- 静态模块结构
+- 支持同步和异步加载
+- 支持模块之间的循环依赖关系
+
+## 参考资料
+
+- [从 IIFE 聊到 Babel 带你深入了解前端模块化发展体系](https://juejin.im/post/5cb9e563f265da03712999e8)
+- [CommonJS 规范](https://javascript.ruanyifeng.com/nodejs/module.html#toc7)
+- [require() 源码解读](http://www.ruanyifeng.com/blog/2015/05/require.html)
+- [浏览器加载 CommonJS 模块的原理与实现](http://www.ruanyifeng.com/blog/2015/05/commonjs-in-browser.html)
+- [Javascript模块化编程（三）：require.js的用法](http://www.ruanyifeng.com/blog/2012/11/require_js.html)
+- [RequireJS和AMD规范](https://javascript.ruanyifeng.com/tool/requirejs.html)
+- [SeaJS从入门到原理](https://aotu.io/notes/2016/08/29/SeaJs-From-Entry-To-The-Principle/index.html)
+- [ECMAScript 6 modules: the final syntax](http://2ality.com/2014/09/es6-modules-final.html)

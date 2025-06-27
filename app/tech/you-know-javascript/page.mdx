@@ -1,0 +1,368 @@
+## 你是否知道 JS
+
+解答和理解一些“奇怪”的 JavaScript 问题，可能不是很常用，但是也可以帮助我们理解这么语言。
+
+1. 浏览器控制台上会打印什么？
+
+```
+var a = 10;
+function foo() {
+    console.log(a); // ??
+    var a = 20;
+}
+foo();
+```
+A： undefined
+
+使用 `var` 关键字声明的变量在 JavaScript 中会被提升，并在内存中分配值为 `undefined`。但初始化是在赋值的地方。另外，`var` 声明的变量是函数作用域，而 `let` 和 `const` 是块作用域。实际的过程是下面这样
+
+```
+var a = 10;
+function foo() {
+  var a; // var声明被提升到函数的顶部
+  console.log(a); // undefined
+  a = 20; // 实际这个时候才初始化
+}
+```
+
+2. 如果我们使用 let 或 const 代替 var，输出是否相同？
+
+```
+var a = 10;
+function foo() {
+    console.log(a); // ??
+    let a = 20;
+}
+foo();  
+```
+
+A：ReferenceError: a is not defined
+
+ES6 明确规定，如果区块中存在 `let` 和 `const` 命令，这个区块对这些命令声明的变量，从一开始就形成封闭的作用域。凡是在声明之前就使用这些变量，就会报错。
+
+总之，在代码块内，使用 `let` 命令声明变量之前，该变量都是不可用的。这在语法上，称为“暂时性死去”（temporal dead zone 简称 TDZ）。
+
+```
+if (true) {
+  // TDZ开始
+  tmp = 'abc'; // ReferenceError
+  console.log(tmp); // ReferenceError
+  
+  let tmp; // TDZ 结束
+  console.log(tmp); // undefined
+
+  tmp = 123;
+  console.log(tmp); // 123
+}
+```
+
+3. “newArray”中有哪些元素？
+
+```
+var array = [];
+for(var i = 0; i <3; i++) {
+ array.push(() => i);
+}
+var newArray = array.map(el => el());
+console.log(newArray); // ? 
+```
+A：[3, 3, 3]
+
+在 for 循环的头部声明带有 `var` 关键字的变量会为该变量创建单个绑定（存储空间），再看一下 for 循环
+
+```
+var array = [];
+for (var i = 0; i < 3; i++) {
+  // 箭头函数中的每个 i 最终都指向同一个
+  // 所以最后输出的都是3
+  array.push(() => i);
+}
+```
+
+如果使用 let，则在每次循环中都创建一个新的变量
+
+```
+var array = [];
+for (let i = 0; i < 3; i++) {
+  // 箭头函数中的i都指向不同的绑定
+  // 所以，返回的是当时的值
+  array.push(() => i);
+}
+```
+
+这里还可以使用闭包
+
+```
+let array = [];
+for (var i = 0; i < 3; i++) {
+  array[i] = (function (x) {
+    return function() {
+      return x;
+    }
+  })(i)
+}
+```
+
+
+4. 如果我们在浏览器控制台中运行'foo'函数，是否会导致堆栈溢出错误？
+
+```
+function foo() {
+  setTimeout(foo, 0); // 是否存在堆栈溢出错误?
+};    
+```
+
+A：不会溢出
+
+JavaScript 并发模型基于“事件循环”。
+
+浏览器的主要组件包括：调用堆栈、事件循环、任务队列和 Web API。像 `setTimeout`、`setInterval` 和 `Promise` 这样的全局函数不是 JavaScript 的一部分，而是 Web API 的一部分。
+
+![image](https://user-images.githubusercontent.com/28384700/61375828-6dc90580-a8d2-11e9-8149-288394e04c12.png)
+
+调用栈是后进先出（LIFO）的，引擎每次从堆栈中取出一个函数，然后从上往下依次执行代码。每当遇到一些异步代码，例如 `setTimeout`，它就把它交给 `Web API`，因此，等到事件触发时，`callback` 就会被添加到任务队列中。
+
+事件循环（Event Loop）不断的检查任务队列（Task Queue），并按照它们的顺序一次处理一个 `callback`。**每当调用栈（call stack）为空时，事件循环就获取一个 `callback` 放入到调用栈中进行处理。
+
+请记住，如果调用栈不是空的，事件循环不会将任何回调推入堆栈。
+
+现在看看这道题
+
+- foo() 会将函数放入调用栈（call stack)
+- 执行的时候遇到 `setTimeout`，然后会将它的回调函数 foo 传给 Web API 并从函数中返回，此时调用栈为空。
+- 定时器被设置为 0，foo 将被添加到任务队列
+- 由于调用栈时空的，事件循环会选择 `callback foo`，将其放到调用栈中处理
+- 进程再次重复，堆栈不会溢出。
+
+5. 如果在控制台中运行以下函数，页面(选项卡)的 UI 是否仍然响应？
+
+```
+function foo() {
+  return Promise.resolve().then(foo);
+};  
+```
+
+A：不会响应
+
+实际上任务队列并非只有一个，我们可以有多个任务队列。由浏览器选择其中一个队列并处理其中的回调。
+
+`setTimout` 属于**宏任务**，`Promise` 属于微任务。
+
+主要区别是，宏任务在单个周期中一次一个的推入堆栈，但是微任务总是在**执行后返回到事件循环之前清空**。因此，你已处理条目的速度向这个队列添加条目，那么你就永远在处理微任务。只要当微任务队列为空时，事件循环才会渲染页面。
+
+```
+function foo() {
+  return Promise.resolve().then(foo);
+}
+```
+
+每次调用 `foo` 都会在微任务队列上添加另一个 `foo` 回调，因此事件循环无法继续处理其他事情（滚动，单击等），直到该队列为空，所以会阻止渲染。
+
+6. 我们能否以某种方式为下面的语句使用展开运算而不导致类型错误？
+
+```
+var obj = { x: 1, y: 2, z: 3 };
+[...obj]; // TypeError 
+```
+
+展开语法和 `for...of` 遍历的时候，该数据结构需要部署了 `Symbol.iterator`，即需要具有 `iterator` 接口。Object 不具有该接口，它是不可迭代的。
+
+要想它是迭代的，这意味者需要它（或者它的原型链）上必须带有 `Symbol.iterator`。
+
+```
+var obj = {x: 1, y: 2, z: 3};
+obj[Symbol.iterator] = function*() {
+  yield 1;
+  yield 2;
+  yield 3;
+}
+[...obj]; // [1, 2, 3]
+```
+
+7. 运行以下代码片段时，控制台上会打印什么？
+
+```
+var obj = { a: 1, b: 2 };
+Object.setPrototypeOf(obj, {c: 3});
+Object.defineProperty(obj, 'd', { value: 4, enumerable: false });
+
+// what properties will be printed when we run the for-in loop?
+for(let prop in obj) {
+    console.log(prop);
+}  
+```
+
+A：a，b，c
+
+`for-in` 循环遍历对象本身的可枚举属性以及对象从其原型继承的属性。可枚举属性是可以在 `for-in` 循环期间包含和访问的属性。
+
+```
+var obj = { a: 1, b: 2 };
+var descriptor = Object.getOwnPropertyDescriptor(obj, "a");
+console.log(descriptor.enumerable); // true
+console.log(descriptor);
+// { value: 1, writable: true, enumerable: true, configurable: true }
+```
+
+```
+var obj = { a: 1, b: 2 }; //a，b 都是 enumerables 属性
+
+// 将{c：3}设置为'obj'的原型，for-in 循环也迭代 obj 继承的属性
+// 所以c可以被访问。
+Object.setPrototypeOf(obj, { c: 3 });
+
+// 我们在'obj'中定义了另外一个属性'd'
+// 但是 将'enumerable'设置为false。 这意味着d不是可枚举的。
+Object.defineProperty(obj, "d", { value: 4, enumerable: false });
+
+for (let prop in obj) {
+  console.log(prop);
+}
+// a, b, c
+```
+
+8. xGetter() 会打印什么值？
+
+```
+var x = 10;
+var foo = {
+  x: 90,
+  getX: function() {
+    return this.x;
+  }
+};
+foo.getX(); // prints 90
+var xGetter = foo.getX;
+xGetter(); // prints ?
+```
+
+A：10
+
+`var xGetter = foo.getX;` xGetter 是 foo.getX 的一个引用。执行 `xGetter`，这是 `this` 指向全局作用域window，所以输出 10。要想获取 `foo.x` 可以使用 `bind`、`call` 或者 `apply`。
+
+```
+xGetter.bind(foo)(); // 90
+xGetter.call(foo); // 90
+xGetter.apply(foo); // 90
+```
+
+9. 下面代码输出结果？
+
+```
+var a = 10;
+a.pro = 10;
+console.log(a.pro + a);
+
+var b = 'hello';
+b.pro = 'world';
+console.log(b.pro + b);
+```
+
+A：输出结果是 `NaN undefinedhello`。
+
+JavaScript 引擎内部在处理对某个基本类型 `a` 进行形如 `a.pro` 的操作时，会在内部临时创建一个对应的包装类型(对数字类型来说就是Numbe r类型)的临时对象，并把对基本类型的操作代理到对这个临时对象身上，使得对基本类型的属性访问看起来像对象一样。但是在操作完成后，临时对象就销毁了，下次再访问时，会重新建立临时对象，当然就会返回 `undefined` 了。
+
+10. 下面代码的输出结果？
+
+```
+var f = 1;
+if (!f) {
+  var a = 10;
+}
+function fn() {
+  var b = 20;
+  c = 30;
+}
+
+fn();
+console.log(a);
+console.log(c);
+console.log(b);
+```
+
+A：输出结果是 `undefined, 30, Uncaught ReferenceError: b is not defined`
+
+1、没有用 var 声明的是全局变量，即便在函数内部；当然在严格模式下会报错
+2、var 声鸣的变量，只有在 function 内部新声明的才是局部变量，在 if，while，for 等声明的变量其实是全局变量（除非本身在function内部）
+3、因为变量提升，虽然 if 块的内容没执行，但是预解析阶段会执行var a，只是没有赋值而已，因此打印 a 是 `undefined` 而打印 b 会报错
+
+11. 下面的代码的输出结果？
+
+```
+var length = 10;
+function fn() {
+  console.log(this.length);
+}
+var obj = {
+  length: 5,
+  method: function(fn) {
+    fn();
+    arguments[0]();
+  }
+}
+
+obj.method(fn, 1);
+```
+
+A：输出结果是 `10, 2`
+
+第一次输出 10 应该没有什么异议，这里的 `this` 指向 `window`，第二个调用 `arguments[0]()` 相当于执行 `arguments` 调用方法，`this` 指向 `arguments`，而这里传了两个参数，故输出 `arguments` 长度为2。
+
+12. 下面的代码的输出结果？
+
+```
+function fn(a) {
+  console.log(a);
+  var a = 2;
+  function a() {};
+  console.log(a);
+}
+fn(1)
+```
+
+A：输出结果是 `function a(){}, 2`
+
+知道预解析阶段，变量声明和函数声明会提前，且变量名和函数名同名时，函数优先级高于变量，会覆盖变量，或者说，函数提升要比变量提升的优先级要高一些，且不会被变量声明覆盖，但是会被变量赋值之后覆盖。因此第一个输出的是f a(){ }，继续执行，会执行a=2，再输出的时候就会输出2。
+
+13. a 在什么情况下，控制台可以输出 hello world？
+
+```
+a = ?
+if (a == 1 && a == 2 && a == 3) {
+  console.log('hello world');
+}
+```
+
+A：这里需要知道，比较相等时，会发生类型转换。如果是对象，则会调用对象的 valueOf() 方法，得到一个返回值，如果返回值是一个基本类型，则按照转换规则继续转换比较；否则调用对象的 toString() 方法，然后依照前面的规则转换返回的字符串。
+
+```
+a = {
+  num: 0,
+  valueOf: function() {
+    return ++this.num;
+  }
+}
+
+// 或者
+a = {
+  num: 0,
+  toString: function() {
+    return ++this.num;
+  }
+}
+
+// 或者
+a = {
+  num: 0,
+  valueOf: function() {
+    return {};
+  },
+  toString: function() {
+    return ++this.num;
+  }
+}
+```
+
+### 参考
+
+- [8 个问题看你是否真的懂 JS](https://juejin.im/post/5d2d146bf265da1b9163c5c9)

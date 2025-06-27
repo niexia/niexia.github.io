@@ -1,0 +1,188 @@
+通过 XHR 实现的 Ajax 请求时有一个主要限制，来源于浏览器的同源策略。同源策略限制了从同一个源加载的文档或脚本如何与来自另一个源的资源进行交互。这是一个用于隔离潜在恶意文件的重要安全机制。
+
+所以默认情况下，XHR 对象只能访问与包含它的页面位于同一个域中的资源。这种安全策略可以预防某些恶意行为。但是，实现合理的跨域请求对开发某些浏览器引用程序也是至关重要的。
+
+## 同源的定义
+
+**如果两个页面的协议，端口（如果有指定）和主机都相同，则两个页面具有相同的源**。我们也可以把它称为“协议/主机/端口 tuple”，或简单地叫做“tuple"。
+
+下表给出了相对 `http://store.company.com/dir/page.html` 同源检测的示例:
+
+| URL | 结果 | 原因 |
+|:----|:----:|:----|
+| `http://store.company.com/dir2/other.html` | 成功 | 只有路径不同 |
+| `http://store.company.com/dir/inner/another.html`	| 成功 | 只有路径不同 |
+| `https://store.company.com/secure.html`	| 失败 | 不同协议 ( https和http ) |
+| `http://store.company.com:81/dir/etc.html` | 失败 | 不同端口 ( http:// 80是默认的) |
+| `http://news.company.com/dir/other.html` | 失败 | 不同域名 ( news和store ) |
+
+同源策略限制了一下行为：
+
+- Cookie、LocalStorage 和 IndexDB 无法读取
+- DOM 和 JS 对象无法获取
+- Ajax 请求发送不出去
+
+## 实现跨域请求
+
+### CORS（Cross-Origin Resource Sharing，跨域源资源共享）
+
+CORS 是 W3C 的一个工作草案，定义了在必须访问跨域资源时，浏览器与服务器应该如何沟通。**CORS 背后的基本思想，就是使用自定义的 HTTP 头部让浏览器与服务器进行沟通，从而决定请求或者响应是否应该成功，还是应该失败**。
+
+整个 CORS 通信过程，都是浏览器自动完成，不需要用户参与。对于开发者来说，CORS通信与同源的 AJAX 通信没有差别，代码完全一样。浏览器一旦发现 AJAX 请求跨源，就会自动添加一些附加的头信息，有时还会多出一次附加的请求，但用户不会有感觉。
+因此，实现 CORS 通信的关键是服务器。只要服务器实现了CORS 接口，就可以跨源通信。
+
+#### 两种请求方式
+
+请求方式分两种：一种是简单请求，另一种是非简单请求。只要满足下面条件就是简单请求：
+
+- 请求方式为：HEAD、POST 或者 GET；
+- http 头信息不超出一下字段：Accept、Accept-Language 、 Content-Language、 Last-Event-ID、 Content-Type(限于三个值：application/x-www-form-urlencoded、multipart/form-data、text/plain)。
+
+区分这两种请求方式是因为浏览器对这这两种方式的处理方式是不同的。
+
+#### 简单请求
+
+对于简单的请求，在发送时，浏览器发现它是一个 CORS 请求，就会在就是在头信息之中，增加一个 `Origin` 字段，其中包含请求页面的源信息（协议、域名和端口），以便服务器根据这个头部信息来决定是否给予响应。
+
+例如：
+
+```
+GET /cors HTTP/1.1
+Origin: http://www.nczonline.net
+```
+
+如果服务器认为这个请求可以接受，就在 `Access-Control-Allow-Origin` 头部中回发相同的源信息（如果是公共资源，可以回发“*”），例如：
+
+```
+Access-Control-Allow-Origin: http://www.nczonline.net
+```
+
+如果没有 `Access-Control-Allow-Origin` 这个头部，或者有这个头部但源信息不匹配，浏览器就会驳回请求。正常情况下，浏览器会处理请求。注意，请求和响应默认是都不包含 cookie 信息的。
+
+**所以即使跨域了，但是请求还是发送了，只是在处理响应时，浏览器发现跨域，才驳回的**。
+
+#### 非简单请求
+
+CORS 通过 Preflight Request 的透明服务器验证机制支持开发人员使用自定义头部、GET 或 POST 之外的方法、不同类型的主体内容。
+
+这些非简单的 CORS 请求，会在正式通信之前，增加一次 HTTP 查询请求，称为“预检请求”（preflight request）。使用 OPTIONS 方法，发送一下头部：
+
+- Origin：与简单的请求相同
+- Access-Control-Request-Method：请求自身使用的方法
+- Access-Control-Request-Header：（可选）自定义的头部信息，多个头部以逗号分隔。
+
+例如，以下是一个带有自定义头部 NCZ 的使用 POST 方法发送请求时的 Preflight 请求：
+
+```
+Origin: http://www.nczonline.net
+Access-Control-Request-Method: POST
+Access-Control-Request-Header: NCZ
+```
+
+发送这个请求之后，服务器可以决定是否允许这种类型的请求。服务器通过在相应中发送如下头部与浏览器进行沟通。
+
+- Access-Control-Allow-Origin：与简单请求相同；
+- Access-Control-Allow-Methods：允许的方法，多个方法以逗号隔开；
+- Access-Control-Allow-Headers：允许的头部，多个头部以逗号分隔
+- Access-Control-Max-Age：应该将这个 Preflight 请求缓存多长时间（以秒计算）
+
+例如：
+
+```
+Access-Control-Allow-Origin: http://www.nczonline.net
+Access-Control-Allow-Methods: POST,GET
+Access-Control-Allow-Headers: NCZ
+Access-Control-Max-Age: 1728000
+```
+
+Preflight 请求结束后，会按照指定的响应时间缓存结果。在此有效时间内，不用发出另一条预检请求。
+
+一旦服务器通过了"预检"请求，以后每次浏览器正常的 CORS 请求，就都跟简单请求一样，会有一个 Origin 头信息字段。
+
+如果浏览器认定，服务器不同意预检请求，会触发一个错误，被 XMLHttpRequest 对象的 onerror 回调函数捕获。
+
+#### 带凭据的请求
+
+默认情况下，跨源请求不提供凭据（cookie、HTTP 认证及客户端 SSL 证明等）。通过将 `withCredentials` 属性设置为 `true`，可以指定某个请求应该发送数据。如果服务器接受带凭据的请求，会用以下 HTTP 头部来响应：
+
+```
+Access-Control-Allow-Credentials: true
+```
+
+如果发送的是带凭据的请求，但服务器的响应没有包含这个头部，那么浏览器就不会把响应交给 JavaScript（于是，responseText 中将是空字符串，status 的值为 0，而且会调用 onerror() 事件处理程序）。另外，服务器还可以在 Preflight 响应中发送这个 HTTP 头部，表示允许源发送带凭据的请求。
+
+接下来，看一下其他的跨域技术。
+
+在 CORS 出现以前，要实现跨域 AJax 通信破费周折。开发人员想出了一下方法，**利用 DOM 中能够执行跨域请求的功能**，在不依赖 XHR 对象的情况下也能发送某种请求。虽然 CORS 已经无处不在，但是开发人员自己发明的这些技术仍然被广泛应用，毕竟这样不需要修改服务器代码
+
+### 图像 Ping
+
+使用 <img /> 标签，我们知道，一个网页可以从任何网页中加载图像，不用担心跨域。这也是在线广告跟踪浏览量的主要方式。可以动态的创建图像，使用它们的 onload 和 onerror 时间处理程序来确定是否收到了响应。
+
+动态创建图像经常用于**图像 Ping**。**图像 Ping 是与服务器进行简单、单向的跨域通信的一种方式。请求的数据是通过查询字符串的形式发送的**。而响应是任意内容，通常是图像像素，或 204 响应。通过图像 Ping，浏览器得不到任何具体的数据，但是通过监听 onload 和 onerror 事件，它能知道响应是什么时候接收到的。
+
+```js
+var img = new Image();
+img.onload = img.onerror = function() {
+  alert("Done!");
+}
+img.src = "http://www.example.com/text?name=Nicholas";
+```
+
+这里创建了一个 Image 实例，然后给 onload 和 onerror 事件绑定同一个函数，这样无论什么响应，只要请求完成，都能得到通知。
+
+请求从 src 属性设置的那一刻开始，这个例子在请求中发送了一个 name 参数。
+
+图像 Ping 最常用于跟踪用户点击。图像 Ping 有两个主要的缺点：**一是只能发送 GET 请求，二是无法访问服务器的响应文本**。因此，图像 Ping 只能用于浏览器与服务器的单向通信。
+
+### JSONP
+
+JSONP 是 JSON with padding（填充式 JSON 或参数式 JSON） 的简写，是一种应用 JSON 的新方法。**JSONP 看起来和 JSON 差不多，只不过是被包含在函数调用中的 JSON**。例如像这样：
+
+```js
+callback({"name": "Nicholas"})
+```
+
+JSONP 由两个部分组成：**回调函数**和**数据**。
+
+- 回调函数：当响应到来时因该在页面中调用的函数，函数的名字一般在请求中指定。
+- 数据：就是传入回调函数中的 JSON 数据。 
+
+JSONP 是通过动态 `<script>` 元素来使用的，使用时可以为 `src` 属性制定一个跨域 URL。这里的 `<script>` 元素和 `<img>` 元素类似，都有能力不受限制从其他域中加载资源。因为 JSONP 是有效的 JavaScript 代码，所以在请求完成后，即在 JSONP 响应加载到页面中以后，就会立即执行。
+
+来看一个例子：
+
+```js
+function handleResponse(response) {
+  console.log(response.name);
+}
+var script = document.createElement("script");
+// 设置为跨域的 URL，并指定回调函数为 handleResponse
+script.src = "http://freegeoip.net/json/?callback=handleResponse";
+document.body.insertBefore(script);
+```
+
+因为指定了回调函数，所以返回的响应可以根据它来构造，将 JSON 数据包含到函数调用中，当请求完成后，立即执行，完成了请求。例如返回下面的代码：
+
+```js
+handleResponse({"name": "foo"});
+```
+
+JSONP 之所以非常流行，是因为它简单易用。和图像 Ping 相比，优点在于能够直接访问页面的响应文本。不过 JSONP 也有两点不足：
+
+- 首先，JSONP 从其他域中加载代码执行。如果其他域不安全，很可能会在响应中夹带一些恶意代码，而此时除了完全放弃 JSONP 调用之外，没有办法追究。因此使用的不是自己运维的 Web 服务时，一定要保证它的安全。
+- 其次，要确定 JSONP 请求是否失败并不容易。虽然 HTML5 给 `<script>` 元素新增 `onerror` 事件处理程序，但目前还没有得到任何浏览器支持。为此，我们可能不得不使用定时器来检测指定时间内是否接收到了响应。
+
+### 代理
+
+代理服务器解决跨域的思路，是利用代理服务器对浏览器页面的请求进行转发，因为同源策略的限制只存在在浏览器中，到了服务器端就没有这个限制了。
+
+相关配置再补充吧 =_=
+
+- node 代理跨域
+- nginx 代理
+
+## 参考
+
+- [JavaScript 高级程序设计 - 21 章](https://book.douban.com/subject/10546125/)
+- [MDN - 浏览器的同源策略](https://developer.mozilla.org/zh-CN/docs/Web/Security/Same-origin_policy)

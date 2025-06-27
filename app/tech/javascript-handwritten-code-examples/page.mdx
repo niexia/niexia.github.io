@@ -1,0 +1,511 @@
+## new
+
+```js
+/**
+ * new 操作符
+ * 
+ * 1.创建（或者说构造）一个全新的对象；
+ * 2.这个新对象会被执行 [[Prototype]] 链接；
+ * 3.这个新对象会被绑定到函数调用的 this；
+ * 4.如果函数没有返回其他新对象，那么 new 表达式中的函数调用会自动返回这个新对象。
+ *
+ * @param {Function} fn 构造函数
+ */
+function myNew(fn) {
+  var obj = {};
+  obj.__proto__ = fn.prototype;
+  var args = [].slice.call(arguments, 1);
+  var result = fn.apply(obj, args);
+  return typeof result === 'object' && result !== null ? result : obj;
+}
+// test
+function Foo(name, age) {
+  this.name = name;
+  this.age = age;
+}
+function Baz(name, age) {
+  this.name = name;
+  this.age = age;
+  return {a: 1};
+}
+myNew(Foo, 1, 2); // {name: 1, age: 2}
+myNew(Baz, 1, 2); // {a: 1}
+```
+
+## JSON.stringfy
+
+```js
+/**
+ * JSON.stringfy
+ * 
+ * 语法格式：JSON.stringify(value[, replacer [, space]])
+ * 
+ * @param {*} obj 要序列化的参数
+ */
+function jsonStringfy(obj) {
+  let type = typeof obj;
+  if (type !== 'object') {
+    if (/function|undefined|symbol/.test(type)) return undefined;
+    if (type === 'string') obj = `"${obj}"`;
+    return String(obj);
+  } else {
+    let json = [];
+    let isArr = Array.isArray(obj);
+    for (let k in obj) {
+      let v = obj[k];
+      let type = typeof v;
+      if (/function|undefined|symbol/.test(type)) continue;
+      if (type === 'string') {
+        v = `"${v}"`;
+      } else if (type === 'object') {
+        v = jsonStringfy(v);
+      }
+      json.push((isArr ? "" : `"${k}":`) + String(v));
+    }
+    // String(json) 数组转为字符串，然后再用 "[]" 或 "{}" 包裹
+    return (isArr ? "[" : "{") + String(json) + (isArr ? "]" : "}")
+  }
+}
+```
+
+## JSON.parse
+
+```js
+/**
+ * JSON.parse
+ *
+ * @param {*} str 反序列化的字符串
+ * @returns 返回结果
+ */
+
+// eval
+function jsonParse(str) {
+  return eval(`(${str})`)
+}
+
+// Function
+function jsonParse(str) {
+  return (new Function('return ' + jsonStr))();
+}
+```
+
+## call
+
+```js
+/**
+ * call
+ *
+ * @param {*} context 
+ * @param {*} args 
+ * @returns 
+ */
+Function.prototype.call1 = function (context = window, ...args) {
+  if (this === Function.prototype) return undefined;
+  context.fn = this;
+  let result = context.fn(...args);
+  delete context.fn;
+  return result;
+}
+```
+
+## apply
+
+```js
+/**
+ * apply
+ *
+ * @param {*} context 
+ * @param {*} args 
+ * @returns 
+ */
+Function.prototype.apply1 = function (context = window, args) {
+  if (this === Function.prototype) return undefined;
+  context.fn = this;
+  let result;
+  if (Array.isArray(args)) {
+    result = context.fn(...args);
+  } else {
+    result = context.fn();
+  }
+  delete context.fn;
+  return result;
+}
+```
+
+## bind
+
+```js
+/**
+ * bind
+ *
+ * @param {*} context 
+ * @param {*} args1
+ * @returns 
+ */
+
+Function.prototype.bind1 = function (context, ...args1) {
+  if (typeof this !== 'function') {
+    throw new Error('Not a function');
+  }
+  let fn = this;
+  function ToBind(...args2) {
+    return fn.apply(
+      this instanceof F ? this : context || window,
+      args1.concat(args2)
+    )
+  }
+  function F() {};
+  F.prototype = fn.prototype;
+  ToBind.prototype = new F();
+  return ToBind;
+}
+```
+
+## 继承
+
+```js
+/**
+ * 实现一个继承
+ */
+function Parent(name) {
+  this.name = name;
+}
+Parent.prototype.sayName = function() {
+  console.log('name:', this.name);
+}
+function Children(name, age) {
+  Parent.call(this, name);
+  this.age = age;
+}
+function create(obj) {
+  function F() {};
+  F.prototype = obj;
+  return new F();
+}
+Children.prototype = create(Parent.prototype);
+// 或者直接只用 Object.create()
+// Children.prototype = Object.create(Parent.prototype);
+Children.prototype.sayAge = function() {
+  console.log('age:', this.age);
+}
+Object.defineProperty(Children.prototype, 'constructor', {
+  value: Children,
+  enumerable: false,
+  writable: true,
+  configurable: true,
+})
+var child = new Children('Foo', 20);
+child.sayAge(); // 20
+child.sayName(); // 'Foo'
+```
+
+## 柯里化
+
+```js
+function curry(fn) {
+  let args = Array.prototype.slice.call(arguments, 1);
+  return function () {
+    let innerArgs = Array.prototype.slice.call(arguments);
+    return fn.apply(this, args.concat(innerArgs));
+  }
+}
+
+// 1. 实现 multi(2)(3)(4), multi(2,3,4), multi(2)(3,4)
+function multiFn(a, b, c) {
+  return a * b * c;
+}
+function curry1(fn) {
+  let length = fn.length;
+  let args1 = Array.prototype.slice.call(arguments, 1);
+  return function () {
+    let args2 = Array.prototype.slice.call(arguments);
+    let args = args1.concat(args2);
+    if (args.length >= length) {
+      return fn.apply(this, args);
+    } else {
+      return curry1(fn, ...args);
+    }
+  }
+}
+let multi = curry1(multiFn);
+multi(2,3,4);
+multi(2)(3)(4);
+
+// 2. 实现 multi(2)(3)(4)(), multi(2)(3)(), multi(2)(3)(4)(5)(), multi(2,3,4,5)()
+function multiFn() {
+  let args = Array.prototype.slice.call(arguments);
+  return args.reduce((pre, cur) => pre * cur);
+}
+function curry2(fn) {
+  let args1 = Array.prototype.slice.call(arguments, 1);
+  return function () {
+    let arg2 = Array.prototype.slice.call(arguments);
+    if (arguments.length === 0) {
+      return fn.apply(this, args1.concat(arg2));
+    } else {
+      return curry2(fn, ...args1.concat(arg2));
+    }
+  }
+}
+let multi = curry2(multiFn);
+multi(2)(3)(4)();
+```
+
+## Promise
+
+```js
+/**
+ * Promise
+ */
+
+// 简单版
+const PENDING = "pending"
+const FULFILLED = "fulfilled"
+const REJECTED = "rejected"
+
+function Promise(f) {
+  this.state = PENDING;
+  this.value = undefined;
+  this.reason = undefined;
+
+  const resolve = value => {
+    if (value === this) {
+      throw new TypeError('Can not fulfill itself');
+    }
+    if (value instanceof Promise) {
+      return value.then(resolve, reject);
+    }
+    setTimeout(() => {
+      if (this.state === PENDING) {
+        this.state = FULFILLED;
+        this.value = value;
+      }
+    })
+  }
+  
+  const reject = reason => {
+    setTimeout(() => {
+      if (this.state === PENDING) {
+        this.state = REJECTED;
+        this.reason = reason;
+      }
+    })
+  }
+
+  try {
+    f(resolve, reject)
+  } catch (error) {
+    reject(error)
+  }
+}
+
+Promise.prototype.then = function(onFulfilled, onRejected) {
+  if (this.state === FULFILLED) {
+    onFulfilled(this.value);
+  } else if (this.state === REJECTED) {
+    onRejected(this.reason);
+  }
+}
+var promise = new Promise((resolve, reject) => resolve(1))
+promise.then(v => console.log(v)); // 1
+
+// 完整版
+const isFunction = obj => typeof obj === 'function'
+const isObject = obj => !!(obj && typeof obj === 'object')
+const isThenable = obj => (isFunction(obj) || isObject(obj)) && 'then' in obj
+const isPromise = promise => promise instanceof Promise
+
+const PENDING = 'pending'
+const FULFILLED = 'fulfilled'
+const REJECTED = 'rejected'
+
+function Promise(f) {
+  this.result = null
+  this.state = PENDING
+  this.callbacks = []
+
+  let onFulfilled = value => transition(this, FULFILLED, value)
+  let onRejected = reason => transition(this, REJECTED, reason)
+
+  let ignore = false
+  let resolve = value => {
+    if (ignore) return
+    ignore = true
+    resolvePromise(this, value, onFulfilled, onRejected)
+  }
+  let reject = reason => {
+    if (ignore) return
+    ignore = true
+    onRejected(reason)
+  }
+
+  try {
+    f(resolve, reject)
+  } catch (error) {
+    reject(error)
+  }
+}
+
+Promise.prototype.then = function(onFulfilled, onRejected) {
+  return new Promise((resolve, reject) => {
+    let callback = { onFulfilled, onRejected, resolve, reject }
+
+    if (this.state === PENDING) {
+      this.callbacks.push(callback)
+    } else {
+      setTimeout(() => handleCallback(callback, this.state, this.result), 0)
+    }
+  })
+}
+
+const handleCallback = (callback, state, result) => {
+  let { onFulfilled, onRejected, resolve, reject } = callback
+  try {
+    if (state === FULFILLED) {
+      isFunction(onFulfilled) ? resolve(onFulfilled(result)) : resolve(result)
+    } else if (state === REJECTED) {
+      isFunction(onRejected) ? resolve(onRejected(result)) : reject(result)
+    }
+  } catch (error) {
+    reject(error)
+  }
+}
+
+const handleCallbacks = (callbacks, state, result) => {
+  while (callbacks.length) handleCallback(callbacks.shift(), state, result)
+}
+
+const transition = (promise, state, result) => {
+  if (promise.state !== PENDING) return
+  promise.state = state
+  promise.result = result
+  setTimeout(() => handleCallbacks(promise.callbacks, state, result), 0)
+}
+
+const resolvePromise = (promise, result, resolve, reject) => {
+  if (result === promise) {
+    let reason = new TypeError('Can not fulfill promise with itself')
+    return reject(reason)
+  }
+
+  if (isPromise(result)) {
+    return result.then(resolve, reject)
+  }
+
+  if (isThenable(result)) {
+    try {
+      let then = result.then
+      if (isFunction(then)) {
+        return new Promise(then.bind(result)).then(resolve, reject)
+      }
+    } catch (error) {
+      return reject(error)
+    }
+  }
+
+  resolve(result)
+}
+```
+
+## 防抖函数
+
+```js
+/**
+ * debounce
+ *
+ * @param {Function} fn 进行防抖处理的函数
+ * @param {Number} wait 延迟时间
+ * @param {Boolean} immediate 是否立即执行
+ * @returns
+ */
+function debounce(fn, wait, immediate) {
+  let timer = null;
+  return function() {
+    if (timer) clearTimeout(timer);
+    if (immediate && !timer) fn.apply(this, arguments);
+    timer = setTimeout(() => {
+      fn.apply(this, arguments);
+    }, wait)
+  }
+}
+```
+
+## 节流函数
+
+```js
+/**
+ * throttle
+ *
+ * @param {*} fn 函数
+ * @param {*} interval 间隔时间
+ * @returns
+ */
+function throttle(fn, interval) {
+  let last = 0;
+  let timer = null;
+  return function() {
+    let now = Date.now();
+    let delay = interval - (now - last);
+    if (delay <= 0) {
+      if (timer) {
+        clearTimeout(timer);
+        timer = null;
+      }
+      fn.apply(this, arguments);
+    } else {
+      timer = setTimeout(() => {
+        fn.apply(this, arguments);
+      }, delay)
+    }
+  }
+}
+```
+
+## 深拷贝
+
+```js
+/**
+ * 深拷贝
+ *
+ * @param {*} obj
+ * @returns
+ */
+function deepClone(obj) {
+  if (typeof obj !== 'object' || obj === null) return obj;
+  let res = Array.isArray(obj) ? [] : {};
+  for (let k in obj) {
+    if (typeof obj[k] === 'object') {
+      res[k] = deepClone(obj[k]);
+    } else {
+      res[k] = obj[k];
+    }
+  }
+  return res;
+}
+```
+
+## instanceof
+
+```js
+/**
+ * instanceOf
+ *
+ * @param {*} obj 对象
+ * @param {*} ctor 构造函数
+ */
+function instanceOf(obj, ctor) {
+  let proto = obj.__proto__
+  let prototype = ctor.prototype
+  while (true) {
+    if (proto === null) return false
+    if (proto === prototype) return true
+    proto = proto.__proto__
+  }
+}
+```
+
+## 参考
+
+- [JavaScript手写代码无敌秘籍](https://juejin.im/post/5c9c3989e51d454e3a3902b6#heading-19)
+- [第1738期 100 行代码实现 Promises/A+ 规范](https://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&mid=2651234151&idx=1&sn=6292156c16e851d8d5f1dbccdfc82a74&chksm=bd4946e38a3ecff561bef99277e0f1ad5ec7f7014437aa100cb01e872eee80985adb04734b11&mpshare=1&scene=1&srcid=1211kyj1oLytVrRxcOWz6Of9&sharer_sharetime=1576051459008&sharer_shareid=b6c4b6250c32718a2107726f684cc201&key=077f61a7e04d28381b622bbe872d86f198d7bc90e1cda9ec743455a1209e116bd13b221d41114c09dd9ec2d6b9355207ade458890c62bd50e840266db64fdde13bba401b67ea0f876012f0266e3d19e4&ascene=1&uin=MjU0MjUyMzgwMw%3D%3D&devicetype=Windows+10&version=62070158&lang=zh_CN&exportkey=AYt5p6CWLEAG483yuB0cdtQ%3D&pass_ticket=kIAwdSfUm098sABzkMq%2FIXfbUyjbTjGd7jzI6dq88tqpl5gMXxB405cG7nrh2ivB##)
+- [MDN - JSON.stringfy](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify)

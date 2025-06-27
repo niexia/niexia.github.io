@@ -1,0 +1,251 @@
+Visual Studio Code 是由微软开发的一款免费、跨平台的文本编辑器。由于其卓越的性能和丰富的功能，它很快就受到了大家的喜爱。同时，它强大的扩展插件也给开发带来极大的便利。
+
+在开发过程中，会逐渐形成一些常用或者公共的代码片段，这个时候就可以通过 VSCode 的自动补全来提高我们的效率了，自动补全的代码就是一些使用频率最高的，通过这种方式最能帮助我们提高编码的速度。
+
+## 在 VSCode 上配置 Snippets
+
+VSCode 本身就支持代码片段自动补全的配置。按下快捷键 `shift+ctrl+p` 显示所有命令，然后输入 `Snippets`，选择“首选项：配置用户代码判断”。
+
+![20191111134216](https://user-images.githubusercontent.com/28384700/68568495-aea6e480-0496-11ea-8de9-642d56ec09ca.png)
+
+![20191111134319](https://user-images.githubusercontent.com/28384700/68568449-95059d00-0496-11ea-93ad-59c85cbe7949.png)
+
+接下来会提示配置那种语言的代码判断，这里以 `javascript.json` 为例。
+
+![20191111135013](https://user-images.githubusercontent.com/28384700/68568504-b8304c80-0496-11ea-9a58-24360397da4d.png)
+
+每个代码片段都必须包含：
+
+- prefix: 前缀是用来触发代码段的
+- body：片段的主体内容，将会被扩展插入
+- description：说明描述
+
+另外 `$1`, `$2` 用于制表符（Tab）切换停止, `$0` 是最后一个位置, 还有 `${1:label}`, `${2:another}`用于配置占位符。
+
+```
+{
+    // Place your snippets for javascript here. Each snippet is defined under a snippet name and has a prefix, body and 
+    // description. The prefix is what is used to trigger the snippet and the body will be expanded and inserted. Possible variables are:
+    // $1, $2 for tab stops, $0 for the final cursor position, and ${1:label}, ${2:another} for placeholders. Placeholders with the 
+    // same ids are connected.
+    // Example:
+    // "Print to console": {
+    //    "prefix": "log",
+    //     "body": [
+    //         "console.log('$1');",
+    //          "$2"
+    //     ],
+    //     "description": "Log output to console"
+    // }
+    "for of": {
+        "prefix": "forof",
+        "body": [
+            "for (let v of ${1:arr}) {",
+            "\t${2://body}",
+           "}"
+        ],
+        "description": "for of"
+    }
+}
+```
+
+然后配置了一个 `for of`，保存之后，在一个 `.js` 文件里边输入 `forof` 这个时候出现我们配置的代码片段了，选择就可以自动补全了！
+
+![20191111135043](https://user-images.githubusercontent.com/28384700/68568516-c1b9b480-0496-11ea-912c-931b6c11f7f9.png)
+
+很方便，但是还存在一些问题：
+
+- 在自己的 VSCode 中配置的，不方便共享；
+- 换个环境就需要重新配置。
+
+这就需要 VSCode 扩展插件了
+
+## 自定一个 VSCode 自动补全插件
+
+接下来，将以一个简单的代码片段自动补全插件为例，看看整个过程
+
+### 环境准备
+
+- 安装脚手架，官方推荐使用的脚手架工具 Yeoman 和 Generator-code
+
+```shell
+npm install -g yo generator-code
+```
+
+- 安装打包和发布工具 vsce
+
+```shell
+npm install -g vsce
+```
+
+### 初始化项目，并选择配置
+
+输入 `yo code` 进行初始化，接下来会提示你选择一些配置，主要包括插件类型、名称和描述等等。不同的插件类型会对应不同的模板，这里选择 `Code Snippets`。
+
+```shell
+yo code
+```
+
+![20191111154005](https://user-images.githubusercontent.com/28384700/68569665-a13f2980-0499-11ea-9ccc-c436c15e0062.png)
+
+生成的代码结构如下
+
+```
+├── .vscode
+	├── launch.json  # 插件加载和调试的配置
+├── snippets
+	├── snippets.json  # 代码片段
+├── CHANGELOG.md  # 变更记录
+├── package.json  # 声明当前插件相关信息
+├── README.md  # 插件使用说明
+└── vsc-extension-quickstart.md
+```
+
+![20191111140247](https://user-images.githubusercontent.com/28384700/68568554-dac26580-0496-11ea-9c20-e7de677dc616.png)
+
+### 自定义代码片段并调试
+
+通过上面的例子，我们已经知道配置规则了。这里我还新建一个 `.vue` 的自动补全：
+
+```json
+"contributes": {
+    "snippets": [
+        {
+            "language": "javascript",
+            "path": "./snippets/snippets.json"
+        },
+        {
+            "language": "vue",
+            "path": "./snippets/vue.json"
+        }
+    ]
+}
+```
+
+然后配置如下：
+
+- `snippets/snippets.json`
+
+```json
+{
+  "forEach": {
+    "prefix": "fe",
+    "body": [
+      "${1:array}.forEach(function(item) {",
+      "\t${2:// body}",
+      "});"
+    ],
+    "description": "Code snippet for \"forEach\""
+  },
+  "for of": {
+        "prefix": "forof",
+        "body": [
+            "for (let v of ${1:arr}) {",
+            "\t${2://body}",
+           "}"
+        ],
+        "description": "for of"
+    }
+}
+```
+
+- `snippets/vue.json`
+
+```json
+{
+  "templateLang": {
+    "prefix": "templateLang",
+    "body": [
+      "<template lang=\"$1\">",
+      "\t<div$2>",
+      "\t\t$0",
+      "\t</div>",
+      "</template>"
+    ],
+    "description": "template element"
+  },
+  "script": {
+    "prefix": "script",
+    "body": [
+      "<script>",
+      "export default {",
+      "\tname: '$1',",
+      "\tdata() {",
+      "\t\treturn {",
+      "\t\t\t$2",
+      "\t\t}",
+      "\t},",
+      "\tmethods: {",
+      "\t\t",
+      "\t}",
+      "}",
+      "</script>"
+    ],
+    "description": "script element"
+  },
+  "styleLang": {
+    "prefix": "styleLang",
+    "body": [
+      "<style lang=\"$1\">",
+      "\t$0",
+      "</style>"
+    ],
+    "description": "style element with lang attribute"
+  }
+}
+```
+
+接下来进行调试，这块的说明在 `vsc-extension-quickstart.md` 都有说明了。按下 `F5` 会打开一个新的窗口：
+
+![20191111140704](https://user-images.githubusercontent.com/28384700/68568573-e57cfa80-0496-11ea-91c6-d944368e585f.png)
+
+然后在新窗口中新建 `.js` 和 `.vue` 文件，输入刚才定义的代码片段的 `prefix`，这个时候就会出现提示了！
+
+![20191111140736](https://user-images.githubusercontent.com/28384700/68568592-f3cb1680-0496-11ea-8e34-eb0cbb345069.png)
+![20191111140809](https://user-images.githubusercontent.com/28384700/68568595-f594da00-0496-11ea-9d8a-f7e1a5368b3e.png)
+
+如果你又修改了配置的代码片段，这是需要按下 `ctrl+r` 重新加载才生效。
+
+### 打包发布
+
+- 打包
+
+输入命令 `vsce package` 进行打包，打包完成之后就会生成一个 `.vsix` 的安装包，如果进作为团队或者内网使用，那么手动安装即可，无需发布到 VSCode 插件市场。
+
+注意，直接打包会发生一些错误：
+
+![20191111132836](https://user-images.githubusercontent.com/28384700/68568618-080f1380-0497-11ea-8df4-cce505b76d1b.png)
+
+1. Missing publisher name：如果不发布，则直接在 `package.json` 加上这个即可：
+
+```
+{
+    "description": "common code snippets",
+    "publisher": "test"
+    "version": "0.0.1",
+}
+````
+2. 没有编辑 `README.md`：需要更改这个文件
+
+3. 没有 `repository` 地址：不发布的话这个可以不配置，若需要发布，则加上 github 上对应的地址。
+
+然后就可以打包成功了：
+
+![20191111153158](https://user-images.githubusercontent.com/28384700/68569282-b49dc500-0498-11ea-898e-bfe60fa5f9ea.png)
+
+接着可以选择安装这个扩展：
+
+![20191111153247](https://user-images.githubusercontent.com/28384700/68569296-b9fb0f80-0498-11ea-8ce3-b471d34fe48d.png)
+
+- 发布
+
+发布需要发布者账号，所以你需要前往 [marketplace](https://marketplace.visualstudio.com/) 注册。注册之后需要创建一个 `organization`，然后申请 Personal Access Tokens 。详细申请细节见 [Publishing Extension](https://code.visualstudio.com/api/working-with-extensions/publishing-extension)。
+输入命令 `vsce publish` 进行发布。
+
+这是发布之后的地址 [Self Snippets](https://marketplace.visualstudio.com/items?itemName=niexias.self-snippets)，以及代码地址 [self-snippets](https://github.com/niexias/self-snippets)
+
+
+## 参考
+
+- [DIY VSCode 插件，让你的开发效率突飞猛进](https://juejin.im/post/5d9f2f436fb9a04e187c9c24)
+- [Publishing Extension](https://code.visualstudio.com/api/working-with-extensions/publishing-extension)

@@ -1,0 +1,162 @@
+### 一个 Generator
+
+Generator 可以看作是一个状态机，保存了多个内部状态，执行 Generator 函数会返回一个遍历器对象，它可以用来遍历 Generator 内部的每个状态。
+
+调用 Generator 之后，函数并没有执行，而是返回一个指向内部状态的指针对象，也就是遍历器对象。每次调用遍历器对象的 next 方法，内部指针从函数头部或者上次执行停下来开始执行，直到遇到 yield 表达式或者 return 语句为止。
+
+调用 next 方法返回的是一个有着 value 和 done 两个属性的对象。value 属性表示当前状态的值，是 yield 或者 return 后面那个表达式的值；done 属性是一个布尔值，表示是否遍历结束。
+
+```
+const generator1 = function* () {
+  yield 1;
+  yield 2;
+ return 3;
+};
+const iterator1 = generator1();
+
+console.log(iterator1.next()); // {value: 1, done: false}
+console.log(iterator1.next()); // {value: 2, done: false}
+console.log(iterator1.next()); // {value 3, done: true}
+console.log(iterator1.next()); // {value: undefined, done: true}
+```
+
+### yield 表达式
+
+yield 是暂停标志，遍历器的 next 方法运行的逻辑如下
+
+1. 遇到 yield 表达式，就暂停执行后面的操作，并将紧跟在 yield 后面的那个表达式的值，作为返回的对象的 value 属性值。
+2. 下一次调用 next 方法时，再继续往下执行，直到遇到下一个 yield 表达式。
+3. 如果没有再遇到新的 yield 表达式，就一直运行到函数结束，直到 return 语句为止，并将 return 语句后面的表达式的值，作为返回的对象的 value 属性值。
+4. 如果该函数没有 return 语句，则返回的对象的 value 属性值为 undefined。
+
+需要注意的是，yield 表达式后面的表达式，只有当调用 next 方法、内部指针指向该语句时才会执行，因此等于为 JavaScript 提供了手动的“惰性求值”（Lazy Evaluation）的语法功能。
+
+```
+function* gen() {
+  yield  123 + 456;
+}
+```
+
+表达式 123 + 345 并不会立即求值，只会在 next 将指针移动到这一句时才执行。
+
+### yield 语句的返回值
+
+```
+const generator2 = function* () {
+  const result = yield 3.141592;
+  console.log(result);
+};
+
+const iterator2 = generator2();
+const next = iterator2.next();
+
+iterator2.next(next.value.toFixed(2)); //3.14
+```
+
+### Generator 的自动执行
+
+```
+const generator3 = function* () {
+  yield console.log(1);
+  yield console.log(2);
+  console.log(3);
+};
+
+const run1 = myGenerator => {
+  const myIterator = myGenerator();
+  let next;
+  do {
+    next = myIterator.next();
+  } while (!next.done)
+};
+
+run1(generator3);
+// 1
+// 2
+// 3
+```
+
+### Generator 的特点
+
+- 在 iterator.next() 被调用之前，generator 暂停在 yield 语句上，不会往下执行。串行执行，继续执行的时间点可控。
+- yield 语句可以有输出（返回值）。每一个异步单元都有一个（或多个）输出。
+
+### 定个小目标
+
+基于 Promise 的 2 步串行异步编程
+
+```
+const generator4 = function* () {
+  const author = yield Authors.findOne({
+    where: {name: 'Curry'}
+  });
+  const books = yield Books.find({
+    where: {authorId: author.id}
+  });
+}
+```
+
+### 编写自动执行器
+
+1. 触发迭代器 next 方法的时机：在 promise 的 then 中 iteration.next();
+2. 为 yield 语句注入返回值：把 resolve 值绑定到 iteration.next 的参数。
+
+```
+const run2 = myGenerator => {
+  const myIterator = myGenerator();
+  let next = myIterator.next();
+  const loop = () => {
+    if (!next.done) {
+      next.value.then(data => {
+        next = myIterator.next(data);
+        loop();
+      });
+    }
+  }
+  loop();
+};
+
+const generator5 = function* () {
+  const a = yield new Promise((resolve, reject) => {
+    setTimeout(resolve.bind(null, 1), 1000);
+  });
+  console.log(a);
+  const b = yield new Promise((resolve, reject) => {
+    setTimeout(resolve.bind(null, 2), 2000);
+  });
+  console.log(b);
+};
+
+run2(generator5);
+```
+
+### 加入错误处理
+
+```
+const run3 = myGenerator => {
+  const myIterator = myGenerator();
+  return new Promise((resolve, reject) => {
+    let next;
+    try {
+      next = myIterator.next();
+    } catch (e) {
+      reject(e);
+    }
+    const loop = () => {
+      if (!next.done) {
+        next.value.then(data => {
+          try {
+            next = myIterator.next(data);
+          } catch (e) {
+            reject (e);
+          }
+          loop();
+        }).catch (reject);
+      } else {
+        resolve(next.value);
+      }
+   }
+   loop();
+  });
+};
+````

@@ -1,0 +1,156 @@
+先看一下这样图
+
+![image](https://user-images.githubusercontent.com/28384700/64506434-2aa37580-d30a-11e9-962e-7d53ed159e99.png)
+
+## scrollX
+
+![image](https://user-images.githubusercontent.com/28384700/64551260-396c4580-d367-11e9-9305-88163a503d24.png)
+
+- scrollTop、scrollLeft
+  
+一个元素的内容垂直滚动和水平滚动的像素值。`scrollTop` 可以读取或设置这个元素的顶部到视口可见内容（的顶部）的距离。当一个元素的内容没有产生垂直方向的滚动条，那么 `scrollTop` 的值是 `0`。`scrollLeft` 可以读取或设置元素滚动条到元素左边的距离。当一个元素的内容没有产生水平方向的滚动条，那么 `scrollLeft` 的值是 `0`。
+
+- scrollWidth、scrollHeight
+
+为只读属性。`scrollWidth` 和 `scrollHeight` 属性指包含滚动条在内的该元素的视觉面积。视口之外隐藏的部分也被包含在里面。那么 `document` 对象的 `scrollWidth` 和 `scrollHeight` 属性就是网页的大小，意思就是滚动条滚过的所有长度和宽度。
+
+## offsetX
+
+![image](https://user-images.githubusercontent.com/28384700/64551367-73d5e280-d367-11e9-8e39-0f6f925db354.png)
+
+- offsetTop、offsetLeft
+  
+为只读属性。`offsetTop` 返回当前元素相对于其 `offsetParent` 元素的顶部的距离。`offsetLeft` 返回当前元素相对于其 `offsetParent` 元素的左边界的距离。
+
+**注意**：`offsetTop` 和 `offsetLeft` 不包含 `offsetParent` 的 `border`。
+
+- offsetWidth、offsetHeight
+
+为只读属性。`offsetWidth` 返回一个元素的布局宽度，`offsetWidth` 包含元素的 `border`、`padding`、`content` 的宽度和竖直方向滚动条 `scrollBar`（如果存在）。`offsetHeight` 返回一个元素的布局高度，`offsetHeight` 包含元素的 `border`、`padding`、`content` 的高度和水平方向滚动条 `scrollBar`（如果存在）。
+
+## clientX
+
+![image](https://user-images.githubusercontent.com/28384700/64551476-b0094300-d367-11e9-9b66-279370db03de.png)
+
+- clientTop、clientLeft
+  
+为只读属性。`clientTop` 返回一个元素顶部边框的宽度，不包括外边距和内边距，即 `border-top-width`。`clientLeft` 返回一个元素左边框的宽度，不包括外边距和内边距，即 `border-left-width`。
+
+- clientWith、clientHeight
+
+为只读属性。`clientWith` 表示元素内部的宽度，即 content 宽度和 padding。但是不包含外边距、边框和垂直滚动条（如果有）。`clientHeight` 表示元素内部的高度，即 content 高度和 padding。但是不包含外边距、边框和水平滚动条（如果有）。内联元素的 `clientWidth` 和 `clientHeight` 为 `0`。
+
+## 总结
+
+如果一个元素没有滚动条，那么它的 `scrollWidth` 和 `clientWidth` 应该是相等的。`scrollHeight` 和 `clientHeight` 也相等。而 `offsetWidth` 和` clientWidth` 相比，`offsetWidth` 还包含了 `border`，`offsetHeight` 和 `clientWidth` 也类似。
+
+## 应用
+
+1.  滚动到顶部
+
+```js
+element.scrollTop = 0
+```
+2.  元素是否滚动到底
+
+```js
+element.scrollHeight - element.scrollTop === element.clientHeight
+```
+
+3. 获取元素的绝对位置。
+
+**元素的绝对位置，指该元素的左上角相对于整张网页左上角的坐标**。
+
+这个绝对位置需要通过计算才能得到。每个元素都有 `offsetTop` 和 `offsetLeft` 属性，表示该元素左上角和父容器（`offsetParent` 对象）左上角的距离。所以，只要将这两个值累加，就可以得到元素的绝对位置。
+
+```js
+function getElementLeft(element) {
+  var actualLeft = element.offsetLeft;
+  var current = element.offsetParent;
+
+  while (current !== null) {
+    actualLeft += current.offsetLeft;
+    current = current.offsetParent;
+  }
+
+  return actualLeft;
+}
+
+function getElementTop(element) {
+  var actualTop = element.offsetTop;
+  var current = element.offsetParent;
+
+  while (current !== null) {
+    actualTop += current.offsetTop;
+    current = current.offsetParent;
+  }
+
+  return actualTop;
+}
+```
+
+4. 获取网页元素的相对位置
+
+**网页元素的相对位置，指该元素左上角相对于浏览器窗口左上角的坐标**。
+
+有了绝对位置之后，获得相对坐标就容易了，只要将绝对坐标减去滚动条滚动的距离就可以了。滚动条滚动条的垂直距离，是 `document` 对象的 `scrollTop`；滚动条滚动的水平距离是 `document` 的 `scrollLeft` 属性。对上面的方法改写一下
+
+```js
+function getElementViewLeft(element) {
+  var actualLeft = element.offsetLeft;
+  var current = element.offsetParent;
+
+  while (current !== null) {
+    actualLeft += current.offsetLeft;
+    current = current.offsetParent;
+  }
+
+  if (document.compatMode == "BackCompat") {
+    var elementScrollLeft = document.body.scrollLeft;
+  } else {
+    var elementScrollLeft = document.documentElement.scrollLeft;
+  }
+
+  return actualLeft - elementScrollLeft;
+}
+
+function getElementViewTop(element) {
+  var actualTop = element.offsetTop;
+  var current = element.offsetParent;
+
+  while (current !== null) {
+    actualTop += current.offsetTop;
+    current = current.offsetParent;
+  }
+
+  if (document.compatMode == "BackCompat") {
+    var elementScrollTop = document.body.scrollTop;
+  } else {
+    var elementScrollTop = document.documentElement.scrollTop;
+  }
+
+  return actualTop - elementScrollTop;
+}
+```
+
+除了这种方法之外，还有一种快速的方法，那就是使用 `getBoundingClientRect()` 方法。它返回一个对象，其中包含了 `left`、`right`、`top`、`bottom` 四个属性，分别对应了该元素的**左上角**和**右下角**相对于浏览器窗口（viewport）左上角的距离。
+
+所以，网页元素的相对位置就是
+
+```js
+var X = this.getBoundingClientRect().left;
+var Y = this.getBoundingClientRect().top;
+```
+
+再加上滚动的距离，就可以得到绝对位置
+
+```js
+var X = this.getBoundingClientRect().left + document.documentElement.scrollLeft;
+var Y = this.getBoundingClientRect().top + document.documentElement.scrollTop;
+```
+
+## 参考
+
+- [用Javascript获取页面元素的位置](http://www.ruanyifeng.com/blog/2009/09/find_element_s_position_using_javascript.html)
+- [The properties of offsetTop, clientTop, scrollTop, offsetTop in the JS](https://www.programering.com/a/MTM2QTNwATA.html)
+- [蒙了吗？offsetLeft、offsetWidth、scrollTop、scrollWidth、event.pageX](https://juejin.im/post/5ac08b405188257cc20d6d52)
