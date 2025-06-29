@@ -1,3 +1,10 @@
+export const metadata = {
+  title: "Generator与异步编程实践",
+  date: "2019-03-18",
+  tag: ["javascript", "es6"],
+  description: "深入解析Generator函数在异步编程中的应用与实现原理"
+}
+
 ### 一个 Generator
 
 Generator 可以看作是一个状态机，保存了多个内部状态，执行 Generator 函数会返回一个遍历器对象，它可以用来遍历 Generator 内部的每个状态。
@@ -158,5 +165,6 @@ const run3 = myGenerator => {
    }
    loop();
   });
+
+
 };
-````

@@ -1,3 +1,10 @@
+export const metadata = {
+  title: "MVC、MVP与MVVM架构模式对比",
+  date: "2021-08-02",
+  tag: ["architecture", "design-pattern"],
+  description: "深入解析三种主流前端架构模式的特点、区别及应用场景"
+}
+
 # MVC、MVP、MVVM
 
 看了几篇 MVC 的 MVVM 的文章，感觉一些背景和区分都不太清楚，一部分还主要是根据一些实际的开发反过来硬套 MVC。不过最后根据其中一些大佬们整理的文章，也总算有一点点头绪，这里记录一下
@@ -25,7 +32,7 @@
 
 在1979年，经典MVC模式被提出。
 
-在当时，人们一直试图将纯粹描述思维中的对象与跟计算机环境打交道的代码隔离开来，而Trygve Reenskaug在跟一些人的讨论中，逐渐剥离出一系列的概念，最初是Thing、Model、View、Editor。后来经过讨论定为Model、View和Controller。作者自言“最难搞的就是给这些架构组件起名字”。
+当时，人们一直试图将纯粹描述思维中的对象与跟计算机环境打交道的代码隔离开来，而Trygve Reenskaug在跟一些人的讨论中，逐渐剥离出一系列的概念，最初是Thing、Model、View、Editor。后来经过讨论定为Model、View和Controller。作者自言“最难搞的就是给这些架构组件起名字”。
 
 因为当时的软件环境跟现在有很大不同，所以**经典MVC中的概念很难被现在的工程师理解**。比如经典 MVC中说：“*view 永远不应该知道用户输入，比如鼠标操作和按键。*”对一个现代的软件工程师来说，这听上去相当不可思议：难道监听事件不需要类似这样的代码吗？
 
@@ -46,7 +53,7 @@ mouse.onmove = ……
 
 ![image](https://user-images.githubusercontent.com/28384700/127811716-362f53fe-66e8-49a0-8689-20cff5221d36.png)
 
-值得一提的是，其实MVC的论文中，还提到了”editor”这个概念。因为没有出现在标题中，所以editor声名不著。MVC论文中推荐controller想要根据输入修改view时，从view中获取一个叫做editor的临时对象，它也是一种特殊的controller，它会完成对view和view相关的model的修改操作。
+值得注意的是，其实MVC的论文中，还提到了”editor”这个概念。因为没有出现在标题中，所以editor声名不著。MVC论文中推荐controller想要根据输入修改view时，从view中获取一个叫做editor的临时对象，它也是一种特殊的controller，它会完成对view和view相关的model的修改操作。
 
 ### 控件系统
 
@@ -84,7 +91,7 @@ Model-View-Presenter是在MVC的基础上，进一步规定了Controller中的�
 
 在这样的架构中，view（或者说叫控件），不但是从依赖关系上跟程序的其他部件解耦，而且从语言上跟其它部分隔离开来。
 
-标记语言的好处是，它可以由非专业的程序员产生，通过工具或者经过简单培训，一些设计师可以直接产生用标记语言描述的UI。想要突破这个限制使得view跟其它部分异常耦合可能性也更低。
+标记语言的好处是，它可以由非专业的程序员产生，通过工具或者经过简单培训，一些设计师可以直接产生用标记语言描述的UI。想要突破这个限制使得view跟其它部分异常耦合可能性更低。
 
 然而这样的系统架构中，MVC和MVP模式已经不能很好地适用了。微软架构师John Gossman在WPF的XAML模式推出的同时，提出了MVVM的概念。
 
