@@ -30,9 +30,9 @@ const NavBar = () => {
             <span className="hidden md:inline">Projects</span>
             <div className="ri-lightbulb-fill md:hidden"></div>
           </Link>
-          <Link href="/tools" title="Tools">
-            <span className="hidden md:inline">Tools</span>
-            <div className="ri-hammer-fill md:hidden"></div>
+          <Link href="/Links" title="Links">
+            <span className="hidden md:inline">Links</span>
+            <div className="ri-links-fill md:hidden"></div>
           </Link>
           <a href="https://x.com/yangjinfe" target="_blank" title="X">
             <div className="ri-twitter-fill" />
