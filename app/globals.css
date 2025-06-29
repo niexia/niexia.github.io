@@ -24,3 +24,91 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+h1,
+h2,
+h3,
+h4 {
+  text-wrap: balance;
+}
+
+pre {
+  background-color: #16161e;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  padding: 1rem;
+  margin: 1.5rem 0;
+  line-height: 1;
+}
+
+pre::-webkit-scrollbar {
+  display: none;
+}
+
+pre {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+code {
+  font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+  font-size: 14px;
+  padding: 0.2em 0.4em;
+  border-radius: 0.3em;
+  background-color: var(--color-gray-100);
+}
+
+pre code {
+  background-color: transparent;
+  padding: 0;
+  border: none;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+pre code>span .sh__token--identifier {
+  color: white !important;
+}
+
+code:not(pre code) span {
+  font-weight: 500;
+  color: black !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  code {
+    font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+    font-size: 14px;
+    padding: 0.2em 0.4em;
+    border-radius: 0.3em;
+    background-color: var(--color-zinc-800);
+  }
+
+  code:not(pre code) span {
+    color: var(--color-zinc-100) !important;
+  }
+}
+
+pre code span {
+  font-weight: 500;
+}
+
+hr {
+  color: var(--color-gray-200);
+}
+
+/* Remove Safari input shadow on mobile */
+input[type='text'],
+input[type='email'] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+table {
+  display: block;
+  max-width: fit-content;
+  overflow-x: auto;
+  white-space: nowrap;
+  text-align: left;
+}
