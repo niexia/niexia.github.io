@@ -30,9 +30,9 @@ bun dev
 ## Roadmap
 
 - [x] Add blog posts
-- [ ] Add Header navigation
+- [x] Add Header navigation
 - [ ] Add posts pagination
-- [ ] Add Mobile responsive
+- [x] Add Mobile responsive
 - [ ] Add categories / tags
 - [ ] Add search
 - [ ] Add comment system
