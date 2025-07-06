@@ -36,10 +36,10 @@ export default function RootLayout({
         <Script id="theme-init" strategy="beforeInteractive">
           {`
             (function () {
-              const userTheme = localStorage.theme;
-              const systemDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
-              const dark = userTheme === "dark" || systemDark;
-              document.documentElement.classList.toggle("dark", dark);
+              const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+              const setting = localStorage.getItem('theme')
+              if (setting === 'dark' || (prefersDark && setting !== 'light'))
+              document.documentElement.classList.toggle('dark', true)
             })();
           `}
         </Script>
