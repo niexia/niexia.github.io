@@ -36,9 +36,9 @@ bun dev
 - [ ] Add categories / tags
 - [ ] Add search
 - [ ] Add comment system
-- [ ] Add dark mode
+- [x] Add dark mode
 - [ ] Add RSS feed
-- [ ] Add analytics
+- [x] Add analytics
 - [ ] Add Article Archive
 - [ ] Add pinned / recommended 
 

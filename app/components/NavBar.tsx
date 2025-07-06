@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { ThemeToggle } from "./ThemeToggle";
 
 const NavBar = () => {
   const toTop = () => {
@@ -37,12 +38,13 @@ const NavBar = () => {
           <a href="https://x.com/yangjinfe" target="_blank" title="X">
             <i className="ri-twitter-fill" />
           </a>
-          <a href="https://github.com/niexia" target="_blank" title="Bluesky">
+          <a href="https://github.com/niexia" target="_blank" title="Github">
             <i className="ri-github-fill" />
           </a>
           {/* <a href="/feed.xml" target="_blank" title="RSS">
             <div className="font-size:1.25rem; margin: 0 -0.125rem;" />
           </a> */}
+          <ThemeToggle></ThemeToggle>
         </div>
       </nav>
     </header>

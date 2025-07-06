@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import Script from "next/script";
 import "./globals.css";
 import { NavBar } from "./components/NavBar";
 
@@ -29,13 +30,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <meta name="google-site-verification" content="gogjeUvgmxhMwuD2GEIWiR3tjeiYHGJRZVIRLWmZBHM" />
+        <Script id="theme-init" strategy="beforeInteractive">
+          {`
+            (function () {
+              const userTheme = localStorage.theme;
+              const systemDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+              const dark = userTheme === "dark" || systemDark;
+              document.documentElement.classList.toggle("dark", dark);
+            })();
+          `}
+        </Script>
       </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`} suppressHydrationWarning>
         <div className="min-h-screen flex flex-col justify-between pt-0 md:pt-8 p-8 dark:bg-zinc-950 bg-white text-gray-900 dark:text-zinc-200">
           <NavBar />
           <main className="max-w-[60ch] md:max-w-[80ch] mx-auto w-full space-y-6">
