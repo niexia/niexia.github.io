@@ -31,15 +31,14 @@ bun dev
 
 - [x] Add blog posts
 - [x] Add Header navigation
-- [ ] Add posts pagination
+- [x] Add posts reading time
 - [x] Add Mobile responsive
-- [ ] Add categories / tags
+- [x] Add categories / tags
 - [ ] Add search
 - [ ] Add comment system
 - [x] Add dark mode
 - [ ] Add RSS feed
 - [x] Add analytics
-- [ ] Add Article Archive
 - [ ] Add pinned / recommended 
 
 
