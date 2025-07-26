@@ -1,0 +1,401 @@
+export const metadata = {
+  title: "编写可读代码的艺术 The Art of Readable Code",
+  description: "这是一篇阅读笔记，关于如何编写可读性更高的代码的文章。总结了很多提高代码可读性的小技巧，看似都微不足道，但是对于整个软件系统的开发而言，它们与宏观的架构决策、设计思想、指导原则同样重要。编码不仅仅只是一种技术，也是一门艺术，编写可读性高的代码尤其如此。如果你要成为一位优秀的程序员，要想开发出高质量的软件系统，必须从细处着手，做到内外兼修",
+  date: "2025-07-22",
+  tags: ["programming", "best practices", "readability"],
+  duration: "30min"
+};
+
+# 编写可读代码的艺术 The Art of Readable Code: Simple and Practical Techniques for Writing Better Code
+
+这是一篇[编写可读代码的艺术](https://book.douban.com/subject/10797189/)阅读笔记，本文不会讨论项目的架构、设计模式，而是旨在帮助你把基本的代码写得更好。总结了很多提高代码可读性的**小技巧**，看似都微不足道，但是对于整个软件系统的开发而言，它们与宏观的架构决策、设计思想、指导原则同样重要。编码不仅仅只是一种技术，也是一门艺术，编写可读性高的代码尤其如此。如果你要成为一位优秀的程序员，要想开发出高质量的软件系统，必须从细处着手，做到内外兼修。
+
+## 关键思想：代码应该写得容易理解
+
+可读性基本定理——代码应当易于理解，其写法应使别人理解它所需的时间最小化。它是衡量代码质量的一个重要标准，且与代码效率、架构等目的不冲突。
+
+我们在写代码的时候，要经常想一想其他人是不是会觉得你的代码容易理解。
+
+## 第一部分 表面层次的改进
+
+**从我们认为的“表面层次”的改进开始：选择好的名字、写好的注释以及把代码整洁的写成更好的格式**。这些改变很容易实现。
+
+### 把信息装到名字里
+无论是命名变量、函数还是类，都可以使用很多相同的原则。我们喜欢把名字当做**一小小的注释**。尽管空间不算很大，但选择一个好名字可以让它承载很多信息。
+仅通过读到名字就可以获得大量信息。
+
+- 选择专业的词：避免使用“get”等泛泛的词，根据语境选择更精准的词汇（如“Fetch”“Download”）。
+- 找到更有表现力的词：清晰和精确比装可爱好。例如单词 make，更多选择如 create、build、add 等。
+- 避免空泛的名字：如“tmp”“retval”，仅在变量短期存在且以临时性为主要特征时使用。
+- 用具体的名字代替抽象的名字：命名时把它描述得更具体而不是更抽象，如检测服务是否可以监听某个给定的 TCP/IP 端口的方法“ServerCanStart ()”改为“CanListenOnPort ()”，更清晰描述功能。
+- 为名字附带更多信息：对于度量值，添加单位（如“delay_secs”“size_mb”）；对于有特殊属性的变量，添加标识（如“unescaped_comment”“html_utf8”）。
+- 确定名字长度：作用域小的变量可用短名字，作用域大的变量需包含足够信息；利用编辑器的单词补全功能，不必因输入麻烦而使用过短名字。
+- 利用名字的格式传递含义：如类名用“CamelCase”，变量名用“lower_separated”，常量用特定格式等，保持项目内一致性。
+
+### 不会误解的名字
+前面提到如何把信息塞入名字中，在这部分关注另外话题：小心可能会有歧义的名字。
+要多问自己几遍：这个名字会被别人解读成其他含义吗？如果会，就需要改名。
+
+- 避免歧义词汇：如“filter”“Clip”等易产生多种解读的词，选择更明确的名字。
+- 命名极限：用“max_”“min_”表示包含的极限（如“MAX_ITEMS_IN_CART”）。
+- 表示范围：“first”“last”用于包含的范围，“begin”“end”用于包含 / 排除范围。
+- 给布尔值命名：使用“is”“has”“can”“should”等词明确含义，最好避免反义名字（如用“use_ssl”代替“disable_ssl”）。
+- 与使用者期望匹配：如“get*()”方法通常被认为是轻量级访问器，若其实现复杂，getMean 应改名（如“computeMean ()”），后者听起来更像是有代价的。
+
+### 审美
+整洁的代码更易读，能提高浏览速度。这部分告诉你，如何使用好留白、对齐及顺序让代码更易读。
+
+排版技巧：
+- 使用一致的布局，让读者很快就习惯这种风格。
+- 让相似的代码看上去相似。
+- 把相关的代码行分组，形成代码块。
+- 用方法整理不规则代码，减少重复。
+- 选择有意义的顺序并保持一致。
+- 必要时使用列对齐，使代码更易浏览。
+- 把声明和代码按逻辑分组，形成“段落”。
+
+风格一致性：个人风格需服从项目一致性，一致的风格比“正确”的风格更重要。
+
+### 该写什么样的注释
+关键思想：注释的目的是尽量帮助读者了解得和作者一样多。
+
+- 不需要注释的情况：不要为那些从代码本身就能快速推断的事实写注释。不要为了注释而注释。不要给不好的名字加注释——应该把名字改好。
+  ```typescript
+  // The class definition for an account.
+  class Account {
+    // ...
+  }
+
+  // Find the Node in the given subtree, with the given name,using the given depth.
+  function findNodeInSubtree(subtree, name, depth) {
+    // Find the node in the subtree.
+    return subtree.find(n => n.id === node.id);
+  }
+  ```
+
+- 应记录的想法：
+  - “导演评论”：电影用常有“导演评论”，制作者在其中给出自己见解并通过讲故事帮助你理解。同样你应该在代码中加入注释来记录你对代码有价值的见解。解释代码设计思路、选择原因等。<br/>
+    例如，这段注释教会读者一些事情，并且防止他们为无谓的优化而浪费时间。
+  - 代码瑕疵：代码始终在演进，并且在这过程中肯定会有瑕疵。不要不好意思把这些瑕疵记录下来。用“TODO:”“FIXME:”“HACK:”“XXX:”等标记。
+  - 给常量加注释：说明常量值的选择原因。
+  ```typescript
+  /** 导演评论 */
+  // 出乎意料的是，对于这些数据用二叉树比用哈希表快 400%
+  // 哈希运算的代价比左/右比较大得多
+
+
+  /** 给常量加注释 */
+  NUM_THREADS = 8; 
+
+  // 这一行看上去可能不需要注释，但很可能选择用这个值的程序员知道得比这个要多
+  // 现在，读代码的人就有了调整这个值的指南了
+  NUM_THREADS = 8;// as long as it's >= 2 * num_processors, that's good enough.
+  ```
+- **站在读者角度：本文所用的一个通用技术是，想象你的代码对于外人来讲看起来是什么样子的。**
+  - 预料读者可能困惑的部分并加注释。当别人读你代码的时候，有些部分可能会让他们有这样的想法：“什么？为什么这么写？”，你的工作就是要给这部分加注释。
+  - 公布可能的陷阱，注释代码的意外行为（如函数的耗时、限制等）。
+  - 提供“全局观”注释：解释类、文件的作用及各部分如何交互。
+  - 用注释总结代码块，帮助读者把握整体逻辑。
+  ```typescript
+  function generateUserReport(user) {
+    // Acquire a lock for this user
+    // ...
+
+    // Read the user data from the database
+    // ...
+
+    // Write the report to the file system
+    // ...
+
+    // Release the lock
+  }
+  ```
+
+注释应该说明“做什么”、“为什么”，还是“怎么做”？
+
+你可能听过这样的建议：注释应该说明“为什么这样做”，而非“做什么”或者“怎么做”。这虽然容易记，但是这种说法太简单化了。
+**我们的建议是，你可以做任何帮助读者更容易理解代码的事。可能包括：做什么、怎么做、为什么的注释。**
+
+最后的思考：克服“作者心理阻滞”。很多人不喜欢写注释，是因为写出好的注释要花很多功夫。当你有了这样的担忧，最好的办法就是现在开始写。
+
+**请注意我们把写注释这件事拆成了几个简单的步骤：**
+1. 不管你心里想什么，先把它写下来。
+2. 读一下这段注释，看看有没有什么地方可以改进。
+3. 不断改进。
+
+### 写出言简意赅的注释
+关键思想：注释应当有很好的信息/空间率。
+- 保持紧凑：用简洁的语言传达信息，避免冗余。
+- 避免不明确的代词：如“it”“this”可能指代不明时，明确其所指。
+  ```typescript
+  // Bad
+  // Insert the data into the cache, but check the data if it's too big first.
+
+  // Good
+  // Insert the data into the cache, but check the data if the data too big first.
+  ```
+- 润色句子：使注释更精确、直接。
+  ```typescript
+  // Bad
+  // Depending on whether we've already crawled this URL before, give it a different priority.
+  
+  // Good: 更加简单小巧，且更直接。同时解释了未曾爬到过的 URL 将得到更好优先级
+  // Give higher priority to URLs we've never crawled before.
+  ```
+- 精确描述函数行为：明确函数的输入、输出及处理逻辑。
+- 用输入 / 输出例子说明特殊情况：比文字描述更直观。
+- 声明代码意图：解释代码的高层次目标，而非表面操作。
+  ```typescript
+    // Bad
+    function DisplayProducts(products: Product[]): void {
+      products.sort(CompareProductByPrice);
+      // Iterate through the list in reverse order
+      for (let i = products.length - 1; i >= 0; i--) {
+        DisplayPrice(products[i].price);
+      }
+    }
+    // Good
+    // Display each price, from highest to lowest
+    for (let i = products.length - 1; i >= 0; i--) {
+      DisplayPrice(products[i].price);
+    }
+  ```
+- “具名函数参数”的注释：对难以理解的函数参数，用注释说明。
+  ```typescript
+    fetchData(/* timeoutMs= */ 5000, /* withCredentials= */ false);
+
+    function createUser(options: { name: string; isAdmin: boolean; age?: number; }) {
+      // ...
+    }
+    createUser({
+      name: "Alice",
+      isAdmin: true,
+    });
+  ```
+
+## 第二部分 简化循环和逻辑
+
+第一步介绍表面层次的改进，第二部分将进一步介绍程序的”循环和逻辑“：控制流、逻辑表达式，以及让你代码正常运行的那些变量。
+通过试试最小化代码中的”思想包袱“来达到目的。
+
+### 把控制流变得易读
+关键思想：把条件、循环以及其他对控制流的改变做得越“自然”越好。运用一种方式使读者不用停下来重读你的代码。
+- 比较参数顺序：将变化的值放左边，稳定的值放右边（如“while。
+  这条指导原则和英语的用法一致。我们会很自然地说："如果你的年收入至少是 10 万美元"或者"如果你不小于 18 岁。"而"如果 18 岁小于或等于你的年龄"这样的说法却很少见。
+  ```typescript
+  if (length>=10) // Good
+  // or
+  if (10 <= length) // Bad
+
+  while (bytes_received< bytes_expected) // Good
+  // or
+  while (bytes_expected > bytes_received) // Bad
+  ```
+- if/else 语句块顺序：先处理正逻辑、简单情况或有趣 / 可疑情况。
+  ```typescript
+  // Good
+  if(a==b){ 
+    //Case One...
+  }else{ 
+    // Case Two... 
+  } 
+
+  // Bad
+  if (a!==b){
+    //Case Two...
+  } else {
+    //Case One...
+  }
+  ```
+- 三目运算符：仅在最简单的情况下使用，复杂逻辑用 if/else 更清晰。<br/>
+  **相对于追求最小化代码行数，一个更好的度量方法是最小化人们理解它所需的时间。**
+- 避免 do/while 循环：其条件在代码块后，易造成阅读困惑，可用 while 循环替代。
+- 提前返回：减少嵌套，使代码更线性，提高可读性。
+  ```typescript
+  function Contains(str: string, substr: string) {
+    if (str == undefined || substr == undefined) {
+      return false;
+    }
+
+    return str.indexOf(substr) !== -1;
+  }
+  ```
+- 最小化嵌套：嵌套过深增加理解难度，可通过提前返回、使用 continue 等减少嵌套。<br/>
+  **当你对代码做改动时，从全新的角度审视它，把它作为一个整体来看待。**
+  ```typescript
+    // 嵌套是如何累积而成的
+
+    // 最开始代码很简单
+    if (userResult === SUCCESS) {
+      reply.WriteError("")
+    } else {
+      reply.WriteError(userResult)
+    }
+    replay.Done();
+
+    // 后来，另外程序员增加了第二个操作。他找到最合适的地方，新代码很整洁而且这个改动的差异很清晰——看起来是个简单的改动。
+    if (userResult === SUCCESS) {
+      if (permissionResult !== SUCCESS) {
+        reply.WriteError('error reading permission')
+        replay.Done();
+        return;
+      }
+      reply.WriteSuccess("")
+    } else {
+      reply.WriteError(userResult)
+    }
+    replay.Done();
+    
+    // 当后面其他人再看这段代码的时候，所有的上下文不在了。当你读到这段代码，不得不全盘接受它
+    // 提前返回来减少嵌套
+    if (userResult === SUCCESS) {
+      reply.WriteSuccess("")
+    } 
+    if (permissionResult !== SUCCESS) {
+      reply.WriteError('error reading permission')
+      replay.Done();
+      return;
+    }
+   
+    reply.WriteError(userResult)
+    replay.Done();
+  ```
+
+### 拆分超长的表达式
+关键思想：把你的超长表达式拆分成更容易理解的小块。
+- 使用解释变量：将长表达式拆分为子表达式，用变量命名说明其含义。
+  ```typescript
+    // Bad
+    if (line.split(":")[].strip()=="root") {
+    }
+    // Good
+    username =line.split(":")[0].strip()
+    if (username =="root") {
+    }
+  ```
+- 使用总结变量：用短名字代替大段代码，方便管理和思考。
+  ```typescript
+  // Bad
+  if (request.user.id === document.owner_id) {
+    // user can edit this document...
+  } 
+  if (request.user.id !== document.owner_id) {
+
+  }
+  // Good
+  const userOwnsDocument = request.user.id === document.owner_id;
+  if (userOwnsDocument) {
+
+  }
+  ```
+- 应用德摩根定理：重写布尔表达式，使其更易读（如“!(a && b)”改为“!a || !b”）。<br/>
+  **德摩根定理：分别取反，转换与/或**。
+  - 对原布尔表达式中的每个子表达式进行取反操作。例如，对于表达式“非（a 且 b）”，需要分别对“a”和“b”取反，得到“非 a”和“非 b”。
+  - 将原表达式中的逻辑运算符“与（∧）”转换为“或（∨）”，“或（∨）”转换为“与（∧）”。例如，“非（a 且 b）”中的“且”需转换为“或”，最终等价于“非 a 或 非 b”；而“非（a 或 b）”中的“或”需转换为“且”，等价于“非 a 且 非 b”。
+- 避免滥用短路逻辑：复杂的短路逻辑易造成理解困难，可拆分为清晰的语句。
+- 拆分巨大语句：将复杂语句拆分为多个部分，提高可读性。
+  ```typescript
+  // Bad
+  var update_highlight = function (message_num){ 
+    if($("#vote_value"+message_num).html() === "Up") {
+      $("#thumbs_up"+message_num).addClass("highlighted"); 
+      $("#thumbs_down"+message_num).removeClass("highlighted");
+    } else if(("#vote_value"+message_num).html() === "Down"){ 
+      $("#thumbs_up"+message_num).removeClass("highlighted");
+      $("#thumbs_down"+message_num).addClass("highlighted");
+    } else {
+      $("#thumbs_up"+message_num).removeClass("highlighted");
+      $("#thumbs_down"+message_num).removeClass("highlighted");
+    }
+  }
+
+  // Good
+  var update_highlight = function (message_num){ 
+    var vote_value =S("#vote_value"+message_num).html(); 
+    var thumbs_up=s("#thumbs_up"+message_num); 
+    var thumbs_down =S("#thumbs_down"+ message_num);
+
+    var hi = "highlighted";
+    if(vote_value==="Up"){
+      thumbs_up.addClass(hi); 
+      thumbs_down.removeClass(hi);
+    } else if(vote_value==="Down"){ 
+      thumbs_up.removeClass(hi); 
+      thumbs_down.addClass(hi);
+    } else{ 
+      thumbs_up.removeClass(hi); 
+      thumbs_down.removeClass(hi);
+    };
+  ```
+
+### 变量与可读性
+草率使用变量会让代码更难理解：变量越多就越难全部跟踪它们的动向。变量的作用域越大，就跟踪它的动向就越久。变量改变越频繁，就越难跟踪它的当前值。
+
+- 减少变量：移除无价值的临时变量、中间结果变量和控制流变量（如通过提前返回消除“done”等控制变量）。
+- 缩小变量作用域：让变量对尽可能少的代码行可见，如将类成员变量降为局部变量，利用语言的作用域规则约束变量可见范围。
+- 优先使用只写一次的变量：常量或只赋值一次的变量更易理解，减少跟踪其值的难度。
+
+一个综合的例子：假设你有一个网页，上面有几个文本输入字段，布置如下：
+```html
+<input type="text"id="input1"value="Trevor">
+<input type="text"id="input2"value="Hunt">
+<input type="text"id="input3"value="">
+<input type="text"id="input4"value="Melissa">
+```
+如你所见，id 从 input1 开始增加。你的工作是写一个叫 `setFirstEmptyInput()` 的函数，
+它接受一个字符串并把它放在页面上第一个空的`<input>`字段中 (在给出的示例中是"input3")。这个函数应当返回已更新的那个 DOM 元素 (如果没有剩下任何空字段则返回 null)。
+下面是完成这项工作的代码，它没有遵守本章中的原则：
+```typescript
+  // 定义了 found，i，elem 三个变量，并且多次写入
+  var setFirstEmptyInput = function (new_value) {
+    var found = false;
+    var i = 1;
+    var elem = document.getElementByd('input'+); 
+    while (elem !==nul1) { 
+      if (elem.value === "") {
+        found = true;
+        break;
+      }
+      i++;
+      elem =document.getElementByd('input'+i);
+    }
+    if (found) {
+      elem.value = new_value;
+    }
+    return found ? elem : null;
+  }
+
+  // 改进：移除 found 变量，提前返回
+  var setFirstEmptyInput = function (new_value) {
+    var i = 1;
+    var elem = document.getElementByd('input'+i); 
+    while (elem !==nul1) { 
+      if (elem.value === "") {
+        elem.value = new_value;
+        return;
+      }
+      i++;
+      elem = document.getElementByd('input'+i);
+    }
+  
+    return  null;
+  }
+
+  // 继续改进：elem 在代码中多次用到，很难追踪，改成 for 循环
+  var setFirstEmptyInput = function (new_value) {
+    for (let i = 1; true; i++) {
+      elem = document.getElementByd('input'+i);
+      if (elem === null) {
+        return null;
+      }
+      if (elem.value === "") {
+        elem.value = new_value;
+        return elem;
+      }
+    }
+  }
+```
+
+## 第三部分 重新组织代码
+
+## 第四部分 精选话题
