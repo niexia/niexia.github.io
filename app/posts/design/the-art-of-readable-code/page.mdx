@@ -326,6 +326,7 @@ export const metadata = {
       thumbs_up.removeClass(hi); 
       thumbs_down.removeClass(hi);
     };
+  }
   ```
 
 ### 变量与可读性
@@ -398,4 +399,525 @@ export const metadata = {
 
 ## 第三部分 重新组织代码
 
+这部分讨论在函数级别对代码做更大的改动。具体来说包括三种组织代码的方法：
+- 抽取出那些与程序主要目的“不相关的子问题“
+- 重新组织代码使它一次制作一件事
+- 先用自然语言描述代码。然后用这个描述来帮助你找到更简洁的解决方案。
+
+### 抽取不相关的子问题
+**所谓的工程学就是关于把大问题拆解成小问题再把这些小问题的解决方案放回一起**。把这条原则应用于
+代码会是的代码更健壮并且更容易读。
+
+- 核心思想：将代码中解决**不相关**子问题的部分抽取为独立函数，使主代码更专注于高层次目标。
+  - 看看某个函数或代码块，问问你自己：这段代码高层次的目标是什么？
+  - 对于每一行代码问一下，它直接为了目标而工作吗？
+  - 如果足够的行数在解决不相关的子问题，抽取代码到独立的函数中。
+- 适用场景：
+  - 纯工具代码：如文件操作、字符串处理等通用功能。
+  - 多用途代码：如格式化输出、数据加密等可在多处复用的功能。
+  - 简化已有接口：为复杂接口创建包装函数，隐藏细节。<br/>
+    例如你需要处理 JavaScript 浏览器中的 cookie，从概念上讲
+    cookie 是一个键值对，但浏览器只提供一个 document.cookie 的字符串，你需要解析这个字符串来获取你需要的 cookie 值。
+    这个时候你可以创建一个 `getCookie()` 函数，它接受一个 cookie 名称作为参数，返回对应的值。
+- 注意事项：避免过度拆分，抽取的函数应能真正提高可读性和复用性。
+
+总结来说“把一般代码和项目转悠代码分开”，其结果是，大部分代码都是一般代码。通过建立一个库和辅助函数来解决一般问题。剩下的只是让你程序与众不同的部分。
+
+这个技巧有帮助的原因是它使程序员关注小而定义良好的问题，这些问题已经同项目的 其他部分脱离。其结果是，对于这些子问题的解决方案倾向于更加完整和正确。你也可以在以后重用它们。
+
+### 一次只做一件事
+- 关键思想：将代码组织成一次只处理一个任务，可拆分为不同函数或同一函数中的不同段落。
+![只做一件事](/design/only-do-one-thing.png)
+- 步骤：
+  - 列出代码所做的所有任务。这里任务没有严格定义。
+  - 尽量将任务拆分到不同函数，至少是代码中不同的段落中。
+- 好处：使代码逻辑清晰，各任务的开始和结束更明确，便于理解和维护。
+
+### 把想法变成代码
+当把一件复杂的事情想别人解释时，哪些小的细节很容易让他们迷惑。
+**把一个想法用“自然语言”解释是一个很有价值的能力，因为这样其他人也能理解它。这需要把一个想法精炼成最重要的概念。**
+这样不仅帮助他人理解，而且也能帮助你把这个想法想得更清楚。
+
+- 过程：
+  - 用自然语言向同事描述代码要做的事。
+  - 关注描述中的关键词和短语。
+  - 写出与描述匹配的代码。
+- 好处：使代码更贴合逻辑，易于理解；帮助发现可拆分的子问题，优化代码结构。
+
+### 少写代码
+知道什么时候不写代码可能对于一个程序员来讲是他所要学习的最重要的技巧。你所写的每一行代码都是要测试和维护的。
+通过重用库或者减少功能，你可以节省时间并且让你的代码库保持精简节约。
+
+- 避免不必要的功能：程序员常高估功能的必要性，很多功能可能未被使用或增加程序复杂度。
+- 质疑和拆分需求：简化问题，解决最基本的需求即可。例如你需要实现一个商店定位功能，即对于任何用户找到距离最近的商店。如果 100% 实现需要考虑当位置处于
+  日期分界线的情况、接近南北极情况、地球表面曲度。但是如果你只有在加州的 30 店，那这些问题就不重要，需求变为“为加州附近的用户，找到最近的店铺”
+- 保持小代码库：通过创建工具代码减少重复、删除无用代码、将项目拆分为子项目等，使代码库更轻量。
+- 熟悉库函数：充分利用标准库和现有库，避免重复开发，定期阅读库的 API 文档以了解可用功能。
+
 ## 第四部分 精选话题
+本书前三部分覆盖了使代码简单易读的各种技巧。在该部分中，我们会把这些技术应用在两个精选出的话题中。
+
+
+### 测试与可读性
+关键思想：测试应当具有可读性，以便其他程序员可以舒服地改变或者增加测试。
+- 测试代码的重要性：测试代码的可读性同样重要，可作为非正式文档，帮助理解真实代码的行为和使用方式。
+- 改进测试的技巧
+  - 每个测试的最高一层应该越简明越好。最好每个测试的输入输出可以用一行代码来描述。
+  - 如果测试失败了，它所发出的错误消息应该能让你容易跟踪并修正这个 bug。
+  - 使用最简单的并且能够完整运用代码的测试输入。
+  - 给测试函数取一个有完整描述性的名字，以使每个测试所测到的东西很明确。不要用`Test1()`,而用像`Test_<FunctionName><Situation>`这样的名字。
+- 可测试性差的代码的特征，以及它所带来的设计问题
+<table>
+  <thead>
+    <tr>
+      <th>特征</th>
+      <th>可测性的问题</th>
+      <th>设计问题</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>使用全局变量</td>
+      <td>对于每个测试都要重置所有全局状态，否则不同的测试之间会互相影响</td>
+      <td>很难理解哪些函数有什么副作用。没办法独立考虑每个函数，要考虑整个程序才能理解是不是所有的代码都能工作</td>
+    </tr>
+    <tr>
+      <td>对外部组件有大量依赖的代码</td>
+      <td>很难给它写出任何测试，因 为要先搭起太多的脚手架。写测试会比效无趣，因此人 们会避免写测试</td>
+      <td>系统会更可能因某一依赖失败而失败。对于改动来讲很难知道会产生什么样的影响。很难重构类。系统会有更多的失败模式，并且要考虑更多恢复路径</td>
+    </tr>
+    <tr>
+      <td>代码有不确定的行为</td>
+      <td>测试会很古怪，而且不可靠。经常失败的测试最终会被忽略</td>
+      <td>这种程序更可能会有条件竞争或者其他难以重现的 bug。这种程序很难推理。产品中的 bug 很难跟踪和改正</td>
+    </tr>
+  </tbody>
+</table>
+- 可测试性较好的代码的特征，以及它所产生的优秀设计
+<table>
+  <thead>
+    <tr>
+      <th>特征</th>
+      <th>对可测性的好处</th>
+      <th>对设计的好处</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>类中只有很少或者没有内部状态</td>
+      <td>很容易写出测试，因为要测试一个方法只要较少的设置，并且有较少的隐藏状态需要检查</td>
+      <td>有较少状态的类更简单，更容易理解</td>
+    </tr>
+    <tr>
+      <td>类/函数只做一件事</td>
+      <td>要测试它只需要较少的测试</td>
+      <td>较小/较简单的组件更加模块化，并且一般来讲系统有更少的耦合</td>
+    </tr>
+    <tr>
+      <td>每个类对别的类的依赖很少，低耦合</td>
+      <td>每个类可以独立地测试 (比多个类一起测试容易得多)</td>
+      <td>系统可以并行开发。可以很容易修改或者删除类，而不会影响系统的其他部分</td>
+    </tr>
+    <tr>
+      <td>函数的接口简单，定义明确</td>
+      <td>有明确的行为可以测试。测试简单接口所需的工作量较少</td>
+      <td>接口更容易让程序员学习，并且重用的可能性更大</td>
+    </tr>
+  </tbody>
+</table>
+
+### 设计并改进“分钟 / 小时计数器”
+
+通过一个例子，一起看看一个工程师可能会经历的自然思考过程：首先试着解决问题、然后改进它的性能和增加功能
+最重要的是，就用前面的原则试着让代码保持易读。
+
+#### 问题
+我们需要跟踪在过去的一分钟和一个小时里 Web 服务器传输了多少字节。下面的图示说明了如何维护这些总和：
+![分钟/小时计数器](/design/delivery-bytes-nums.png)
+
+#### 定义类接口
+
+```typescript
+interface MinuteHourCounter {
+  // Add a count
+  counter(numBytes: number): void;
+  
+  // Return the count over this minute
+  minuteCount(): number;
+
+  // Return the count over this hour
+  hourCount(): number;
+}
+```
+
+#### 改进命名
+
+类名是比价好的，方法名 `minuteCount` 和 `hourCount` 也比较好。你可能会给它们起 `getMinuteCount` 和 `getHourCount`。
+但这样没有帮助。因为”get“暗示着”轻量级的访问器“，但是实现并不会是轻量的。
+
+但是 `counter` 这个方法有问题，有的人可能认为它的意思是”返回所有时间里的总的计数“。它既是动词也是名词。既可以是"我想要得到你所见过的所有样本的计数"的意思也可以 是"我想要你对样本进行计数"的意思。  
+所以这里可以改为：`add`。
+
+另外这里的 `numBytes` 太有针对性了。确实主要的用例是对字节计数，但是 MinuteHourCounter 没必要知道这一点。
+所以改为 `count`。
+
+#### 改进注释
+```typescript
+interface MinuteHourCounter {
+  // Add a count
+  add(count: number): void;
+  
+  // Return the count over this minute
+  minuteCount(): number;
+
+  // Return the count over this hour
+  hourCount(): number;
+}
+```
+
+再看一遍注释并改进它。
+
+``` typescript
+//Add a count
+void Add(int count);
+```
+这条注释完全多余——要么删除它要么改进它。
+
+再看看 `minuteCount` 方法的注释。当我们问同事这段注释的含义时，可能得到两种冲突的解读：
+- 返回当前所在的时间（例如 12:12 pm）所在的分钟中的计数。
+- 返回过去 60s 内的计数，和时钟边界无关。
+第二种才是它的工作方式，所以我们把这个混淆用更明确和具体的语言解释清楚。
+
+最后还有一条类的注释。
+
+```typescript
+// Track the cumulative counts over the past minute and over the past hour. 
+// Useful,for example,to track recent bandwidth usage.
+interface MinuteHourCounter {
+  // Add a new data point
+  // For the next minute, minuteCount() will be larger by +count.
+  // For the next hour, hourCount() will be larger by +count.
+  add(count: number): void;
+  
+  // Return the accumulated count over the past 60 seconds
+  minuteCount(): number;
+
+  // Return the accumulated count over the past 3600 seconds
+  hourCount(): number;
+}
+```
+
+你已经注意到，我们可以通过同事来帮助我们解决问题，询问外部视角的观点是你测试你的代码是否“对用户”友好的好办法。
+
+#### 尝试一：一个幼稚的方式
+
+开始解决这个问题，我们会从一个很直接的方式开始：就是保持一个有时间戳的事件列表
+
+```typescript
+interface Event {
+  timestamp: number;
+  count: number;
+}
+class BytesMinuteHourCounter implements MinuteHourCounter {
+  private events: Event[] = [];
+
+  add(count: number): void {
+    this.events.push({
+      time: Date.now(),
+      count,
+    });
+  }
+
+  minuteCount(): number {
+    let count = 0;
+    const nowSecs = Date.now();
+    for (let i = this.events.length - 1; i >= 0; i--) {
+      if (this.events[i].time > nowSecs - 60 * 1000) {
+        count += this.events[i].count;
+      } else {
+        break;
+      }
+    }
+    return count;
+  }
+
+  hourCount(): number {
+    let count = 0;
+    const nowSecs = Date.now();
+    for (let i = this.events.length - 1; i >= 0; i--) {
+      if (this.events[i].time > nowSecs - 60 * 60 * 1000) {
+        count += this.events[i].count;
+      } else {
+        break;
+      }
+    }
+    return count;
+  }
+}
+```
+
+**这段代码易于理解吗**
+
+- for 循环太大了，一口吃不下
+- minuteCount 和 hourCount 方法的逻辑是一样的，代码重复。可以通过提取公共逻辑来改进。
+
+**一个更易读的版本**
+```typescript
+class BytesMinuteHourCounter implements MinuteHourCounter {
+  private events: Event[] = [];
+
+  countSince(time: number): number {
+    let count = 0;
+    // 用 rit 表示反向迭代器
+    for (let rit = this.events.length - 1; rit >= 0; rit--) {
+      if (this.events[rit].time > time) {
+        count += this.events[rit].count;
+      } else {
+        break;
+      }
+    }
+    return count;
+  }
+
+  add(count: number): void {
+    this.events.push({
+      time: Date.now(),
+      count,
+    });
+  }
+
+  minuteCount(): number {
+    return this.countSince(Date.now() - 60 * 1000);
+  }
+
+  hourCount(): number {
+    return this.countSince(Date.now() - 60 * 60 * 1000);
+  }
+}
+```
+
+**性能问题**
+
+这个设计有两个严重的性能问题
+1. 它一直不停增大：这个类保存它见过的所有事件，会导致内存使用量无限增长。最好能自动删除超过一个小时的事件，因为不需要了。
+2. minuteCount 和 hourCount 性能太慢：countSince 方法事件复杂度 `O(0)`，每次都需要遍历所有事件。最好 MinuteHourCounter 能记住 minuteCount 和 hourCount 的值，并随 add 方法调用而更新。
+
+#### 尝试 2：传送带设计方案
+
+打算这样做：我们会像传送带一样使用 list，当数据在一端到达，就会在总数上增加。当数据太旧，就从另一端“掉落”，并从总数中减去。
+- 维护两个独立 list：
+![分钟/小时计数器](/design/minute-hour-counter-list-two.png)
+- 维护两个 list，事件先进入第一个再进入第二个：
+![分钟/小时计数器](/design/minute-hour-counter-list-one.png)
+
+我们会采用“两阶段”这会走功能方式，看上去更有效。
+
+```typescript
+class BytesMinuteHourCounter implements MinuteHourCounter {
+  private minuteEvents: Event[] = [];
+  private hourEvents: Event[] = [];
+  private minuteCount: number = 0;
+  private hourCount: number = 0;
+
+  add(count: number): void {
+    const nowSecs = Date.now();
+    shiftOldEvent(nowSecs);
+
+    // Feed into the minute list (not into the hour list, that will happen later)
+    this.minuteEvents.push({
+      time: nowSecs,
+      count,
+    });
+    // Update the minute count
+    this.minuteCount += count;
+    // Update the hour count
+    this.hourCount += count;
+  }
+
+  minuteCount(): number {
+    shiftOldEvent(Date.now());
+    return this.minuteCount;
+  }
+
+  hourCount(): number {
+    shiftOldEvent(Date.now());
+    return this.hourCount;
+  }
+
+  // Find and delete old events. and decrease minuteCount and hourCount
+  shiftOldEvent(nowSecs: number): void {
+    const minuteAgo = nowSecs - 60 * 1000;
+    const hourAgo = nowSecs - 60 * 60 * 1000;
+
+    // Move events more than one minute old from 'minute_events' into 'hour_events'
+    // (Events older than one hour will be removed in the second loop.)
+    while (this.minuteEvents.length > 0 && this.minuteEvents[0].time <= minuteAgo) {
+        this.hourEvents.push(this.minuteEvents[0]);
+        this.minuteCount -= this.minuteEvents[0].count;
+        this.minuteEvents.shift();
+    }
+
+    // Remove events more than one hour old from 'hour_events'
+    while (this.hourEvents.length > 0 && this.hourEvents[0].time <= hourAgo) {
+        this.hourCount -= this.hourEvents[0].count;
+        this.hourEvents.shift();
+    }
+  }
+}
+```
+
+**这样就完成了吗**
+
+对很多应用来说已经足够了，但是还有缺点：
+- 首先设计不灵活，如果期望保留 24 小时计数，可能要大改代码。shiftOldEvent 是一个很集中的函数，在分钟与小时之间做了微妙的互动。
+- 其次，这个类占用内存不小。假设是一个高流量的服务，因为我们需要保存过去一个小时的事件，可能用到 5MB 内存。add 调用越多内存就越大。
+
+#### 尝试 3: 时间桶设计
+
+这里关键思想是：把一个小时窗之内的事件装到桶里，然后用一个总和累加这些事件。
+例如，过去 1 分钟的事件可以插入 60 个离散桶里，每个有一秒钟宽。过去一个小时也可以插入 60 个离散桶里，每个有 1 分钟宽。
+
+这些方法精度会是 1/60。如果要更精确可以使用更多桶，以使用更多内存为交换。
+
+**实现桶设计**
+
+如果只用一个类来设计会有很多错综复杂的代码，所以我们创建一些不同类来处理不同问题。
+
+```typescript
+class TrailingBucketCounter {
+  // Example: trailingBuckerCounter(30, 60) tracks the last 30 minute-buckets of time.
+  trailingBuckerCounter(numBuckets: number, secsPerBucket: number) {
+  }
+  add(count: number, now: number): void {
+  }
+  // Return the total cover the last numBuckets worth of time
+  trailingCount(now: number): number {
+  }
+}
+
+class BytesMinuteHourCounter implements MinuteHourCounter {
+  class MinuteHourCounter {
+  private minuteCounts: TrailingBucketCounter;
+  private hourCounts: TrailingBucketCounter;
+
+  constructor() {
+    this.minuteCounts = new TrailingBucketCounterImpl(/*numBuckets*/60, /*secsPerBucket*/1);
+    this.hourCounts = new TrailingBucketCounterImpl(/*numBuckets*/60, /*secsPerBucket*/60);
+  }
+
+  add(count: number): void {
+    const now = Date.now();
+    this.minuteCounts.add(count, now);
+    this.hourCounts.add(count, now);
+  }
+
+  minuteCount(): number {
+    const now = Date.now();
+    return this.minuteCounts.trailingCount(now);
+  }
+
+  hourCount(): number {
+    const now = Date.now();
+    return this.hourCounts.trailingCount(now);
+  }
+}
+```
+
+ 这段代码可读性更强，也更灵活。
+
+ **实现了 TrailingBucketCounter 类**
+
+ 再一次，创建一个辅助类来进一步拆分这个问题：一个叫做 `ConveyorQueue` 的数据结构，它的工作是处理其下的计数与总和。
+ `TrailingBucketCounter` 类可以只关注过去了多少时间来移动 `ConveyorQueue`。
+
+ConveyorQueue 接口：
+```typescript
+// A queue with a maximum number of slots, where old data "falls off" the end.
+interface ConveyorQueue {
+    // Increment the value at the back of the queue.
+    addToBack(count: number): void;
+
+    // Each value in the queue is shifted forward by 'num_shifted'.
+    // New items are initialized to 0.
+    // Oldest items will be removed so there are <= max_items.
+    shift(num_shifted: number): void;
+
+    // Return the total value of all items currently in the queue.
+    totalSum(): number;
+}
+
+class TrailingBucketCounter {
+  private buckets: ConveyorQueue;
+  private secsPerBucket: number;
+  private lastUpdateTime: number; // the last time Update() was called
+
+  constructor(numBuckets: number, secsPerBucket: number) {
+    this.buckets = new ConveyorQueueImpl(numBuckets);
+    this.secsPerBucket = secsPerBucket;
+    this.lastUpdateTime = Date.now() / 1000; 
+  }
+  // Calculate how many buckets of time have passed and shift accordingly.
+  private update(now: number): void {
+    const currentBucket = Math.floor(now / (this.secsPerBucket));
+    const lastUpdateBucket = Math.floor(this.lastUpdateTime / (this.secsPerBucket));
+    const bucketShift = currentBucket - lastUpdateBucket;
+
+    this.buckets.shift(bucketShift);
+    this.lastUpdateTime = now;
+  }
+
+  add(count: number, now: number): void {
+    this.update(now);
+    this.buckets.addToBack(count);
+  }
+
+  trailingCount(now: number): number {
+    this.update(now);
+    return this.buckets.totalSum();
+  }
+}
+```
+继续实现 ConveyorQueue 类：
+```typescript
+class ConveyorQueueImpl implements ConveyorQueue {
+  private queue: number[] = [];
+  private maxItems: number;
+  private totalSum: number = 0;
+
+  constructor(maxItems: number) {
+    this.maxItems = maxItems;
+  }
+
+  addToBack(count: number): void {
+    if (this.queue.length === 0) {
+      // Make sure queue has at least one item.
+      this.shift(1);
+    }
+    this.queue[this.queue.length - 1] += count;
+    this.totalSum += count;
+  }
+
+  shift(numShifted: number): void {
+    // In case too many items shifted, just clear the queue.
+    if (numShifted >= this.maxItems) {
+      this.queue = [];
+      this.totalSum = 0;
+      return;
+    }
+    // Push all the needed zeros.
+    while (numShifted > 0) {
+      this.queue.push(0);
+      numShifted--;
+    }
+    // Let all the excess items fall off.
+    while (this.queue.length > this.maxItems) {
+      this.totalSum -= this.queue[0];
+      this.queue.shift();
+    }
+  }
+
+  totalSum(): number {
+    return this.totalSum;
+  }
+}
+```

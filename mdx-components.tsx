@@ -11,17 +11,17 @@ type BlockquoteProps = ComponentPropsWithoutRef<'blockquote'>;
 
 const components = {
   h1: (props: HeadingProps) => (
-    <h1 className="font-medium text-lg pt-12 mb-10" {...props} />
+    <h1 className="font-medium text-2xl pt-12 mb-10" {...props} />
   ),
   h2: (props: HeadingProps) => (
     <h2
-      className="text-gray-800 dark:text-zinc-200 font-medium mt-8 mb-3"
+      className="text-gray-800 text-xl dark:text-zinc-200 font-medium mt-8 mb-3"
       {...props}
     />
   ),
   h3: (props: HeadingProps) => (
     <h3
-      className="text-gray-800 dark:text-zinc-200 font-medium mt-8 mb-3"
+      className="text-gray-800 text-lg dark:text-zinc-200 font-medium mt-8 mb-3"
       {...props}
     />
   ),

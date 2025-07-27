@@ -114,9 +114,16 @@ input[type='email'] {
 }
 
 table {
-  display: block;
-  max-width: fit-content;
-  overflow-x: auto;
-  white-space: nowrap;
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  border: 1px solid var(--color-gray-600);
+}
+
+table th,
+table td {
+  padding: 0.5rem;
   text-align: left;
+  border: 1px solid var(--color-gray-600);
+  word-wrap: break-word;
 }
