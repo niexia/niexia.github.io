@@ -18,10 +18,24 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Yang Jin",
+    default: "杨金 (Yang Jin)",
     template: "%s | Yang Jin",
   },
-  description: "This is my portfolio, blog, and personal website. About life, technology and reading.",
+  description: "杨金的个人博客，分享关于生活、技术和阅读的见解 | Yang Jin's personal blog, sharing insights on life, technology, and reading.",
+  keywords: ["杨金", "Yang Jin", "前端工程师", "个人博客", "技术分享", "Front-end Engineer", "Personal Blog", "Technology"],
+  openGraph: {
+    title: "杨金 (Yang Jin)'s Blog",
+    description: "杨金的个人博客，分享关于生活、技术和阅读的见解 | Yang Jin's personal blog, sharing insights on life, technology, and reading.",
+    url: "https://yangjin.dev",
+    siteName: "杨金 (Yang Jin)'s Blog",
+    images: [
+      {
+        url: "https://yangjin.dev/social.jpg",
+        width: 1200,
+      },
+    ],
+    type: "website",
+  },
 };
 
 export default function RootLayout({
