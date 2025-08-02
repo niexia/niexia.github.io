@@ -1,10 +1,8 @@
-# [Yang Jin's Blog](https://yangjin-blog.vercel.app/)
-
-<br />
+### [yangjin.dev](https://yangjin.dev)<br />
 
 This is my portfolio, blog, and personal website. About life, technology and reading.
 
-# Blog stack
+### Blog stack
 
 This is a blog template built with:
 - **Framework**: [Next.js](https://nextjs.org)
@@ -12,12 +10,13 @@ This is a blog template built with:
 - **Deployment**: [Vercel](https://vercel.com)
 - **Analytics**: [Vercel Analytics](https://vercel.com/analytics)
 
-
-## Getting Started
+### Getting Started
 
 First, run the development server:
 
 ```bash
+npm install
+
 npm run dev
 # or
 yarn dev
@@ -27,7 +26,7 @@ pnpm dev
 bun dev
 ```
 
-## Roadmap
+### Roadmap
 
 - [x] Add blog posts
 - [x] Add Header navigation
@@ -41,8 +40,7 @@ bun dev
 - [x] Add analytics
 - [ ] Add pinned / recommended 
 
-
-## Credits
+### Credits
 
 - [leerob/next-mdx-blog](https://github.com/leerob/next-mdx-blog): This repository provided the original creative ideas and templates. 
 - [antfu.me](https://github.com/antfu/antfu.me): For the design and function inspiration.

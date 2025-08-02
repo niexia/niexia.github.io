@@ -12,6 +12,7 @@
   "scripts": {
     "dev": "npm run gen:posts && next dev --turbopack",
     "build": "npm run gen:posts && next build",
+    "build:ssg": "npm run gen:posts && SSG=true next build",
     "start": "next start",
     "lint": "next lint",
     "gen:posts": "node scripts/gen-all-posts.js"

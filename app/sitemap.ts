@@ -1,7 +1,10 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 
-const SITE_URL = 'https://yangjin-blog.vercel.app';
+export const revalidate = false;
+
+const isSsgBuild = process.env.SSG === 'true';
+const SITE_URL = isSsgBuild ? 'https://niexia.github.io' : 'https://yangjin.dev';
 
 async function getNoteSlugs(dir: string) {
   const entries = await fs.readdir(dir, {
