@@ -3,8 +3,6 @@ import createMDX from "@next/mdx";
 
 const isSsgBuild = process.env.SSG === 'true';
 
-console.log('isSsgBuild: ', isSsgBuild)
-
 const nextConfig: NextConfig = {
   pageExtensions: ["ts", "tsx", "mdx"],
 };
