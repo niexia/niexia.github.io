@@ -1,8 +1,8 @@
 export const metadata = {
-  title: "JavaScript核心知识问答",
+  title: "JavaScript 核心知识问答",
   date: "2017-07-17",
   tag: ["javascript", "interview"],
-  description: "精选JavaScript核心概念问题，检验你的JS知识深度",
+  description: "精选 JavaScript 核心概念问题，检验你的 JS 知识深度",
   duration: '15min'
 }
 
@@ -44,7 +44,7 @@ function foo() {
 foo();  
 ```
 
-A：ReferenceError: a is not defined
+A: ReferenceError: a is not defined
 
 ES6 明确规定，如果区块中存在 `let` 和 `const` 命令，这个区块对这些命令声明的变量，从一开始就形成封闭的作用域。凡是在声明之前就使用这些变量，就会报错。
 
@@ -142,7 +142,7 @@ JavaScript 并发模型基于“事件循环”。
 - 由于调用栈时空的，事件循环会选择 `callback foo`，将其放到调用栈中处理
 - 进程再次重复，堆栈不会溢出。
 
-5. 如果在控制台中运行以下函数，页面(选项卡)的 UI 是否仍然响应？
+5. 如果在控制台中运行以下函数，页面 (选项卡) 的 UI 是否仍然响应？
 
 ```
 function foo() {
@@ -246,7 +246,7 @@ xGetter(); // prints ?
 
 A：10
 
-`var xGetter = foo.getX;` xGetter 是 foo.getX 的一个引用。执行 `xGetter`，这是 `this` 指向全局作用域window，所以输出 10。要想获取 `foo.x` 可以使用 `bind`、`call` 或者 `apply`。
+`var xGetter = foo.getX;` xGetter 是 foo.getX 的一个引用。执行 `xGetter`，这是 `this` 指向全局作用域 window，所以输出 10。要想获取 `foo.x` 可以使用 `bind`、`call` 或者 `apply`。
 
 ```
 xGetter.bind(foo)(); // 90
@@ -268,7 +268,7 @@ console.log(b.pro + b);
 
 A：输出结果是 `NaN undefinedhello`。
 
-JavaScript 引擎内部在处理对某个基本类型 `a` 进行形如 `a.pro` 的操作时，会在内部临时创建一个对应的包装类型(对数字类型来说就是Numbe r类型)的临时对象，并把对基本类型的操作代理到对这个临时对象身上，使得对基本类型的属性访问看起来像对象一样。但是在操作完成后，临时对象就销毁了，下次再访问时，会重新建立临时对象，当然就会返回 `undefined` 了。
+JavaScript 引擎内部在处理对某个基本类型 `a` 进行形如 `a.pro` 的操作时，会在内部临时创建一个对应的包装类型 (对数字类型来说就是 Numbe r 类型) 的临时对象，并把对基本类型的操作代理到对这个临时对象身上，使得对基本类型的属性访问看起来像对象一样。但是在操作完成后，临时对象就销毁了，下次再访问时，会重新建立临时对象，当然就会返回 `undefined` 了。
 
 10. 下面代码的输出结果？
 
@@ -291,8 +291,8 @@ console.log(b);
 A：输出结果是 `undefined, 30, Uncaught ReferenceError: b is not defined`
 
 1、没有用 var 声明的是全局变量，即便在函数内部；当然在严格模式下会报错
-2、var 声鸣的变量，只有在 function 内部新声明的才是局部变量，在 if，while，for 等声明的变量其实是全局变量（除非本身在function内部）
-3、因为变量提升，虽然 if 块的内容没执行，但是预解析阶段会执行var a，只是没有赋值而已，因此打印 a 是 `undefined` 而打印 b 会报错
+2、var 声鸣的变量，只有在 function 内部新声明的才是局部变量，在 if，while，for 等声明的变量其实是全局变量（除非本身在 function 内部）
+3、因为变量提升，虽然 if 块的内容没执行，但是预解析阶段会执行 var a，只是没有赋值而已，因此打印 a 是 `undefined` 而打印 b 会报错
 
 11. 下面的代码的输出结果？
 
@@ -314,7 +314,7 @@ obj.method(fn, 1);
 
 A：输出结果是 `10, 2`
 
-第一次输出 10 应该没有什么异议，这里的 `this` 指向 `window`，第二个调用 `arguments[0]()` 相当于执行 `arguments` 调用方法，`this` 指向 `arguments`，而这里传了两个参数，故输出 `arguments` 长度为2。
+第一次输出 10 应该没有什么异议，这里的 `this` 指向 `window`，第二个调用 `arguments[0]()` 相当于执行 `arguments` 调用方法，`this` 指向 `arguments`，而这里传了两个参数，故输出 `arguments` 长度为 2。
 
 12. 下面的代码的输出结果？
 
@@ -330,7 +330,7 @@ fn(1)
 
 A：输出结果是 `function a(){}, 2`
 
-知道预解析阶段，变量声明和函数声明会提前，且变量名和函数名同名时，函数优先级高于变量，会覆盖变量，或者说，函数提升要比变量提升的优先级要高一些，且不会被变量声明覆盖，但是会被变量赋值之后覆盖。因此第一个输出的是f a(){ }，继续执行，会执行a=2，再输出的时候就会输出2。
+知道预解析阶段，变量声明和函数声明会提前，且变量名和函数名同名时，函数优先级高于变量，会覆盖变量，或者说，函数提升要比变量提升的优先级要高一些，且不会被变量声明覆盖，但是会被变量赋值之后覆盖。因此第一个输出的是 f a(){ }，继续执行，会执行 a=2，再输出的时候就会输出 2。
 
 13. a 在什么情况下，控制台可以输出 hello world？
 

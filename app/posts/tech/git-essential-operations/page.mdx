@@ -1,8 +1,8 @@
 export const metadata = {
-  title: "Git常用操作完全指南",
+  title: "Git 常用操作完全指南",
   date: "2019-11-02",
   tag: ["git", "tooling"],
-  description: "整理Git日常开发中最实用的命令与技巧，提高版本控制效率",
+  description: "整理 Git 日常开发中最实用的命令与技巧，提高版本控制效率",
   duration: '10min'
 }
 
@@ -67,7 +67,7 @@ $ git check-ignore -v node_modules
 
 ### 已经提交过的如何忽略
 
-之前在提交代码时，`.gitignore` 没有填写完整，例如导致 `npm run build` 生成的 `dist` 文件被提交了。然后每次重新打包项目，`dist` 都会更新，将 `dist` 填写到`.gitignore` 规则中,但是运行 `git status` 的时候，依然能看到这些文件。
+之前在提交代码时，`.gitignore` 没有填写完整，例如导致 `npm run build` 生成的 `dist` 文件被提交了。然后每次重新打包项目，`dist` 都会更新，将 `dist` 填写到`.gitignore` 规则中，但是运行 `git status` 的时候，依然能看到这些文件。
 
 这时因为 `.gitignore` 文件只能作用于 `Untracked Files`，也就是那些从来没有被 git 记录过的文件（自添加以后，从未 `add` 及 `commit` 过的文件）。而 `dist` 已经被我们提交过来，git 已经追踪。这时候再修改 `.gitignore` 是无效的。
 
@@ -108,5 +108,5 @@ git rm -r --cached dist
 
 ## 参考
 
-- [git忽略已经被提交的文件，以及如何恢复追踪](https://www.cnblogs.com/zhangceblogs/p/9020499.html)
+- [git 忽略已经被提交的文件，以及如何恢复追踪](https://www.cnblogs.com/zhangceblogs/p/9020499.html)
 - [忽略特殊文件](https://www.liaoxuefeng.com/wiki/896043488029600/900004590234208)

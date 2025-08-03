@@ -1,8 +1,8 @@
 export const metadata = {
-  title: "VSCode自动补全插件开发指南",
+  title: "VSCode 自动补全插件开发指南",
   date: "2019-11-11",
   tag: ["vscode", "tooling"],
-  description: "从零开始开发VSCode自动补全插件，详解开发流程与核心API",
+  description: "从零开始开发 VSCode 自动补全插件，详解开发流程与核心 API",
   duration: '15min'
 }
 
@@ -28,7 +28,7 @@ VSCode 本身就支持代码片段自动补全的配置。按下快捷键 `shift
 - body：片段的主体内容，将会被扩展插入
 - description：说明描述
 
-另外 `$1`, `$2` 用于制表符（Tab）切换停止, `$0` 是最后一个位置, 还有 `${1:label}`, `${2:another}`用于配置占位符。
+另外 `$1`, `$2` 用于制表符（Tab）切换停止，`$0` 是最后一个位置，还有 `${1:label}`, `${2:another}`用于配置占位符。
 
 ```
 {
@@ -247,7 +247,7 @@ yo code
 
 - 发布
 
-发布需要发布者账号，所以你需要前往 [marketplace](https://marketplace.visualstudio.com/) 注册。注册之后需要创建一个 `organization`，然后申请 Personal Access Tokens 。详细申请细节见 [Publishing Extension](https://code.visualstudio.com/api/working-with-extensions/publishing-extension)。
+发布需要发布者账号，所以你需要前往 [marketplace](https://marketplace.visualstudio.com/) 注册。注册之后需要创建一个 `organization`，然后申请 Personal Access Tokens。详细申请细节见 [Publishing Extension](https://code.visualstudio.com/api/working-with-extensions/publishing-extension)。
 输入命令 `vsce publish` 进行发布。
 
 这是发布之后的地址 [Self Snippets](https://marketplace.visualstudio.com/items?itemName=niexias.self-snippets)，以及代码地址 [self-snippets](https://github.com/niexias/self-snippets)

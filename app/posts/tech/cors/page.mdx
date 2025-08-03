@@ -1,8 +1,8 @@
 export const metadata = {
-  title: "CORS跨域资源共享详解",
+  title: "CORS 跨域资源共享详解",
   date: "2019-12-03",
   tag: ["javascript", "web", "security"],  
-  description: "深入解析CORS跨域资源共享机制，包括简单请求、预检请求及常见跨域解决方案",
+  description: "深入解析 CORS 跨域资源共享机制，包括简单请求、预检请求及常见跨域解决方案",
   duration: '20min'
 }
 
@@ -14,15 +14,15 @@ export const metadata = {
 
 **如果两个页面的协议，端口（如果有指定）和主机都相同，则两个页面具有相同的源**。我们也可以把它称为“协议/主机/端口 tuple”，或简单地叫做“tuple"。
 
-下表给出了相对 `http://store.company.com/dir/page.html` 同源检测的示例:
+下表给出了相对 `http://store.company.com/dir/page.html` 同源检测的示例：
 
 | URL | 结果 | 原因 |
 |:----|:----:|:----|
 | `http://store.company.com/dir2/other.html` | 成功 | 只有路径不同 |
 | `http://store.company.com/dir/inner/another.html`	| 成功 | 只有路径不同 |
-| `https://store.company.com/secure.html`	| 失败 | 不同协议 ( https和http ) |
-| `http://store.company.com:81/dir/etc.html` | 失败 | 不同端口 ( http:// 80是默认的) |
-| `http://news.company.com/dir/other.html` | 失败 | 不同域名 ( news和store ) |
+| `https://store.company.com/secure.html`	| 失败 | 不同协议 ( https 和 http ) |
+| `http://store.company.com:81/dir/etc.html` | 失败 | 不同端口 ( http:// 80 是默认的) |
+| `http://news.company.com/dir/other.html` | 失败 | 不同域名 ( news 和 store ) |
 
 同源策略限制了一下行为：
 
@@ -36,15 +36,15 @@ export const metadata = {
 
 CORS 是 W3C 的一个工作草案，定义了在必须访问跨域资源时，浏览器与服务器应该如何沟通。**CORS 背后的基本思想，就是使用自定义的 HTTP 头部让浏览器与服务器进行沟通，从而决定请求或者响应是否应该成功，还是应该失败**。
 
-整个 CORS 通信过程，都是浏览器自动完成，不需要用户参与。对于开发者来说，CORS通信与同源的 AJAX 通信没有差别，代码完全一样。浏览器一旦发现 AJAX 请求跨源，就会自动添加一些附加的头信息，有时还会多出一次附加的请求，但用户不会有感觉。
-因此，实现 CORS 通信的关键是服务器。只要服务器实现了CORS 接口，就可以跨源通信。
+整个 CORS 通信过程，都是浏览器自动完成，不需要用户参与。对于开发者来说，CORS 通信与同源的 AJAX 通信没有差别，代码完全一样。浏览器一旦发现 AJAX 请求跨源，就会自动添加一些附加的头信息，有时还会多出一次附加的请求，但用户不会有感觉。
+因此，实现 CORS 通信的关键是服务器。只要服务器实现了 CORS 接口，就可以跨源通信。
 
 #### 两种请求方式
 
 请求方式分两种：一种是简单请求，另一种是非简单请求。只要满足下面条件就是简单请求：
 
 - 请求方式为：HEAD、POST 或者 GET；
-- http 头信息不超出一下字段：Accept、Accept-Language 、 Content-Language、 Last-Event-ID、 Content-Type(限于三个值：application/x-www-form-urlencoded、multipart/form-data、text/plain)。
+- http 头信息不超出一下字段：Accept、Accept-Language、Content-Language、Last-Event-ID、Content-Type(限于三个值：application/x-www-form-urlencoded、multipart/form-data、text/plain)。
 
 区分这两种请求方式是因为浏览器对这这两种方式的处理方式是不同的。
 
@@ -145,7 +145,7 @@ img.src = "http://www.example.com/text?name=Nicholas";
 
 ### JSONP
 
-JSONP 是 JSON with padding（填充式 JSON 或参数式 JSON） 的简写，是一种应用 JSON 的新方法。**JSONP 看起来和 JSON 差不多，只不过是被包含在函数调用中的 JSON**。例如像这样：
+JSONP 是 JSON with padding（填充式 JSON 或参数式 JSON）的简写，是一种应用 JSON 的新方法。**JSONP 看起来和 JSON 差不多，只不过是被包含在函数调用中的 JSON**。例如像这样：
 
 ```js
 callback({"name": "Nicholas"})

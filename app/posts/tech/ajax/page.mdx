@@ -2,13 +2,13 @@ export const metadata = {
   title: "Ajax 技术全面解析",
   date: "2019-12-03", 
   tag: ["javascript", "web"],
-  description: "从XMLHttpRequest到现代Ajax实践，详解异步JavaScript与XML技术",
+  description: "从 XMLHttpRequest 到现代 Ajax 实践，详解异步 JavaScript 与 XML 技术",
   duration: '10min',
 }
 
 # Ajax
 
-2005 年 Jesse James Garrett 发表了一篇在线文章 “Ajax：A new Approach to Web application”。他在这篇文章中介绍了一种新的技术，就叫 Ajax（ Asynchronous Javascript + XML）。这一技术能够解决向服务器发送额外的数据请求而无需卸载页面，会带来更好的体验。
+2005 年 Jesse James Garrett 发表了一篇在线文章“Ajax：A new Approach to Web application”。他在这篇文章中介绍了一种新的技术，就叫 Ajax（Asynchronous Javascript + XML）。这一技术能够解决向服务器发送额外的数据请求而无需卸载页面，会带来更好的体验。
 
 Ajax 的核心就是 XMLHttpRequest 对象（简称 XHR），这是微软首先引入的一个特性，其他的浏览器提供商后来都提供了相同的实现。XHR 为想服务器发送请求和解析服务器响应提供了流畅的接口。能够以异步的方式从服务器取得更多的信息，意味着用户单击之后，可以不必刷新页面也能取得数据。
 
@@ -75,7 +75,7 @@ xhr.send(null);
 if (xhr.status >= 200 && xhr.status < 300 || xhr.status === 304) {
   alert(xhr.responseText);
 } else {
-  alert("Request was unsuccessful：" + xhr.status);
+  alert("Request was unsuccessful:" + xhr.status);
 }
 ```
 
@@ -100,7 +100,7 @@ xhr.onreadystatechange = function() {
     if (xhr.status >= 200 && xhr.status < 300 || xhr.status === 304) {
       alert(xhr.responseText);
     } else {
-      alert("Request was unsuccessful：" + xhr.status);
+      alert("Request was unsuccessful:" + xhr.status);
     }
   }
 };
@@ -135,12 +135,12 @@ request.onreadystatechange = function () { // 状态发生变化时，函数被�
       // 失败，根据响应码判断失败原因
       return fail(request.status);
     }
-  } else { // HTTP请求还在继续
+  } else { // HTTP 请求还在继续
     // ...
   }
 }
 
-// 发送请求:
+// 发送请求：
 request.open('get', 'example.php', true); 
 request.send(null);
 ```

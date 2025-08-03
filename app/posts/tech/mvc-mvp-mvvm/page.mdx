@@ -1,5 +1,5 @@
 export const metadata = {
-  title: "MVC、MVP与MVVM架构模式对比",
+  title: "MVC、MVP 与 MVVM 架构模式对比",
   date: "2021-08-02",
   tag: ["architecture", "design-pattern"],
   description: "深入解析三种主流前端架构模式的特点、区别及应用场景",
@@ -19,7 +19,7 @@ export const metadata = {
 这三种模式都是把所有的实体归类到了下面三种分类中的一种：
 
 - Models（模型）- 数据层，或者负责处理数据的数据接口层。
-- Views（视图） - 展示层(GUI)
+- Views（视图） - 展示层 (GUI)
 - Controller/Presenter/ViewModel（控制器/展示器/视图模型） - 它是 Model 和 View 之间的胶水或者说是中间人。一般来说，当用户对 View 有操作时它负责去修改相应 Model；当 Model 的值发生变化时它负责去更新对应 View。
 
 通过以上的分类：
@@ -31,81 +31,81 @@ export const metadata = {
 
 ### 由来
 
-在1979年，经典MVC模式被提出。
+在 1979 年，经典 MVC 模式被提出。
 
-当时，人们一直试图将纯粹描述思维中的对象与跟计算机环境打交道的代码隔离开来，而Trygve Reenskaug在跟一些人的讨论中，逐渐剥离出一系列的概念，最初是Thing、Model、View、Editor。后来经过讨论定为Model、View和Controller。作者自言“最难搞的就是给这些架构组件起名字”。
+当时，人们一直试图将纯粹描述思维中的对象与跟计算机环境打交道的代码隔离开来，而 Trygve Reenskaug 在跟一些人的讨论中，逐渐剥离出一系列的概念，最初是 Thing、Model、View、Editor。后来经过讨论定为 Model、View 和 Controller。作者自言“最难搞的就是给这些架构组件起名字”。
 
-因为当时的软件环境跟现在有很大不同，所以**经典MVC中的概念很难被现在的工程师理解**。比如经典 MVC中说：“*view 永远不应该知道用户输入，比如鼠标操作和按键。*”对一个现代的软件工程师来说，这听上去相当不可思议：难道监听事件不需要类似这样的代码吗？
+因为当时的软件环境跟现在有很大不同，所以**经典 MVC 中的概念很难被现在的工程师理解**。比如经典 MVC 中说：“*view 永远不应该知道用户输入，比如鼠标操作和按键。*”对一个现代的软件工程师来说，这听上去相当不可思议：难道监听事件不需要类似这样的代码吗？
 
 view.onclick = ……
 
-但是想想在70年代末，80年代初，**我们并没有操作系统和消息循环**，甚至鼠标的光标都需要我们的 UI 系统来自行绘制，所以我们面对的应该是类似下面的局面：
+但是想想在 70 年代末，80 年代初，**我们并没有操作系统和消息循环**，甚至鼠标的光标都需要我们的 UI 系统来自行绘制，所以我们面对的应该是类似下面的局面：
 
 mouse.onclick = …… <br />
 mouse.onmove = ……
 
-当鼠标点击事件发生后，我们需要通过 view 的信息将点击事件派发到正确的 view 来处理。假如我们面对的是鼠标、键盘驱动这样的底层环境，**我们就需要一定的机制和系统来统一处理用户输入并且分配给正确的 view 或者 model 来处理**。这样也就不难理解为什么经典 MVC 中称”controller是用户和系统之间的链接”。
+当鼠标点击事件发生后，我们需要通过 view 的信息将点击事件派发到正确的 view 来处理。假如我们面对的是鼠标、键盘驱动这样的底层环境，**我们就需要一定的机制和系统来统一处理用户输入并且分配给正确的 view 或者 model 来处理**。这样也就不难理解为什么经典 MVC 中称”controller 是用户和系统之间的链接”。
 
-因为现在的多数环境和UI系统设计思路已经跟1979年完全不同，所以现代一些喜好生搬硬套的“MVC”实现者常常会认为controller的输入来自view，以至于画出model、view、controller之间很奇葩的依赖关系：
+因为现在的多数环境和 UI 系统设计思路已经跟 1979 年完全不同，所以现代一些喜好生搬硬套的“MVC”实现者常常会认为 controller 的输入来自 view，以至于画出 model、view、controller 之间很奇葩的依赖关系：
 
 ![image](https://user-images.githubusercontent.com/28384700/127811706-0bd861a2-18c9-4171-86a3-b32c41203e0e.png)
 
-我们来看看Trygve Reenskaug自己画的图：
+我们来看看 Trygve Reenskaug 自己画的图：
 
 ![image](https://user-images.githubusercontent.com/28384700/127811716-362f53fe-66e8-49a0-8689-20cff5221d36.png)
 
-值得注意的是，其实MVC的论文中，还提到了”editor”这个概念。因为没有出现在标题中，所以editor声名不著。MVC论文中推荐controller想要根据输入修改view时，从view中获取一个叫做editor的临时对象，它也是一种特殊的controller，它会完成对view和view相关的model的修改操作。
+值得注意的是，其实 MVC 的论文中，还提到了”editor”这个概念。因为没有出现在标题中，所以 editor 声名不著。MVC 论文中推荐 controller 想要根据输入修改 view 时，从 view 中获取一个叫做 editor 的临时对象，它也是一种特殊的 controller，它会完成对 view 和 view 相关的 model 的修改操作。
 
 ### 控件系统
 
-MVC是一种非常有价值的架构思路，然而时代在变迁，随着以windows系为代表的WIMP（window、icon、menu、pointer）风格的应用逐渐成为主流，人们发现，view和controller某些部件之间的局部性实际上强于controller内部的局部性。于是一种叫做控件（control）的预制组件开始出现了。
+MVC 是一种非常有价值的架构思路，然而时代在变迁，随着以 windows 系为代表的 WIMP（window、icon、menu、pointer）风格的应用逐渐成为主流，人们发现，view 和 controller 某些部件之间的局部性实际上强于 controller 内部的局部性。于是一种叫做控件（control）的预制组件开始出现了。
 
-**控件本身带有一定的交互功能，从MVC的视角来看，它既包含view，又包含controller**，并且它通过“属性”，来把用户输入暴露给model。
+**控件本身带有一定的交互功能，从 MVC 的视角来看，它既包含 view，又包含 controller**，并且它通过“属性”，来把用户输入暴露给 model。
 
-controller的输入分配功能，则被操作系统提供的各种机制取代：
+controller 的输入分配功能，则被操作系统提供的各种机制取代：
 
-- 指针系统：少数DOS时代过来的程序员应该记得，20年前的程序中的“鼠标箭头”实际上是由各个应用自己绘制的，以MVC的视角来看，这应当属于一个”PointerView”的职责范畴。但是20世纪以后，这样的工作基本由操作系统的底层UI系统来实现了。
-- 文本系统：今天我们几乎不需要再去关心文本编辑、选中、拖拽等逻辑，对web程序员可以尝试自己用canvas写一个文本编辑框来体验一下上个时代程序员编写程序的感受。你会发现，选中、插入/覆盖模式切换、换行、退格、双击、拖拽等逻辑异常复杂，经典MVC模式中通常使用TextView和TextEditor配合来完成这样的工作，但是今天几乎找不到需要我们自己处理这些逻辑的场景。
-- 焦点系统：焦点系统通过响应鼠标、tab键等消息来使得控件获得操作系统级唯一的焦点状态，所有的键盘事件通常仅仅会由拥有焦点的控件来响应。在没有焦点系统的时代，操作系统通常是单任务的，但是即使是单一应用，仍然要自己管理多个controller之间的优先权和覆盖逻辑，焦点系统不但从技术上，也从交互设计的角度规范化了UI的输入响应，而最妙的是，焦点系统是对视觉障碍人士友好的，现在颇多盲人用读屏软件都是强依赖焦点系统的。
+- 指针系统：少数 DOS 时代过来的程序员应该记得，20 年前的程序中的“鼠标箭头”实际上是由各个应用自己绘制的，以 MVC 的视角来看，这应当属于一个”PointerView”的职责范畴。但是 20 世纪以后，这样的工作基本由操作系统的底层 UI 系统来实现了。
+- 文本系统：今天我们几乎不需要再去关心文本编辑、选中、拖拽等逻辑，对 web 程序员可以尝试自己用 canvas 写一个文本编辑框来体验一下上个时代程序员编写程序的感受。你会发现，选中、插入/覆盖模式切换、换行、退格、双击、拖拽等逻辑异常复杂，经典 MVC 模式中通常使用 TextView 和 TextEditor 配合来完成这样的工作，但是今天几乎找不到需要我们自己处理这些逻辑的场景。
+- 焦点系统：焦点系统通过响应鼠标、tab 键等消息来使得控件获得操作系统级唯一的焦点状态，所有的键盘事件通常仅仅会由拥有焦点的控件来响应。在没有焦点系统的时代，操作系统通常是单任务的，但是即使是单一应用，仍然要自己管理多个 controller 之间的优先权和覆盖逻辑，焦点系统不但从技术上，也从交互设计的角度规范化了 UI 的输入响应，而最妙的是，焦点系统是对视觉障碍人士友好的，现在颇多盲人用读屏软件都是强依赖焦点系统的。
 
-所以时至今日，MVC，尤其是其中 controller 的功能已经意义不大，若是在控件系统中，再令所有用户输入流经一个 controller 则可谓不伦不类、本末倒置。MVVM 的提出者，微软架构师John Gossman曾言：“我倾向于认为它(指controller)只是隐藏到后台了，它仍然存在，但是我们不需要像是1979年那样考虑那么多事情了”
+所以时至今日，MVC，尤其是其中 controller 的功能已经意义不大，若是在控件系统中，再令所有用户输入流经一个 controller 则可谓不伦不类、本末倒置。MVVM 的提出者，微软架构师 John Gossman 曾言：“我倾向于认为它 (指 controller) 只是隐藏到后台了，它仍然存在，但是我们不需要像是 1979 年那样考虑那么多事情了”
 
 ## MVP
 
 ### 由来
 
-1996年，Taligent公司的CTO，Mike Potel 在一篇论文中提出 Model-View-Presenter 的概念。
+1996 年，Taligent 公司的 CTO，Mike Potel 在一篇论文中提出 Model-View-Presenter 的概念。
 
-在这个时期，主流的 view 的概念跟经典MVC中的那个“永远不应该知道用户输入”的view有了很大的差别，它通常指本文中所述的控件，此时在Mike眼中，输入已经是由view获得的了：
+在这个时期，主流的 view 的概念跟经典 MVC 中的那个“永远不应该知道用户输入”的 view 有了很大的差别，它通常指本文中所述的控件，此时在 Mike 眼中，输入已经是由 view 获得的了：
 
 ![image](https://user-images.githubusercontent.com/28384700/127811753-51e1deb6-211b-41a9-9e59-53a09e678ad5.png)
 
-Model-View-Presenter是在MVC的基础上，进一步规定了Controller中的一些概念而成的：
+Model-View-Presenter 是在 MVC 的基础上，进一步规定了 Controller 中的一些概念而成的：
 
 ![image](https://user-images.githubusercontent.com/28384700/127811773-cbc0bf11-67b1-4e45-8bef-c7fe0286202e.png)
 
-对，所以，不论你按照 Mike 还是 Trygve 的理解方式，MVP和MVC的依赖关系图应该是一模一样的！因为Mike的论文里说了“we refer to this kind（指应用程序全局且使用interactor, command以及selection概念的） of controller as a presenter”。presenter它就是一种controller啊！
+对，所以，不论你按照 Mike 还是 Trygve 的理解方式，MVP 和 MVC 的依赖关系图应该是一模一样的！因为 Mike 的论文里说了“we refer to this kind（指应用程序全局且使用 interactor, command 以及 selection 概念的）of controller as a presenter”。presenter 它就是一种 controller 啊！
 
 ## 标记语言和 MVVM
 
-随着 20 世纪初 web 的崛起，HTML 跟 JS 这样标记语言+程序语言的组合模式开始变得令人注目。逐渐推出的Flex、Sliverlight、QT、WPF、JSF、Cocoa等UI系统不约而同地选择了标记语言来描述界面。
+随着 20 世纪初 web 的崛起，HTML 跟 JS 这样标记语言 + 程序语言的组合模式开始变得令人注目。逐渐推出的 Flex、Sliverlight、QT、WPF、JSF、Cocoa 等 UI 系统不约而同地选择了标记语言来描述界面。
 
 在这样的架构中，view（或者说叫控件），不但是从依赖关系上跟程序的其他部件解耦，而且从语言上跟其它部分隔离开来。
 
-标记语言的好处是，它可以由非专业的程序员产生，通过工具或者经过简单培训，一些设计师可以直接产生用标记语言描述的UI。想要突破这个限制使得view跟其它部分异常耦合可能性更低。
+标记语言的好处是，它可以由非专业的程序员产生，通过工具或者经过简单培训，一些设计师可以直接产生用标记语言描述的 UI。想要突破这个限制使得 view 跟其它部分异常耦合可能性更低。
 
-然而这样的系统架构中，MVC和MVP模式已经不能很好地适用了。微软架构师John Gossman在WPF的XAML模式推出的同时，提出了MVVM的概念。
+然而这样的系统架构中，MVC 和 MVP 模式已经不能很好地适用了。微软架构师 John Gossman 在 WPF 的 XAML 模式推出的同时，提出了 MVVM 的概念。
 
-WPF得MVVM正式说明了它的view的概念跟MVC中的view的概念的区别。
+WPF 得 MVVM 正式说明了它的 view 的概念跟 MVC 中的 view 的概念的区别。
 
 ![image](https://user-images.githubusercontent.com/28384700/127812098-5ae6923a-155a-4547-a2b2-2ce35461c0ee.png)
 
-在MVVM模式中，数据绑定是最重要的概念，在MVC和MVP中的view和model的互相通讯，被以双向绑定的方式替代，这进一步把逻辑代码变成了声明模式。
+在 MVVM 模式中，数据绑定是最重要的概念，在 MVC 和 MVP 中的 view 和 model 的互相通讯，被以双向绑定的方式替代，这进一步把逻辑代码变成了声明模式。
 
 ## 参考
-- [谈谈UI架构设计的演化](http://www.uml.org.cn/zjjs/2015021310.asp)
+- [谈谈 UI 架构设计的演化](http://www.uml.org.cn/zjjs/2015021310.asp)
 - [MVC，MVP 和 MVVM 的图示](https://www.ruanyifeng.com/blog/2015/02/mvcmvp_mvvm.html)
 - [简单理解 MVC、MVP、MVVM](https://zhuanlan.zhihu.com/p/165572019)
 - [设计框架（MVC、MVP、MVVM、VIPER）的演化说明总结](https://blog.hudongdong.com/ios/459.html/comment-page-1)
 - [【翻译】MODELS - VIEWS – CONTROLLERS](https://www.cnblogs.com/winter-cn/archive/2012/06/13/2547662.html)
-- [【翻译】使用MVVM模式构建WPF应用程序介绍](https://www.cnblogs.com/winter-cn/archive/2012/08/08/2628200.html)
+- [【翻译】使用 MVVM 模式构建 WPF 应用程序介绍](https://www.cnblogs.com/winter-cn/archive/2012/08/08/2628200.html)
