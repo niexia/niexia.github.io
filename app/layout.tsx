@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import Script from "next/script";
 import "./globals.css";
 import { NavBar } from "./components/NavBar";
 
@@ -46,17 +45,20 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+          (function() {
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const setting = localStorage.getItem('theme');
+            if (setting === 'dark' || (prefersDark && setting !== 'light')) {
+              document.documentElement.classList.add('dark');
+            }
+          })();
+        `,
+          }}
+        />
         <meta name="google-site-verification" content="gogjeUvgmxhMwuD2GEIWiR3tjeiYHGJRZVIRLWmZBHM" />
-        <Script id="theme-init" strategy="beforeInteractive">
-          {`
-            (function () {
-              const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
-              const setting = localStorage.getItem('theme')
-              if (setting === 'dark' || (prefersDark && setting !== 'light'))
-              document.documentElement.classList.toggle('dark', true)
-            })();
-          `}
-        </Script>
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`} suppressHydrationWarning>
         <div className="min-h-screen flex flex-col justify-between pt-0 md:pt-8 p-8 dark:bg-zinc-950 bg-white text-gray-900 dark:text-zinc-200">
