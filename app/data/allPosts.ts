@@ -19,6 +19,7 @@ import { metadata as virtualScrollerMetaData } from "../posts/tech/virtual-scrol
 import { metadata as vscodeAutoCompletionPluginTutorialMetaData } from "../posts/tech/vscode-auto-completion-plugin-tutorial/page.mdx";
 import { metadata as whyLearnNodejsMetaData } from "../posts/tech/why-learn-nodejs/page.mdx";
 import { metadata as youKnowJavascriptMetaData } from "../posts/tech/you-know-javascript/page.mdx";
+import { metadata as elonMuskMetaData } from "../posts/think/elon-musk/page.mdx";
 import { metadata as feynmanLearningMethodMetaData } from "../posts/think/feynman-learning-method/page.mdx";
 import { metadata as generatingNewProductIdeasMetaData } from "../posts/think/generating-new-product-ideas/page.mdx";
 import { metadata as howToSelfImprovementMetaData } from "../posts/think/how-to-self-improvement/page.mdx";
@@ -104,6 +105,10 @@ export const allPosts = [
   {
     url: '/posts/tech/you-know-javascript',
     metadata: youKnowJavascriptMetaData
+  },
+  {
+    url: '/posts/think/elon-musk',
+    metadata: elonMuskMetaData
   },
   {
     url: '/posts/think/feynman-learning-method',
