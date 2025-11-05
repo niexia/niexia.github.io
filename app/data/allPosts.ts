@@ -27,6 +27,7 @@ import { metadata as independentDeveloperStoriesMetaData } from "../posts/think/
 import { metadata as netflixAndRockstarsMetaData } from "../posts/think/netflix-and-rockstars/page.mdx";
 import { metadata as productDesignGuideWritingBusinessPlanMetaData } from "../posts/think/product-design-guide-writing-business-plan/page.mdx";
 import { metadata as thoughtsOnFrontendDeathDebateMetaData } from "../posts/think/thoughts-on-frontend-death-debate/page.mdx";
+import { metadata as whatMakesDocumentGoodMetaData } from "../posts/think/what-makes-document-good/page.mdx";
 import { metadata as workRelatedReflectionsMetaData } from "../posts/think/work-related-reflections/page.mdx";
 
 export const allPosts = [
@@ -137,6 +138,10 @@ export const allPosts = [
   {
     url: '/posts/think/thoughts-on-frontend-death-debate',
     metadata: thoughtsOnFrontendDeathDebateMetaData
+  },
+  {
+    url: '/posts/think/what-makes-document-good',
+    metadata: whatMakesDocumentGoodMetaData
   },
   {
     url: '/posts/think/work-related-reflections',

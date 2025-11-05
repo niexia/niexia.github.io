@@ -1,0 +1,163 @@
+export const metadata = {
+  title: "What makes documentation good 如何写好文档",
+  date: "2025-11-06",
+  tag: ["write"],
+  description: "分析前端开发领域的发展趋势，探讨技术人的职业发展方向",
+  duration: '5min'
+}
+
+# What makes documentation good 如何写好文档
+
+原文链接: [What makes documentation good](https://github.com/openai/openai-cookbook/blob/main/articles/what_makes_documentation_good.md)
+
+Documentation puts useful information inside other people’s heads. Follow these tips to write better documentation.<br/>
+文档的作用是把游泳的信息装进他人的脑袋。遵循以下提示，你可以写出更好的文档。
+
+## Make docs easy to skim 让文档易于快速浏览
+> 信息组织清晰，让人几秒内找到重点。
+> 1. 将内容分为带标题的章节，并使用有信息量的标题。
+> 2. 用目录，能帮助读者更快找到信息。
+> 3. 每段开头写主题句，把要点放在前面，不要铺垫太久也不要介绍过程再说结论。 
+> 4. 段落短、句子短，视觉上别压迫。
+> 5. 使用列表、表格、加粗关键词，提高可扫描性。
+
+
+Few readers read linearly from top to bottom. They’ll jump around, trying to assess which bit solves their problem, if any.<br/>
+很少有读者会从头到尾地顺序阅读。他们通常会跳着看，试图找到能解决问题的那部分内容。
+
+To reduce their search time and increase their odds of success, make docs easy to skim.<br/>
+为了减少读者的查找时间并提高成功率，使文档易于快速浏览。
+
+Split content into sections with titles. Section titles act as signposts, telling readers whether to focus in or move on. <br/>
+将内容分为带标题的章节。标题像路标，告诉读者该停留还是继续往下看。
+
+Prefer titles with informative sentences over abstract nouns. For example, if you use a title like “Results”, 
+a reader will need to hop into the following text to learn what the results actually are. In contrast, if you use the title “Streaming reduced time to first token by 50%”, 
+it gives the reader the information immediately, without the burden of an extra hop.<br/>
+比起抽象的名词，更倾向使用具有信息量的句子标题。比如用 “Results” 作标题时，读者必须继续读正文才能知道结果是什么。而如果写成 “Streaming reduced time to first token by 50%”，读者立刻就能获得核心信息。
+
+Include a table of contents. Tables of contents help readers find information faster, akin to how hash maps have faster lookups than linked lists. 
+Tables of contents also have a second, oft overlooked benefit: they give readers clues about the doc, which helps them understand if it’s worth reading.<br/>
+加入目录。目录能帮助读者更快找到信息，就像哈希表比链表查找更快一样。目录还有第二个常被忽略的好处：它能让读者了解文档的整体结构，从而判断是否值得阅读全文。
+
+Keep paragraphs short. Shorter paragraphs are easier to skim. If you have an essential point, 
+consider putting it in its own one-sentence paragraph to reduce the odds it’s missed. Long paragraphs can bury information.
+保持段落简短。短段落更便于浏览。如果有关键观点，可单独成段，以免被忽略。冗长的段落可能掩盖重要信息。
+
+Begin paragraphs and sections with short topic sentences that give a standalone preview. When people skim, they look disproportionately at the first word,
+first line, and first sentence of a section. Write these sentences in a way that don’t depend on prior text. 
+For example, consider the first sentence “Building on top of this, let’s now talk about a faster way.” 
+This sentence will be meaningless to someone who hasn’t read the prior paragraph. Instead, write it in a way that can be understood standalone: e.g., 
+“Vector databases can speed up embeddings search.”<br/>
+段落和章节开头应使用简短的主题句，提供可独立理解的预览。当人们浏览时，最常注意的是第一词、第一行和第一句。避免让这些句子依赖前文。例如 “Building on top of this, let’s now talk about a faster way.” 
+对未读上文的读者毫无意义；而 “Vector databases can speed up embeddings search.” 则能独立理解。
+
+Put topic words at the beginning of topic sentences. Readers skim most efficiently when they only need to read a word or two to know what a paragraph is about.
+ Therefore, when writing topic sentences, prefer putting the topic at the beginning of the sentence rather than the end. For example, 
+ imagine you’re writing a paragraph on vector databases in the middle of a long article on embeddings search. 
+ Instead of writing “Embeddings search can be sped up by vector databases” prefer “Vector databases speed up embeddings search.” 
+ The second sentence is better for skimming, because it puts the paragraph topic at the beginning of the paragraph.<br/>
+在主题句中将话题词放在句首。读者只读前几个词就能判断段落主题时，浏览效率最高。因此，应将主题放在句首而非句尾。例如，与其写 “Embeddings search can be sped up by vector databases”，
+不如写 “Vector databases speed up embeddings search.”，后者更易于快速理解。
+
+Put the takeaways up front. Put the most important information at the tops of documents and sections. Don’t write a Socratic big build up. 
+Don’t introduce your procedure before your results.<br/>
+把要点放在前面。将最重要的信息放在文档或章节开头。不要铺垫太久，也不要先介绍过程再说结果。
+
+Use bullets and tables. Bulleted lists and tables make docs easier to skim. Use them frequently.<br/>
+使用项目符号和表格。它们能让内容更易于浏览，应当经常使用。
+
+Bold important text. Don’t be afraid to bold important text to help readers find it.<br/>
+对重要文字加粗。不要害怕使用粗体帮助读者定位关键信息。
+
+## Write well 写得清晰而简洁
+> 简洁比炫技重要。
+> 1. 短句 > 长句；一个句子传达一个想法。
+> 2. 写那些不含歧义、容易解析的句子，避免歧义、双关、俚语。
+> 3. 用明确主语（不要“this”、“that”模糊指代）。
+> 4. 格式要一致，避免让人分心。
+> 5. 不要替读者假设想法或动作。
+
+Badly written text is taxing to read. Minimize the tax on readers by writing well.
+写得糟的文本会让人疲惫。通过良好的写作，减少读者的“认知税”。<br/>
+
+Keep sentences simple. Split long sentences into two. Cut adverbs. Cut unnecessary words and phrases.
+ Use the imperative mood, if applicable. Do what writing books tell you.<br/>
+保持句子简洁。把长句拆成短句，删去副词和无用的词组。若适用，使用祈使语气。遵循写作书中的建议。
+
+Write sentences that can be parsed unambiguously. For example, consider the sentence “Title sections with sentences.” 
+When a reader reads the word “Title”, their brain doesn’t yet know whether “Title” is going to be a noun or verb or adjective.
+It takes a bit of brainpower to keep track as they parse the rest of the sentence, and can cause a hitch if their brain mis-predicted the meaning. 
+Prefer sentences that can be parsed more easily (e.g., “Write section titles as sentences”) even if longer. 
+Similarly, avoid noun phrases like “Bicycle clearance exercise notice” which can take extra effort to parse.<br/>
+写那些不含歧义、容易解析的句子。例如 “Title sections with sentences.” 一开始的 “Title” 让读者不确定它是名词、动词还是形容词，增加理解负担。宁可写得稍长，
+比如 “Write section titles as sentences”。同样，避免“Bicycle clearance exercise notice” 这样的复杂名词短语。
+
+Avoid left-branching sentences. Linguistic trees show how words relate to each other in sentences. 
+Left-branching trees require readers to hold more things in memory than right-branching sentences, 
+akin to breadth-first search vs depth-first search. An example of a left-branching sentence is “You need flour, eggs, milk, butter and a dash of salt to make pancakes.” 
+In this sentence you don’t find out what ‘you need’ connects to until you reach the end of the sentence. An easier-to-read right-branching version is “To make pancakes, 
+you need flour, eggs, milk, butter, and a dash of salt.” Watch out for sentences in which the reader must hold onto a word for a while, and see if you can rephrase them.<br/>
+避免左分支句子。语言树显示了句子中单词之间的关系。左分支树要求读者在记忆中保持的内容比右分支句子更多，类似于广度优先搜索与深度优先搜索的区别。
+一个左分支句子的例子是“You need flour, eggs, milk, butter and a dash of salt to make pancakes.”
+在这个句子中，直到句子末尾你才知道“you need”与什么相关联。一个更易读的右分支版本是To make pancakes, you need flour, eggs, milk, butter, and a dash of salt.”
+注意那些读者必须暂时记住某个词的句子，看看是否可以重新表述它们。
+
+Avoid demonstrative pronouns (e.g., “this”), especially across sentences. For example, 
+instead of saying “Building on our discussion of the previous topic, now let’s discuss function calling” try “Building on message formatting, 
+now let’s discuss function calling.” The second sentence is easier to understand because it doesn’t burden the reader with recalling the previous topic.<br/>
+避免使用指示代词（如 “this”），特别是跨句时。例如，与其说 “Building on our discussion of the previous topic...”，不如说 “Building on message formatting...”。后者不要求读者回忆前文，理解更轻松。
+
+Be consistent. Human brains are amazing pattern matchers. Inconsistencies will annoy or distract readers.
+If we use Title Case everywhere, use Title Case. If we use terminal commas everywhere, use terminal commas. 
+If all of the Cookbook notebooks are named with underscores and sentence case, use underscores and sentence case. 
+Don’t do anything that will cause a reader to go ‘huh, that’s weird.’ Help them focus on the content, not its inconsistencies.<br/>
+保持一致。人脑善于发现模式，不一致会让人分心。如果到处使用标题式大写，就保持一致；若使用终止逗号，也要一致；若笔记文件都用下划线与句式命名，就维持统一。
+不要让读者觉得“咦，这怪怪的”，要让他们专注于内容本身。
+
+Don’t tell readers what they think or what to do. 
+Avoid sentences like “Now you probably want to understand how to call a function” or “Next, 
+you’ll need to learn to call a function.” Both examples presume a reader’s state of mind, which may annoy them or burn our credibility. 
+Use phrases that avoid presuming the reader’s state. E.g., “To call a function, …”<br/>
+不要替读者假设想法或动作。避免写 “Now you probably want to…” 或 “Next, you’ll need to…”，这些都假定了读者的心理状态，可能惹恼他们或损害信任。
+应改为 “To call a function, …” 这样的表达。
+
+## Be broadly helpful 对更多人真正有用
+> 帮到尽可能多的人
+> 1. 提供 Quickstart + 完整示例。
+> 2. 讲清楚假设前提（需要什么知识/环境）和权衡与限制（性能 vs 简单性），让读者自己选择。
+> 4. 列出常见错误消息及其解决办法。
+> 5. 示例要包容多平台/语言。
+> 5. 链接到权威文档，不重复维护。
+
+Be broadly helpful. Aim to make your documentation useful to as many readers as possible. 
+Include examples, explain common pitfalls, provide alternatives, and link to deeper reference material.<br/>
+要做到广泛有用。让文档对尽可能多的读者都有帮助。提供示例、说明常见陷阱、给出替代方案，并链接更深入的参考资料。
+
+Include quick starts and full examples. Quick starts help people get running fast; full examples show real usage patterns and edge cases.<br/>
+包含快速入门和完整示例。快速入门帮助用户迅速上手；完整示例展示真实使用方式和边界情况。
+
+Explain assumptions and tradeoffs. Tell readers what you assume (e.g., prior knowledge or environment) and what tradeoffs a given approach has (e.g., complexity vs performance). 
+This helps readers choose the right path for them.<br/>
+解释假设和权衡。告诉读者你所假设的内容（例如，先验知识或环境）以及某种方法所具有的权衡（例如，复杂性与性能）。这有助于读者为自己选择合适的路径。
+
+Give troubleshooting and “what to try next.” When things go wrong, readers want concrete steps to debug and sensible next steps to try. 
+Include common error messages and how to resolve them.<br/>
+提供排障和“下一步尝试”。当事情出错时，读者需要具体的调试步骤与合理的后续方向。列出常见错误消息及其解决办法。
+
+Be inclusive in examples. Provide examples in several languages or platforms if relevant, and avoid presuming a single workflow. 
+Not everyone uses the same stack.<br/>
+在示例中体现包容性。如有需要，提供多种语言或平台的示例，避免假设所有人都使用同一技术栈。
+
+Link to authoritative references. When deeper or definitive detail exists elsewhere, link to it — API references, specification docs, 
+or other canonical sources. Don’t duplicate what’s better maintained externally.<br/>
+链接权威资料。当更深入或权威的细节存在于别处时，直接链接过去——如 API 文档、规范或官方资源。不要重复那些外部维护得更好的内容。
+
+## Break these rules when you have a good reason 有正当理由时可以打破规则
+
+Ultimately, do what you think is best. Documentation is an exercise in empathy. Put yourself in the reader’s position,
+ and do what you think will help them the most.<br/>
+最终，遵从你认为最好的方式。文档写作是一种同理心的实践。把自己放在读者的位置，做出你认为最能帮助他们的选择。
+
+
+**终极记忆口诀：易于浏览，清晰易读，广泛有用。Easy to skim. Clear to read. Broadly helpful.**
