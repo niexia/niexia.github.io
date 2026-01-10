@@ -5,21 +5,9 @@ import Image from "next/image";
 import { ThemeToggle } from "./ThemeToggle";
 
 const NavBar = () => {
-  const toTop = () => {
-    return window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
   return (
     <header>
       <Link href="/" className="absolute"><Image src="/logo.png" width={32} height={32} alt="logo" /></Link>
-      <button title="scroll to top"
-        className="fixed bottom-8 right-8 rounded-full p-1 shadow-lg shadow-zinc-950/50 hover:bg-zinc-800 transition-colors duration-200"
-        onClick={toTop}
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-10 h-10">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M15 11.25l-3-3-3 3" />
-        </svg>
-      </button>
       <nav className="grid grid-cols-[auto_max-content] gap-4 w-full py-2">
         <div></div>
         <div className="grid grid-cols-[repeat(7,auto)] gap-4">

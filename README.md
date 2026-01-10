@@ -32,7 +32,7 @@ bun dev
 - [x] Add Header navigation
 - [x] Add posts reading time
 - [x] Add Mobile responsive
-- [x] Add categories / tags
+- [x] Add categories / tag
 - [ ] Add search
 - [ ] Add comment system
 - [x] Add dark mode
