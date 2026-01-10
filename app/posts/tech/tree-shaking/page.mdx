@@ -1,0 +1,409 @@
+export const metadata = {
+  title: "Tree Shaking 原理与实践",
+  date: "2026-01-10",
+  tag: ["前端工程化", "tree-shaking"],
+  description: "Tree Shaking 是一种优化技术，用于在打包 JavaScript 代码时移除未使用的代码。它通过静态分析代码依赖关系，只保留被实际使用的代码，从而减少最终打包文件的大小。",
+  duration: '10min'
+}
+
+# Tree Shaking
+
+## 原理与核心概念
+
+### 是什么
+
+Tree Shaking 是一种静态代码消除（Dead Code Elimination）技术，用于在构建阶段分析代码依赖关系，移除产物中未被实际使用的代码，从而减小最终打包文件的体积，提升性能。
+
+它解决的根本问题是：随着模块化和组件化的发展，应用中引入大量“未被实际使用的代码”，但这些代码仍然会被打包进最终产物，导致文件体积膨胀，影响加载速度和用户体验。
+
+Tree Shaking 的核心目标是：只打包“真正被用到”的那部分代码。
+
+### 工作原理
+
+从流程上，可以类比为：
+> 从入口文件开始，摇动整棵依赖树，把没有被触碰到的叶子摇掉“。
+
+Tree Shaking 的核心原理是：基于静态分析模块的依赖关系，在编译的时候判断哪些导出永远不会被使用，从而安全地将其移除。
+
+1. 构建模块依赖图：入口 → import → import → ...
+2. 标记被使用的导出（Mark）：编辑所有被使用的 export（函数、变量、组件等）。
+3. 分析副作用：判断模块是否存在**顶层副作用（side effects）**。
+3. 摇掉未使用的导出（Shake）：移除所有未被标记的、且无副作用影响的代码。
+4. 代码压缩：进一步由 Terser / SWC 等压缩器删除**不可达分支**。
+
+关键特性（Key Characteristics）：
+1. 基于 ESM 的静态分析
+2. 编译期完成（非运行时）
+3. 以“export 粒度”为最小裁剪单位
+4. 强依赖“无副作用代码设计”
+5. 通常与 Minifier（Terser）协同工作
+
+
+## 实现（Implementation & Ecosystem）
+
+### 基础条件
+
+要实现 Tree Shaking，需满足以下基础条件：使用 ESM 模块系统、构建工具（如 Webpack、Rollup 等）、生产模式。
+```typescript
+// 使用 ESM 模块系统
+// Good
+// math.js
+export function add(a, b) {
+  return a + b;
+}
+import { add } from './math.js';
+
+// Bad (CommonJS)
+// math.js
+module.exports = { add };
+const { add } = require('./math.js');
+
+// package.json
+{
+  "type": "module", // 使用 ESM 模块系统
+  "sideEffects": false // 标记无副作用代码设计
+}
+```
+
+### 简单例子
+```typescript
+// utils.js
+export function used() {
+  console.log('used');
+}
+
+export function unused() {
+  console.log('unused');
+}
+
+// index.js
+import { used } from './utils.js';
+
+used(); // 输出 'used'
+```
+
+Tree Shaking 会移除 `unused` 函数，因为它未被使用。
+
+```typescript
+function used() {
+  console.log("used");
+}
+used();
+``` 
+
+### 常见失效场景（非常关键）
+
+1. ❌ 动态访问：→ bundler 无法判断使用了哪个 export
+```typescript
+import * as utils from './utils';
+utils[fnName]();
+```
+
+2. ❌ 顶层副作用（Top-Level Side Effects）：→ 即使 foo 未使用，模块也不能删除
+
+```typescript
+console.log('side effect');
+export const foo = 1;
+```
+
+3. ❌ re-export 滥用：编译变慢、Tree Shaking 精度下降
+
+```typescript
+// index.ts
+export * from './a';
+export * from './b';
+```
+
+## 使用场景
+
+### 适用场景
+
+Tree Shaking 适用于以下场景：
+1. 使用 ESM 模块系统的项目：多页面/多入口
+2. UI / 组件库：因为它们通常包含多个方法、组件，而每个项目所需要的可能只是其中的一部分。
+
+### 优势和局限
+
+✅ 优势
+
+1. 显著减少 bundle size
+2. 降低首屏加载时间
+3. 鼓励更好的模块设计
+4. 对业务无侵入（构建期优化）
+
+❌ 局限
+
+1. 依赖 ESM，无法完美支持 CommonJS
+2. 对副作用代码极其敏感
+3. 对动态代码（eval）无能为力
+4. 配置复杂，容易“看起来开启了，实际上没生效”
+
+### 最佳实践
+
+核心原则一句话版：一个 export = 一个能力，且这个能力没有隐式副作用
+
+1. 单文件单能力 → 提高 Tree Shaking 精度，职责清晰
+2. 命名导出（不要 default export） → 明确导出，便于删除未使用代码
+3. 显式导出（不要 export *） → 降低依赖图复杂度，提高摇树效率
+4. 无副作用 & 顶层逻辑封装 → Tree Shaking 才能安全删除未使用模块
+5. 避免动态/条件访问 → 保持依赖图静态可分析
+
+对于库和项目来说：**库层面用显式导出 + 无副作用设计 + 拆单文件；业务应用按需导入 + 入口统一初始化 + 禁止动态/条件访问**，这样 Tree Shaking 才能真正生效，最终产物最小、性能最优。
+
+#### **1. library 层面**
+```
+my-ui-library/
+├── package.json
+├── tsconfig.json
+├── src/
+│   ├── components/
+│   │   ├── button/
+│   │   │   ├── Button.tsx
+│   │   │   ├── Button.types.ts
+│   │   │   └── index.ts
+│   │   ├── modal/
+│   │   │   ├── Modal.tsx
+│   │   │   ├── Modal.types.ts
+│   │   │   └── index.ts
+│   │   └── index.ts
+│   ├── hooks/
+│   │   ├── useToggle.ts
+│   │   └── index.ts
+│   └── utils/
+│       ├── formatDate.ts
+│       ├── debounce.ts
+│       └── index.ts
+└── dist/
+```
+
+1. 模块 & 导出规范
+
+- 单组件 / 单能力
+```typescript
+// src/components/button/index.ts
+export { Button } from './Button';
+export type { ButtonProps } from './Button';
+```
+- 严禁默认导出 `export default`（❌）：bundler 无法静态判断对象属性是否被使用，会导致整个对象被保留
+```typescript
+// src/components/index.ts
+// ❌ 禁止
+export default {
+  Button,
+  Modal,
+};
+// ✅ 推荐
+export { Button } from './button';
+export { Modal } from './modal';
+```
+- 避免 `export * from '...'`（Re-export 滥用），只允许命名导出（✅）
+`export *` 会增加依赖图复杂度，降低 Tree Shaking 精度。Bundler 可能保留所有 re-export 的内容，即使只使用其中一个。显式导出可保证未使用模块被正确删除。
+```typescript
+// src/components/index.ts
+// ❌ 不推荐
+export * from './button';
+export * from './modal';
+// ✅ 推荐
+export { Button } from './button';
+export { Modal } from './modal';
+```
+- Root Index 的唯一职责
+```typescript
+// src/index.ts
+// ✅ 显式 re-export
+export { Button } from './components/button';
+export type { ButtonProps } from './components/button';
+
+export { Modal } from './components/modal';
+export type { ModalProps } from './components/modal';
+
+export { useToggle } from './hooks/useToggle';
+export type { UseToggleOptions } from './hooks/useToggle';
+
+export { formatDate } from './utils/formatDate';
+export { debounce } from './utils/debounce';
+
+```
+
+2. 副作用（Side Effects）治理规范
+- package.json 必须声明
+```json
+{
+  "type": "module",
+  "sideEffects": false // 所有模块默认无副作用
+}
+// 有副作用的模块，必须显式声明
+{
+  "type": "module",
+  "sideEffects": [
+    "./styles/global.css",
+    "./polyfills/*.js"
+  ]
+}
+```
+- 严禁顶层副作用代码
+```typescript
+// ❌ 顶层执行
+console.log('init');
+export const Button = () => {};
+```
+
+3. 构建产物规范
+- 同时产出 ESM / CJS（对外）
+```json
+{
+  "main": "dist/index.cjs.js", // CommonJS 入口
+  "module": "dist/index.esm.js", // ESM 入口
+  "types": "dist/index.d.ts" // TypeScript 类型声明文件
+}
+```
+- Types 不影响 Tree Shaking
+```typescript
+// 推荐
+export type { ButtonProps } from './Button';
+// ❌ 不推荐
+export { ButtonProps } from './Button';
+```
+
+#### **2. Application 层面**
+```typescript
+// ✅ 推荐精确导入
+import { Button } from '@my-lib/button';
+import { useToggle } from '@my-lib/hooks';
+
+// ❌ 不推荐 
+import UI from '@my-lib';
+```
+
+### 工程化建议
+
+- Lint & TypeScript 强制规则
+  - 禁止默认导出：`import/no-default-export`
+  - 禁止 `export *`：`no-restricted-syntax`
+  - 顶层禁止副作用：`no-console`, 自定义规则检测初始化逻辑
+- 目录结构
+  - 单组件 / 单功能文件夹
+  - 每个文件只 `export` 一个能力
+- Bundle 分析
+  - 分析 bundle 大小，确认 Tree Shaking 是否生效
+  - 检查是否有未被使用的模块或代码路径
+
+## 总结
+
+Tree Shaking 是建立在 ES Module 静态语义之上的编译期代码裁剪能力，它通过可达性分析和副作用约束，将“未被使用的能力”从最终产物中彻底移除，是现代前端性能优化与模块设计的基础设施**。
+
+## FAQ
+
+### 为什么不能 `export *`：以下 1 和 2 到底存在什么差异？
+```typescript
+// src/index.ts
+// 1 export *
+export * from './components'
+// 2 显式导出
+export { Button } from './components/button';
+export { Modal } from './components/modal';
+```
+
+一句话结论：
+> `export *` 会把“可被 Tree Shaking 的显式依赖”，退化成“不透明的中转依赖”，使 bundler 更难精确判断哪些模块真的被使用。
+
+ESM 的 Tree Shaking 是“基于静态可枚举导出”的。Tree Shaking 的核心能力来自 ES Module 的静态结构，bundler 在编译期需要知道：
+1. 这个模块导出了哪些名字
+2. 这些名字分别来自哪个文件
+3. 哪些导出最终被引用
+```typescript
+// 2 显式导出
+export { Button } from './components/button';
+export { Modal } from './components/modal';
+```
+bundler 立刻知道：
+1. `Button` → `./components/button`
+2. 如果 `Button` 没被用，整个 `button` 模块可以删
+
+```typescript
+// 1 export *
+export * from './components';
+```
+此时 bundler 看到的是：
+>“我不知道你导出了什么，去 ./components 再看看它导了什么。”
+```typescript
+// src/components/index.ts
+export { Button } from './button';
+export { Modal } from './modal';
+```
+再进一步：
+> “我知道你导出了 Button 和 Modal，但是我不能确定你是否会使用它们。那我得把 button、modal 都拉进依赖图再说。”
+
+**📌 注意：依赖图已经被扩大了**：
+``` typescript
+// 2. 显式导出时的依赖图
+App
+ └─ index.ts
+     └─ button
+// 1. export * 时的依赖图
+App
+ └─ index.ts
+     └─ components/index.ts
+         ├─ button
+         └─ modal
+```
+即使你只用了 Button：modal 已经进依赖图，后续是否能被完全摇掉，取决于：bundler 实现、是否有副作用、是否被进一步 re-export
+
+**Tree Shaking 从“确定可删”，变成了“也许能删”**。
+
+最终影响：
+1. Tree Shaking 精度下降：bundler 更保守，很多情况下会保留整个模块。你会看到 bundle analyzer 里出现 “明明没用却被打包的组件”
+2. 构建性能下降：export * 迫使 bundler 把更多模块进入依赖图，增加编译时间和内存消耗
+
+关键不是“不能有 `index.ts`”，而是“`index.ts` 只能显式导出，不能 `export *`”。`export * `几乎只在“类型导出”中
+
+### 副作用是什么？
+> 副作用 = 我只是“看了一眼这个文件”（import），但它却“自己动起来了”。
+
+副作用（Side Effects）是指代码在执行时会影响到模块外部的。**副作用不是“做了事情”，而是“在 import 阶段做了事情”**。
+
+一个判断标准是：我什么都没调用，它会不会自己执行？会 → 副作用，不会 → 无副作用。例如：
+
+1. `import` 这个文件，会不会立刻执行代码？
+```typescript
+// ① 顶层代码 = 一打开门就干活
+connectDB();
+// 你还没说“我要连数据库”
+// 它自己连了
+```
+2. 会不会改 window / global / prototype？
+```typescript
+// ② 改公共区域 = 偷偷改整栋楼
+window.theme = 'dark';
+// 你本来只是想用一个函数
+// 结果整栋楼灯都变了
+
+```
+3. 会不会注册到某个全局系统？
+```typescript
+// ③ 注册全局系统 = 偷偷在全局注册一个变量
+eventBus.on('login', handler);
+// 你没调用 handler
+// 但系统里已经“多了一个监听者”
+```
+4. 它的依赖里有没有副作用模块？
+
+任意一个「是」 → 这个文件 = 有副作用
+
+那什么不是副作用？
+1. 安全的：你不用，它就永远不发生
+```typescript
+export function openDoor() {
+  console.log('door opened');
+}
+```
+2. 常量也是安全的
+3. TS 的 type 更安全
+
+### Tree Shaking 为什么讨厌副作用
+
+Tree Shaking 想做的是：“这个模块没人用，我就不搬这个盒子了。”
+
+但如果：不搬盒子，整个系统就不对了
+
+那打包器只能说：“那我还是老老实实全搬吧 😓”

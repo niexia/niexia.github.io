@@ -14,6 +14,7 @@ import { metadata as infiniteScrollMetaData } from "../posts/tech/infinite-scrol
 import { metadata as javascriptHandwrittenCodeExamplesMetaData } from "../posts/tech/javascript-handwritten-code-examples/page.mdx";
 import { metadata as mvcMvpMvvmMetaData } from "../posts/tech/mvc-mvp-mvvm/page.mdx";
 import { metadata as regxExecAndMatchMetaData } from "../posts/tech/regx-exec-and-match/page.mdx";
+import { metadata as treeShakingMetaData } from "../posts/tech/tree-shaking/page.mdx";
 import { metadata as understandingScrollOffsetClientPropertiesMetaData } from "../posts/tech/understanding-scroll-offset-client-properties/page.mdx";
 import { metadata as virtualScrollerMetaData } from "../posts/tech/virtual-scroller/page.mdx";
 import { metadata as vscodeAutoCompletionPluginTutorialMetaData } from "../posts/tech/vscode-auto-completion-plugin-tutorial/page.mdx";
@@ -86,6 +87,10 @@ export const allPosts = [
   {
     url: '/posts/tech/regx-exec-and-match',
     metadata: regxExecAndMatchMetaData
+  },
+  {
+    url: '/posts/tech/tree-shaking',
+    metadata: treeShakingMetaData
   },
   {
     url: '/posts/tech/understanding-scroll-offset-client-properties',
