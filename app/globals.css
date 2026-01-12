@@ -17,6 +17,10 @@
   --sh-entity: #e0af68;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 html.dark {
   --background: #0a0a0a;
   --foreground: #ededed;

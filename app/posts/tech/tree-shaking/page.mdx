@@ -39,7 +39,7 @@ Tree Shaking 的核心原理是：基于静态分析模块的依赖关系，在�
 5. 通常与 Minifier（Terser）协同工作
 
 
-## 实现（Implementation & Ecosystem）
+## 实现
 
 ### 基础条件
 
@@ -91,7 +91,7 @@ function used() {
 used();
 ``` 
 
-### 常见失效场景（非常关键）
+### 常见失效场景
 
 1. ❌ 动态访问：→ bundler 无法判断使用了哪个 export
 ```typescript
@@ -294,7 +294,7 @@ Tree Shaking 是建立在 ES Module 静态语义之上的编译期代码裁剪�
 
 ## FAQ
 
-### 为什么不能 `export *`：以下 1 和 2 到底存在什么差异？
+### 为什么不能 `export *`
 ```typescript
 // src/index.ts
 // 1 export *
@@ -357,7 +357,7 @@ App
 
 关键不是“不能有 `index.ts`”，而是“`index.ts` 只能显式导出，不能 `export *`”。`export * `几乎只在“类型导出”中
 
-### 副作用是什么？
+### 副作用是什么
 > 副作用 = 我只是“看了一眼这个文件”（import），但它却“自己动起来了”。
 
 副作用（Side Effects）是指代码在执行时会影响到模块外部的。**副作用不是“做了事情”，而是“在 import 阶段做了事情”**。
