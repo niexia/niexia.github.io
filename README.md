@@ -33,12 +33,13 @@ bun dev
 - [x] Add posts reading time
 - [x] Add Mobile responsive
 - [x] Add categories / tag
+- [x] Add table of contents
+- [x] Add dark mode
+- [x] Add analytics
 - [ ] Add search
 - [ ] Add comment system
-- [x] Add dark mode
 - [ ] Add RSS feed
-- [x] Add analytics
-- [ ] Add pinned / recommended 
+- [ ] Add pinned / recommended
 
 ### Credits
 

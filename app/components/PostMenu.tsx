@@ -1,26 +1,29 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 
 type Heading = { id: string; text: string; level: number };
 
 /**
- * 将文本转换为 URL 友好的 slug
+ * Converts a heading text into a URL-friendly id.
+ *
+ * Notes:
+ * - We keep this intentionally simple (lowercase + spaces to hyphens).
+ * - The uniqueness guarantee is handled by checking existing DOM ids.
+ * This function performs the following operations:
+ * 1. Convert text to lowercase
+ * 2. Trim leading and trailing spaces
+ * 4. Replace consecutive spaces with a single hyphen
+ * 5. Collapse consecutive hyphens into one
  * 
- * 该函数执行以下操作：
- * 1. 将文本转换为小写
- * 2. 去除首尾空格
- * 4. 将连续的空格替换为单个连字符
- * 5. 合并连续的连字符
- * 
- * @param s 要转换的文本字符串
- * @returns URL 友好的 slug 字符串
+ * @param s The input text string to convert
+ * @returns A URL-friendly slug string
  * 
  * @example
- * slugify("Hello World!") // 返回 "hello-world"
- * slugify("  How to Create a Slug?  ") // 返回 "how-to-create-a-slug"
- * slugify("Multiple---Hyphens") // 返回 "multiple-hyphens"
+ * slugify("Hello World!") // returns "hello-world"
+ * slugify("  How to Create a Slug?  ") // returns "how-to-create-a-slug"
+ * slugify("Multiple---Hyphens") // returns "multiple-hyphens"
  */
 function slugify(s: string) {
   return s
@@ -37,6 +40,14 @@ function indentClass(level: number) {
   return "";
 }
 
+/**
+ * Normalize heading nodes into a render-friendly list and ensure each node has a stable id.
+ *
+ * Why set scrollMarginTop:
+ * - When navigating to an anchor, browsers align the target near the top.
+ * - Without a scroll margin, the title can end up too close to the top edge (or under sticky UI),
+ *   which also makes "active heading" detection unstable right after a jump.
+ */
 function transferNodeToHeading(nodes: HTMLElement[]) {
   return nodes.map((node) => {
     let id = node.id;
@@ -51,8 +62,7 @@ function transferNodeToHeading(nodes: HTMLElement[]) {
       id = unique;
       node.id = id;
     }
-    // give headings a bit of scroll margin so anchor links aren't hidden behind sticky header
-    // node.style.scrollMarginTop = "6rem";
+    node.style.scrollMarginTop = "7rem";
     return {
       id,
       text: node.textContent || "",
@@ -66,6 +76,34 @@ function PostMenu() {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [showMenu, setShowMenu] = useState<boolean>(false);
   const [mobileOpen, setMobileOpen] = useState<boolean>(false);
+
+  /**
+   * A cached list of heading elements inside the article. We keep elements (not ids)
+   * so we can compute their absolute positions quickly without querying the DOM on every scroll.
+   */
+  const headingElsRef = useRef<HTMLElement[]>([]);
+
+  /**
+   * Coalesces multiple scroll events into a single computation per animation frame.
+   * This reduces state churn and avoids layout thrashing.
+   */
+  const rafRef = useRef<number | null>(null);
+
+  /**
+   * "Click lock" to prevent the scroll-spy logic from overriding the active item while
+   * a smooth scroll is in progress.
+   *
+   * Without this, adjacent headings (A/B) can alternate as "active" during the animation,
+   * because the scroll position moves through the boundary where both headings are valid candidates.
+   */
+  const lockRef = useRef<{ id: string } | null>(null);
+
+  /**
+   * Releases the click lock after scrolling has been idle for a short time window.
+   * This is more reliable than a fixed timeout because different devices/browsers
+   * animate smooth scrolling with different durations.
+   */
+  const idleTimerRef = useRef<number | null>(null);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -77,6 +115,12 @@ function PostMenu() {
       setHeadings([]);
       setActiveId(null);
       setMobileOpen(false);
+      lockRef.current = null;
+      headingElsRef.current = [];
+      if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+      if (idleTimerRef.current != null) window.clearTimeout(idleTimerRef.current);
+      idleTimerRef.current = null;
       return;
     }
 
@@ -85,28 +129,123 @@ function PostMenu() {
       setHeadings([]);
       return;
     }
+
+    /**
+     * We only need to track h2/h3 for now (matches the TOC depth we render).
+     * If you later add h4+ to the menu, update this selector and indentClass.
+     */
     const nodes = Array.from(content.querySelectorAll("h2,h3")) as HTMLElement[];
 
-    const headings = transferNodeToHeading(nodes)
+    const headings = transferNodeToHeading(nodes);
     setHeadings(headings);
+    headingElsRef.current = nodes;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveId((prev) => entry.target.id || prev);
-          }
-        });
-      },
-      { root: null, rootMargin: "0px 0px -70% 0px", threshold: [0, 0.1, 0.5] }
-    );
-    nodes.forEach((n) => observer.observe(n));
+    /**
+     * Scroll-spy strategy (instead of IntersectionObserver):
+     * - IO callbacks depend on intersection threshold and entry ordering.
+     * - During smooth scrolling / fast wheel scrolling, multiple headings can be intersecting,
+     *   and the last delivered entry can overwrite the "correct" active id.
+     *
+     * Here we compute active based on current scrollY:
+     * - Choose the heading whose top is the closest one that is above a "virtual top line".
+     * - This makes active selection stable and deterministic.
+     */
+    const computeActive = () => {
+      const lock = lockRef.current;
+      if (lock) {
+        setActiveId((prev) => (prev === lock.id ? prev : lock.id));
+        return;
+      }
 
-    return () => observer.disconnect();
+      /**
+       * Virtual top line offset (px) used for determining the active heading.
+       * Think of it as "the reading line" slightly below the top of the viewport.
+       */
+      const threshold = 120;
+      const y = window.scrollY + threshold;
+      let bestId: string | null = null;
+      let bestTop = Number.NEGATIVE_INFINITY;
+      for (const el of headingElsRef.current) {
+        const top = el.getBoundingClientRect().top + window.scrollY;
+        if (top <= y && top > bestTop) {
+          bestTop = top;
+          bestId = el.id;
+        }
+      }
+      if (!bestId && headingElsRef.current[0]) bestId = headingElsRef.current[0].id;
+      if (bestId) setActiveId((prev) => (prev === bestId ? prev : bestId));
+    };
+
+    const scheduleCompute = () => {
+      if (rafRef.current != null) return;
+      rafRef.current = requestAnimationFrame(() => {
+        rafRef.current = null;
+        computeActive();
+      });
+    };
+
+    const onScroll = () => {
+      /**
+       * If the user clicked a TOC item, keep the active id locked to that item while
+       * smooth scrolling is progressing. We consider scrolling "done" when no scroll event
+       * happens for a short idle window.
+       */
+      if (lockRef.current) {
+        if (idleTimerRef.current != null) window.clearTimeout(idleTimerRef.current);
+        idleTimerRef.current = window.setTimeout(() => {
+          lockRef.current = null;
+          idleTimerRef.current = null;
+          scheduleCompute();
+        }, 160);
+      }
+      scheduleCompute();
+    };
+
+    const onResize = () => scheduleCompute();
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onResize);
+
+    const hash = window.location.hash?.slice(1);
+    if (hash && nodes.some((n) => n.id === hash)) {
+      setActiveId(hash);
+      scheduleCompute();
+    }
+
+    const onHashChange = () => {
+      const next = window.location.hash?.slice(1);
+      if (next && nodes.some((n) => n.id === next)) {
+        /**
+         * If navigation happens via hash change (e.g. browser back/forward),
+         * release any click lock and recompute based on actual scroll position.
+         */
+        lockRef.current = null;
+        setActiveId(next);
+        scheduleCompute();
+      }
+    };
+    window.addEventListener("hashchange", onHashChange);
+    scheduleCompute();
+
+    return () => {
+      window.removeEventListener("hashchange", onHashChange);
+      lockRef.current = null;
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onResize);
+      if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+      if (idleTimerRef.current != null) window.clearTimeout(idleTimerRef.current);
+      idleTimerRef.current = null;
+    };
   }, [pathname, showMenu]);
 
   useEffect(() => {
     if (!mobileOpen) return;
+    /**
+     * Mobile drawer UX:
+     * - Esc to close.
+     * - Prevent background scrolling while the drawer is open.
+     */
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") setMobileOpen(false);
     };
@@ -128,7 +267,38 @@ function PostMenu() {
             <li key={h.id} className="relative">
               <a
                 href={`#${h.id}`}
-                onClick={() => setMobileOpen(false)}
+                onClick={(e) => {
+                  if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+                  e.preventDefault();
+
+                  /**
+                   * Make the UI feel instant:
+                   * - update active immediately on click
+                   * - then perform smooth scrolling to the target heading
+                   */
+                  setActiveId(h.id);
+                  setMobileOpen(false);
+
+                  /**
+                   * Lock active while smooth scrolling is happening, otherwise adjacent headings
+                   * can temporarily become active due to the moving scroll position.
+                   */
+                  lockRef.current = { id: h.id };
+                  if (idleTimerRef.current != null) window.clearTimeout(idleTimerRef.current);
+                  idleTimerRef.current = window.setTimeout(() => {
+                    lockRef.current = null;
+                    idleTimerRef.current = null;
+                  }, 160);
+
+                  const el = document.getElementById(h.id);
+                  if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+
+                  /**
+                   * Keep the URL hash in sync without triggering a full navigation.
+                   * This preserves shareable URLs and back/forward behavior.
+                   */
+                  window.history.replaceState(null, "", `#${h.id}`);
+                }}
                 className={`flex items-start gap-2 no-underline px-1 py-0.5 transition-colors duration-150 break-words ${isActive ? "text-zinc-900 dark:text-zinc-100 font-semibold" : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-100"} `}
                 aria-current={isActive ? "location" : undefined}
               >
