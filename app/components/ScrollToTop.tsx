@@ -35,7 +35,7 @@ function ScrollToTop() {
   <>
     {showToTop && (
       <button title="scroll to top"
-        className="fixed bottom-8 right-8 rounded-full p-1 shadow-lg hover:cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors duration-200"
+        className="fixed bottom-8 right-6 rounded-full p-1 shadow-lg hover:cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors duration-200"
         onClick={toTop}
       >
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-10 h-10">
