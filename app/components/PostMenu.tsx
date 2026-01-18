@@ -132,7 +132,7 @@ function PostMenu() {
                 className={`flex items-start gap-2 no-underline px-1 py-0.5 transition-colors duration-150 break-words ${isActive ? "text-zinc-900 dark:text-zinc-100 font-semibold" : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-100"} `}
                 aria-current={isActive ? "location" : undefined}
               >
-                <span className={`${isActive ? "bg-emerald-400" : "bg-transparent"} w-1 rounded h-5 -ml-3`} />
+                <span className={`${isActive ? "bg-emerald-400" : "bg-transparent"} w-1 rounded h-5`} />
                 <span className={`${indentClass(h.level)} text-sm`}>{h.text}</span>
               </a>
             </li>
@@ -147,13 +147,13 @@ function PostMenu() {
   return (
     <>
       <nav className="hidden xl:block fixed top-32 right-8 w-56 max-h-[calc(100vh-10rem)] overflow-auto">
-        <div className="mb-3 pl-1 text-sm font-semibold text-zinc-600 dark:text-zinc-400">ON THIS PAGE</div>
+        <div className="mb-3 pl-4 text-sm font-semibold text-zinc-600 dark:text-zinc-400">ON THIS PAGE</div>
         {list}
       </nav>
 
       <button
         type="button"
-        className="xl:hidden fixed top-20 right-6 z-40 rounded-full bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-950 px-2 py-1 text-sm shadow-lg shadow-black/10"
+        className="xl:hidden fixed bottom-8 right-6 z-40 rounded-full bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-950 px-3 py-1.5 text-sm shadow-lg shadow-black/10"
         onClick={() => setMobileOpen(true)}
         aria-haspopup="dialog"
         aria-expanded={mobileOpen}
