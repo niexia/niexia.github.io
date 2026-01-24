@@ -27,9 +27,7 @@ function PostCard(post: Post) {
         {metadata.duration && 
           <span className='text-gray-500 dark:text-gray-400'>· {metadata.duration}</span>
         }
-        {metadata.tag && metadata.tag.map((tag: string) => (
-          <Tag options={metadata.tag} key={tag}/>
-        ))}
+        {metadata.tag && <Tag options={metadata.tag} />}
       </div>
       <div className="text-sm text-gray-700 dark:text-zinc-300 leading-relaxed">{metadata.description}</div>
     </div>

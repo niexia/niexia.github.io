@@ -4,9 +4,10 @@ type TagProps = {
   onChange?: (value: string[]) => void
   multiple?: boolean
   checkable?: boolean
+  className?: string
 }
 
-const Tag = ({ options, value = [], onChange, multiple = false, checkable = false }: TagProps) => {
+const Tag = ({ options, value = [], onChange, multiple = false, checkable = false, className = '' }: TagProps) => {
   const handleChange = (tag: string) => {
     if (!checkable) return;
     
@@ -23,7 +24,7 @@ const Tag = ({ options, value = [], onChange, multiple = false, checkable = fals
   const isActive = (tag: string) => value.includes(tag)
 
   return (
-    <span className="flex flex-wrap gap-2 text-sm font-medium">
+    <span className={`flex flex-wrap gap-2 text-sm font-medium ${className}`}>
       {options.map((tag) => (
         <span 
           key={tag} 

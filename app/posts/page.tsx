@@ -18,7 +18,7 @@ export default function Posts() {
 
   return (
     <div className="mx-auto">
-      <Tag options={tags} value={selectedTags} onChange={setSelectedTags} checkable multiple />
+      <Tag options={tags} value={selectedTags} onChange={setSelectedTags} checkable multiple className="mb-4" />
       {filteredPosts.map((post, idx) => (
         <PostCard key={idx} {...post} />
       ))}
