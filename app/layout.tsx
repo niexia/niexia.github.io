@@ -59,6 +59,7 @@ export default function RootLayout({
         `,
           }}
         />
+        <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml" />
         <meta name="google-site-verification" content="gogjeUvgmxhMwuD2GEIWiR3tjeiYHGJRZVIRLWmZBHM" />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`} suppressHydrationWarning>
@@ -103,4 +104,3 @@ function Footer() {
     </footer>
   );
 }
-

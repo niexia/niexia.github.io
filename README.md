@@ -36,9 +36,8 @@ bun dev
 - [x] Add table of contents
 - [x] Add dark mode
 - [x] Add analytics
-- [ ] Add search
+- [x] Add RSS feed, this site exposes an RSS feed at `/rss.xml`
 - [ ] Add comment system
-- [ ] Add RSS feed
 - [ ] Add pinned / recommended
 
 ### Credits
