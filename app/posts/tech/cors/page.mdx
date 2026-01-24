@@ -6,6 +6,8 @@ export const metadata = {
   duration: '20min'
 }
 
+# CORS 跨域资源共享详解
+
 通过 XHR 实现的 Ajax 请求时有一个主要限制，来源于浏览器的同源策略。同源策略限制了从同一个源加载的文档或脚本如何与来自另一个源的资源进行交互。这是一个用于隔离潜在恶意文件的重要安全机制。
 
 所以默认情况下，XHR 对象只能访问与包含它的页面位于同一个域中的资源。这种安全策略可以预防某些恶意行为。但是，实现合理的跨域请求对开发某些浏览器引用程序也是至关重要的。
@@ -16,13 +18,42 @@ export const metadata = {
 
 下表给出了相对 `http://store.company.com/dir/page.html` 同源检测的示例：
 
-| URL | 结果 | 原因 |
-|:----|:----:|:----|
-| `http://store.company.com/dir2/other.html` | 成功 | 只有路径不同 |
-| `http://store.company.com/dir/inner/another.html`	| 成功 | 只有路径不同 |
-| `https://store.company.com/secure.html`	| 失败 | 不同协议 ( https 和 http ) |
-| `http://store.company.com:81/dir/etc.html` | 失败 | 不同端口 ( http:// 80 是默认的) |
-| `http://news.company.com/dir/other.html` | 失败 | 不同域名 ( news 和 store ) |
+<table>
+  <thead>
+    <tr>
+      <th>URL</th>
+      <th style={{ textAlign: 'center' }}>结果</th>
+      <th>原因</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>http://store.company.com/dir2/other.html</code></td>
+      <td style={{ textAlign: 'center' }}>成功</td>
+      <td>只有路径不同</td>
+    </tr>
+    <tr>
+      <td><code>http://store.company.com/dir/inner/another.html</code></td>
+      <td style={{ textAlign: 'center' }}>成功</td>
+      <td>只有路径不同</td>
+    </tr>
+    <tr>
+      <td><code>https://store.company.com/secure.html</code></td>
+      <td style={{ textAlign: 'center' }}>失败</td>
+      <td>不同协议 ( https 和 http )</td>
+    </tr>
+    <tr>
+      <td><code>http://store.company.com:81/dir/etc.html</code></td>
+      <td style={{ textAlign: 'center' }}>失败</td>
+      <td>不同端口 ( http:// 80 是默认的)</td>
+    </tr>
+    <tr>
+      <td><code>http://news.company.com/dir/other.html</code></td>
+      <td style={{ textAlign: 'center' }}>失败</td>
+      <td>不同域名 ( news 和 store )</td>
+    </tr>
+  </tbody>
+</table>
 
 同源策略限制了一下行为：
 
