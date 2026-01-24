@@ -1,4 +1,4 @@
-### [yangjin.dev](https://yangjin.dev)<br />
+## [Personal blog](https://yangjin.dev)
 
 This is my portfolio, blog, and personal website. About life, technology and reading.
 
