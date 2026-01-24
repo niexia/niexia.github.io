@@ -37,7 +37,7 @@ bun dev
 - [x] Add dark mode
 - [x] Add analytics
 - [x] Add RSS feed, this site exposes an RSS feed at `/rss.xml`
-- [ ] Add comment system
+- [x] Add comment system, powered by [Giscus](https://giscus.app)
 - [ ] Add pinned / recommended
 
 ### Credits
