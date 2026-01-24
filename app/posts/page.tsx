@@ -8,7 +8,7 @@ import { useMemo, useState } from 'react'
 
 export default function Posts() {
   const posts = allPosts.sort((a, b) => compareDesc(new Date(a.metadata.date), new Date(b.metadata.date)))
-  const tags = [...new Set(posts.flatMap((post) => post.metadata.tag ?? []))]
+  const tags = posts.flatMap((post) => post.metadata.tag ?? [])
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const filteredPosts = useMemo(() => {
     return selectedTags.length
@@ -18,7 +18,7 @@ export default function Posts() {
 
   return (
     <div className="mx-auto">
-      <Tag options={tags} value={selectedTags} onChange={setSelectedTags} checkable multiple className="mb-4" />
+      <Tag options={tags} value={selectedTags} onChange={setSelectedTags} checkable multiple showCount className="mb-4" />
       {filteredPosts.map((post, idx) => (
         <PostCard key={idx} {...post} />
       ))}
