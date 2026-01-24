@@ -62,9 +62,9 @@ export default function RootLayout({
         <meta name="google-site-verification" content="gogjeUvgmxhMwuD2GEIWiR3tjeiYHGJRZVIRLWmZBHM" />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`} suppressHydrationWarning>
-        <div className="min-h-screen flex flex-col justify-between pt-0 md:pt-8 p-8 dark:bg-zinc-950 bg-white text-gray-900 dark:text-zinc-200">
+        <div className="min-h-screen flex flex-col pt-0 md:pt-8 p-8 dark:bg-zinc-950 bg-white text-gray-900 dark:text-zinc-200">
           <NavBar />
-          <main className="max-w-[60ch] md:max-w-[80ch] mx-auto w-full space-y-6">
+          <main className="max-w-[60ch] md:max-w-[80ch] mx-auto w-full space-y-6 flex-grow">
             {children}
           </main>
           <Footer />

@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { format, parseISO } from 'date-fns'
 import { allPosts } from '../data/allPosts'
+import { Tag } from './Tag'
 
 type Post = (typeof allPosts)[number]
 
@@ -27,12 +28,7 @@ function PostCard(post: Post) {
           <span className='text-gray-500 dark:text-gray-400'>· {metadata.duration}</span>
         }
         {metadata.tag && metadata.tag.map((tag: string) => (
-          <span
-            key={tag}
-            className="px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-xs text-zinc-600 dark:text-zinc-300 font-mono"
-          >
-            {tag}
-          </span>
+          <Tag options={metadata.tag} key={tag}/>
         ))}
       </div>
       <div className="text-sm text-gray-700 dark:text-zinc-300 leading-relaxed">{metadata.description}</div>
