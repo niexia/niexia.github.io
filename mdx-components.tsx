@@ -27,21 +27,21 @@ const components = {
   ),
   h4: (props: HeadingProps) => <h4 className="font-medium" {...props} />,
   p: (props: ParagraphProps) => (
-    <p className="text-gray-800 dark:text-zinc-300 leading-snug" {...props} />
+    <p className="text-gray-800 dark:text-zinc-300 leading-6 my-4" {...props} />
   ),
   ol: (props: ListProps) => (
     <ol
-      className="text-gray-800 dark:text-zinc-300 list-decimal pl-5 space-y-2"
+      className="text-gray-800 dark:text-zinc-300 leading-6 list-decimal pl-5 space-y-2 my-4"
       {...props}
     />
   ),
   ul: (props: ListProps) => (
     <ul
-      className="text-gray-800 dark:text-zinc-300 list-disc pl-5 space-y-1"
+      className="text-gray-800 dark:text-zinc-300 leading-6 list-disc pl-5 space-y-2 my-4"
       {...props}
     />
   ),
-  li: (props: ListItemProps) => <li className="pl-1" {...props} />,
+  li: (props: ListItemProps) => <li className="pl-1 leading-6" {...props} />,
   em: (props: ComponentPropsWithoutRef<'em'>) => (
     <em className="font-medium" {...props} />
   ),
@@ -103,7 +103,7 @@ const components = {
   ),
   blockquote: (props: BlockquoteProps) => (
     <blockquote
-      className="ml-[0.075em] border-l-3 border-gray-300 pl-4 text-gray-700 dark:border-zinc-600 dark:text-zinc-300"
+      className="ml-[0.075em] border-l-3 border-gray-300 pl-4 text-gray-700 dark:border-zinc-600 dark:text-zinc-300 leading-6 my-6"
       {...props}
     />
   ),
