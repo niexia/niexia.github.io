@@ -21,11 +21,11 @@ export const metadata: Metadata = {
     default: "Yang Jin (杨金)",
     template: "%s | Yang Jin",
   },
-  description: "杨金的个人博客，分享生活、技术和阅读 | Yang Jin's personal blog, sharing insights on life, technology, and reading.",
-  keywords: ["杨金", "Yang Jin", "前端工程师", "个人博客", "技术分享", "Front-end Engineer", "Personal Blog", "Technology"],
+  description: "Yang Jin's personal blog about front-end engineering, performance, browser internals, and software design, plus notes on life and reading. RSS available. 杨金的个人博客，分享前端工程化、性能优化、浏览器原理与软件设计，也记录生活与阅读思考，支持 RSS 订阅。",
+  keywords: ["杨金", "Yang Jin", "前端工程师", "个人博客", "技术分享", "Front-end Engineer", "Personal Blog", "Technology", "前端工程化", "性能优化", "前端教程", "软件设计", "浏览器原理", "架构设计"],
   openGraph: {
     title: "Yang Jin (杨金)'s Blog",
-    description: "杨金的个人博客，分享生活、技术和阅读 | Yang Jin's personal blog, sharing insights on life, technology, and reading.",
+    description: "Yang Jin's personal blog about front-end engineering, performance, browser internals, and software design, plus notes on life and reading. RSS available. 杨金的个人博客，分享前端工程化、性能优化、浏览器原理与软件设计，也记录生活与阅读思考，支持 RSS 订阅。",
     url: "https://yangjin.dev",
     siteName: "Yang Jin (杨金)'s Blog",
     images: [
