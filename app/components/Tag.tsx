@@ -36,7 +36,7 @@ const Tag = ({ options, value = [], onChange, multiple = false, checkable = fals
       {filteredOptions.map((tag) => (
         <span 
           key={tag} 
-          className={`px-2 py-0.5 rounded-full text-xs font-mono cursor-pointer transition-colors ${isActive(tag) ? 'bg-green-500 text-white' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300'}`} 
+          className={`px-2 py-0.5 rounded-full text-xs font-mono ${checkable ? 'cursor-pointer' : ''} transition-colors ${isActive(tag) ? 'bg-green-500 text-white' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300'}`} 
           onClick={() => handleChange(tag)}
           role="button"
           >
