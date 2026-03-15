@@ -8,6 +8,12 @@ type ListProps = ComponentPropsWithoutRef<'ul'>;
 type ListItemProps = ComponentPropsWithoutRef<'li'>;
 type AnchorProps = ComponentPropsWithoutRef<'a'>;
 type BlockquoteProps = ComponentPropsWithoutRef<'blockquote'>;
+type TableProps = ComponentPropsWithoutRef<'table'>;
+type TheadProps = ComponentPropsWithoutRef<'thead'>;
+type TbodyProps = ComponentPropsWithoutRef<'tbody'>;
+type TrProps = ComponentPropsWithoutRef<'tr'>;
+type ThProps = ComponentPropsWithoutRef<'th'>;
+type TdProps = ComponentPropsWithoutRef<'td'>;
 
 const components = {
   h1: (props: HeadingProps) => (
@@ -107,6 +113,33 @@ const components = {
       {...props}
     />
   ),
+  // 解决 markdown 表格 hydration 错误：过滤掉空白文本节点
+  table: ({ children, ...props }: TableProps) => {
+    const filteredChildren = React.Children.toArray(children).filter(
+      (child) => !(typeof child === 'string' && child.trim() === '')
+    );
+    return <table {...props}>{filteredChildren}</table>;
+  },
+  thead: ({ children, ...props }: TheadProps) => {
+    const filteredChildren = React.Children.toArray(children).filter(
+      (child) => !(typeof child === 'string' && child.trim() === '')
+    );
+    return <thead {...props}>{filteredChildren}</thead>;
+  },
+  tbody: ({ children, ...props }: TbodyProps) => {
+    const filteredChildren = React.Children.toArray(children).filter(
+      (child) => !(typeof child === 'string' && child.trim() === '')
+    );
+    return <tbody {...props}>{filteredChildren}</tbody>;
+  },
+  tr: ({ children, ...props }: TrProps) => {
+    const filteredChildren = React.Children.toArray(children).filter(
+      (child) => !(typeof child === 'string' && child.trim() === '')
+    );
+    return <tr {...props}>{filteredChildren}</tr>;
+  },
+  th: (props: ThProps) => <th {...props} />,
+  td: (props: TdProps) => <td {...props} />,
 };
 
 declare global {

@@ -14,6 +14,7 @@ import { metadata as generatorsAndAsyncProgrammingMetaData } from "../posts/tech
 import { metadata as gitEssentialOperationsMetaData } from "../posts/tech/git-essential-operations/page.mdx";
 import { metadata as infiniteScrollMetaData } from "../posts/tech/infinite-scroll/page.mdx";
 import { metadata as javascriptHandwrittenCodeExamplesMetaData } from "../posts/tech/javascript-handwritten-code-examples/page.mdx";
+import { metadata as learnClaudeCodeMetaData } from "../posts/tech/learn-claude-code/page.mdx";
 import { metadata as regxExecAndMatchMetaData } from "../posts/tech/regx-exec-and-match/page.mdx";
 import { metadata as treeShakingMetaData } from "../posts/tech/tree-shaking/page.mdx";
 import { metadata as understandingScrollOffsetClientPropertiesMetaData } from "../posts/tech/understanding-scroll-offset-client-properties/page.mdx";
@@ -88,6 +89,10 @@ export const allPosts = [
   {
     url: '/posts/tech/javascript-handwritten-code-examples',
     metadata: javascriptHandwrittenCodeExamplesMetaData
+  },
+  {
+    url: '/posts/tech/learn-claude-code',
+    metadata: learnClaudeCodeMetaData
   },
   {
     url: '/posts/tech/regx-exec-and-match',
