@@ -1,0 +1,182 @@
+export const metadata = {
+  title: 'postMessage-catcher：看见每一条跨窗口消息',
+  description: '一个把页面里所有 frame 的 postMessage 放进 DevTools 面板的 Chrome 扩展：它解决什么问题、怎么用、适合哪些场景，以及为什么它坚持不修改页面。',
+  date: '2026-11-15',
+  tag: ['Chrome 扩展', '开发者工具'],
+  duration: '9min',
+}
+
+# postMessage-catcher：看见每一条跨窗口消息
+
+> 每一条送达的消息，都会在某个 window 上触发一次 `message` 事件。只要每一帧都有人听着。
+
+`postMessage` 是浏览器里最不起眼的一条通信通道。OAuth 回调、支付 iframe、客服 widget、微前端握手都靠它。它出问题的时候，通常只留下一个现象：某个页面偶尔不工作，刷新又好了。
+
+`postMessage-catcher` 是一个 Chrome 扩展。它把页面里所有 frame 收到的 `postMessage` 放进 DevTools 面板：谁发的、发到哪、payload 是什么、有没有被截断。你不需要改页面代码，也不需要提前埋监听器。
+
+- 源码：[niexia/postMessage-catcher](https://github.com/niexia/postMessage-catcher)
+- Chrome Web Store：[postMessage-catcher](https://chromewebstore.google.com/detail/postmessage-catcher/henlmhlhpgnkeecjjcbhhcfmecohnilo)（写作时商店里仍是 v2；v3 尚未提交审核）
+- 隐私说明：[docs/privacy.md](https://github.com/niexia/postMessage-catcher/blob/main/docs/privacy.md)
+- 架构说明：[docs/architecture.md](https://github.com/niexia/postMessage-catcher/blob/main/docs/architecture.md)
+
+它适合这些时候：
+
+- 正在接支付、OAuth 或第三方 iframe，需要确认握手消息到底有没有发；
+- 维护微前端，主应用和子应用各说各话；
+- 排查「消息发了，但 handler 没执行」的问题；
+- 想看清楚某个第三方 widget 到底往页面里发了什么。
+
+![DevTools 里的 postMessage 面板：左侧是消息列表，右侧是选中消息的 Overview](/postmessage-catcher/panel.png)
+
+## 起因：console.log 漏掉的三件事
+
+我第一次认真查 `postMessage`，是在一个支付回跳页上。父页面和收银台 iframe 之间有一串握手消息，本地一切正常，线上偶发失败。最自然的做法是打开 console，粘一行：
+
+```js
+window.addEventListener('message', (event) => console.log(event));
+```
+
+刷新，等复现。结果 console 很安静。
+
+**第一，它只看到当前 frame。** 监听器装在顶层页面，但消息可能只发给某个 iframe；跨源时，父帧连子帧里发生了什么都不知道。
+
+**第二，它开始得太晚。** console 是在页面加载完之后才粘进去的，而握手、OAuth 回调、SDK 初始化通常发生在 `document_start` 到 `load` 之间。监听器注册的时候，要抓的那条消息已经过去了。Preserve log 保留的是日志，不是一个更早注册的监听器。
+
+**第三，它会刷屏。** 页面上还有 DevTools、HMR、React/Vue 插件、埋点 SDK 的消息。几百条里找一条，console 没有 origin 过滤、没有类型、没有历史，也不能导出。
+
+`postMessage-catcher` 把这三件事分别接住：
+
+| `console.log` | postMessage-catcher |
+| --- | --- |
+| 只看到当前 frame | 每个 frame 都装探针 |
+| 注册时握手已经结束 | 页面脚本之前就开始录 |
+| 控制台被刷屏，没有历史 | 面板列表 + 每 tab 历史 |
+| 一条条日志，没法筛选 | 按 payload / origin / type 搜索，导出 JSON |
+
+## 它到底能做什么
+
+主界面只有一个：DevTools 里的 **postMessage** 面板。打开之后，你能拿到这些：
+
+| 能力 | 具体是什么 |
+| --- | --- |
+| 全帧录制 | 顶层页面、iframe、`srcdoc`、`about:blank`、`data:`、`blob:` |
+| 发送方归因 | `event.origin` 加上 `self` / `parent` / `child` / `other` 的关系，跨源也准确 |
+| Payload 查看 | 树形展开；JSON 字符串自动解析；截断和超大有标记 |
+| 历史 | 每个 tab 最近 2000 条；刷新不丢；面板可以事后打开 |
+| 搜索与导出 | 按 payload / origin / type 搜索；方向筛选；导出当前结果 |
+| 录制控制 | 每 tab 开关 + 总开关；popup 显示计数和主题 |
+
+选中一条消息，右侧是三个 tab：**Overview** 看路由、大小、frame、document 和警告；**Payload** 是懒展开的树；**Raw** 是完整的快照 JSON。当前 tab 属于面板而不是消息，所以你可以停在 Payload，连续扫下一条。
+
+搜索框过滤 payload、origin 和类型；`⌘F` / `Ctrl+F` 聚焦，`↑` / `↓` 换选中，`Esc` 清空。方向 chips 可以只看 Parent 或 Child。导出的是当前筛选后的结果。
+
+很多 widget 和 SDK 不直接 post 对象，而是先 `JSON.stringify` 再 post 字符串。这样的消息在列表里是一整行转义字符串，没法读。v3 会把它解析成树，右上角留一个 Parsed / Text 开关回到原始文本；列表的 TYPE 列显示内层判别字段，而不是 `<string>`。
+
+![JSON 字符串被解析成树，Parsed / Text 可以切回原文](/postmessage-catcher/payload.png)
+
+历史是另一个关键。service worker 维护每个 tab 的环形缓冲，并把最近 300 条压到 `storage.session`。面板晚打开也没关系：先让 bug 发生，再打开 DevTools，订阅时 worker 会把快照推过来。
+
+录制状态有两层：总开关和每 tab 开关。面板里的 Recording 按钮改的是后者，popup 里两个都能改；总开关关掉时，每 tab 开关会禁用。每 tab 关掉只影响这个 tab，不会清空已有历史。
+
+<div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent: 'center' }}>
+  <img src="/postmessage-catcher/popup-dark.png" alt="popup 深色主题：每 tab 录制、总开关和消息计数" width={290} />
+  <img src="/postmessage-catcher/popup-light.png" alt="popup 浅色主题" width={290} />
+</div>
+
+popup 只有 320px 宽：每 tab 录制、总开关、状态行里的消息计数、一行 DevTools 提示和 GitHub 链接。主题有 System / Light / Dark 三档，选择会镜像到 `localStorage`，让 popup 在 React 启动前就画对颜色；面板则跟随 DevTools 的主题。
+
+## 装好之后怎么用
+
+1. 安装。商店里现在是 v2；想试 v3，可以在仓库里 `pnpm install && pnpm build`，然后在 `chrome://extensions` 里加载 `.output/chrome-mv3`。
+2. 打开任意 `http(s)` 页面，DevTools → **postMessage**。
+3. 刷新页面，或者继续操作。加载期的消息会出现在列表里，不需要在页面里提前埋监听器。
+4. 选中一条消息，看 Overview / Payload / Raw；用 `⌘F` 搜索，用方向键换选中，用右上角导出当前筛选结果。
+5. 要停的时候，在 popup 里关掉当前 tab；总开关也在同一个 popup 里。
+
+## 几个实际场景
+
+**支付 / OAuth 回跳。** 父页面和收银台 iframe 之间通常有一串 `ready` / `init` / `callback`。哪一条没到、是谁发的、payload 对不对，面板里一眼能看到；刷新时也不会漏掉加载期的握手。
+
+**微前端。** 主应用和子应用各在一个 frame 里，消息是它们的 API。按 sender 关系筛 Parent / Child，比在 console 里翻几十条日志快得多。
+
+**第三方 widget / 客服 SDK。** 这类 SDK 很喜欢 `JSON.stringify` 之后再 post。Payload 默认就是展开的树，不用去读压缩后的源码。
+
+**广告 / 埋点 iframe 审计。** 发送方 origin 是 `"null"` 时，列表会给一个警告；谁在发、发了什么、发到哪，都能看，也能导出。
+
+**线上偶发问题。** 先让 bug 发生，再打开面板。每个 tab 的历史还在；不需要在复现的那一刻手忙脚乱地开 console。
+
+## 它为什么坚持不修改页面
+
+一个自然的做法，是在页面里包一层 `window.postMessage`，顺便拿到 `targetOrigin`。我们没有这么做。
+
+`event.source` 取的是调用方所在的 realm。包装函数是在接收方的 realm 里创建的；子帧调用 `parent.postMessage(...)` 时，真正执行的是父帧里的 wrapper，浏览器于是把发送者认成父帧自己。
+
+> 包装之后，`event.source === iframe.contentWindow` 从 `true` 变成 `false`。
+
+任何做发送方校验的页面都会受影响：有的直接丢弃消息，有的走错分支。更麻烦的是它不是必现的——只有经过被包装的那个 window、只有特定方向的消息才会变，测试环境可能一切正常。这不是理论风险，我们做过对照实验。
+
+所以 v3 只做接收侧：不替换、不代理、不修改 `window.postMessage`。每一条送达的消息都会在某个 window 上触发 `message` 事件；只要每个 frame 都装了探针，就能看到它。
+
+代价必须说清楚：看不到 `targetOrigin`——它只在发送侧可见；也看不到因为 `targetOrigin` 不匹配而被丢弃的发送。这两条写在 README 和面板的已知限制里，不假装能看到。
+
+「不修改页面」也体现在权限上：
+
+- 不读表单、Cookie、localStorage、网络请求或页面正文，只监听 `message` 事件，快照送达的数据；
+- 只申请 `storage` 权限；为了让探针能在任意 `http(s)` 页面运行，content scripts 声明为 `<all_urls>`，这是这类工具绕不开的站点访问范围；
+- 没有网络请求、账号、遥测，也没有远程代码；
+- payload 快照有预算，循环引用、`BigInt`、超大对象不会让页面或扩展挂掉。
+
+## 它是怎么做到的
+
+要做到上面这些，探针得在页面脚本之前、在每个 frame 里运行。v3 的探针跑在 MAIN world，用 `document_start` + `all_frames` + `match_origin_as_fallback`：
+
+- `document_start`：页面自己的脚本还没执行，监听器已经在了；
+- `all_frames`：每个 iframe 一个探针，而不是只看顶层；
+- `match_origin_as_fallback`：`srcdoc`、`about:blank`、`data:`、`blob:` 这类没有独立 URL 的帧也能覆盖；
+- MAIN world：和页面共享同一个 window，能看到页面自己的 `message` 事件；扩展的桥接脚本在 ISOLATED world 里，两边用 DOM 事件通信。
+
+探针把 payload 做成 JSON-safe 的快照，通过 DOM 事件交给桥接脚本，再由 service worker 汇总到面板。所以面板打开时拿到的是已有的历史，而不是从打开那一刻才开始。
+
+![一次捕获经过的四层：MAIN world 探针、ISOLATED world 桥、service worker、面板](/postmessage-catcher/architecture.svg)
+
+service worker 保留每个 tab 最近 2000 条；刷新页面不丢，worker 被回收后最近的 300 条也会从 `storage.session` 回来。
+
+## 从 v2 到 v3
+
+这个扩展不是新项目。v2 是一个 483 行的 console 工具：`document_idle` 注入、只看顶层 frame、把结果 `console.log` 出来。它的捕获层有三个结构性缺陷，所以 v3 把整个捕获层换掉：
+
+| v2 | v3 |
+| --- | --- |
+| `console.log` | DevTools 面板 |
+| `document_idle` + 顶层 frame | `document_start` + 所有 frame |
+| 全局开关广播到窗口内所有 tab | 每 tab 录制 + 总开关 |
+| 只看同源 iframe 的发送 | 接收侧监听，跨源也能归因 |
+
+v2 留在 `legacy/` 作参考，不再维护。
+
+## 边界
+
+| 限制 | 原因 |
+| --- | --- |
+| 看不到 `targetOrigin` | 只有发送侧可见；包装发送侧会改 `event.source` |
+| 发送方 `frameId` 不可知 | 跨源无法查询；只给 origin + 关系 |
+| 不抓 `MessagePort` / `BroadcastChannel` / `Worker` | 还没做；协议里留了 `channel` 字段 |
+| `sandbox` 且没有 `allow-scripts` 的帧不可见 | 帧里不执行脚本，探针进不去 |
+| `chrome://`、扩展页、商店、PDF 阅读器 | 平台不允许 content script |
+| 面板只在 DevTools 打开时存在 | worker 仍在缓冲，打开后能拿到历史 |
+
+其中有些是浏览器划的红线，有些是我主动放弃的功能。把它们写出来，是为了不让你在需要 `targetOrigin` 的时候才发现没有。
+
+商店里现在仍是 v2；v3 的代码在 `main` 上，还没有提交审核。
+
+## 最后
+
+`postMessage` 的问题从来不是协议复杂。它只是发生在你不在场的时候：页面加载的第一秒、某个跨源 iframe 里、一条被 console 刷掉的消息。等你想看，它已经过去了。
+
+`postMessage-catcher` 能做的也不多：在每一帧里提前听着，把送到的消息留下来，然后用一个不撒谎的面板展示它。观察，而不是接管——这是它所有取舍的起点。
+
+- [GitHub 源码](https://github.com/niexia/postMessage-catcher)
+- [Chrome Web Store](https://chromewebstore.google.com/detail/postmessage-catcher/henlmhlhpgnkeecjjcbhhcfmecohnilo)
+- [架构说明](https://github.com/niexia/postMessage-catcher/blob/main/docs/architecture.md)
+
+项目是 MIT 协议。[Issues](https://github.com/niexia/postMessage-catcher/issues) 和 PR 都欢迎；如果它帮你抓住了一条本来会溜走的消息，也可以把它推荐给同样在和 iframe 打交道的人。

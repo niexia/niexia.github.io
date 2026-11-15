@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="420" viewBox="0 0 900 420" role="img" aria-labelledby="title desc">
+  <title id="title">postMessage-catcher 的捕获链路</title>
+  <desc id="desc">页面的每一帧里，MAIN world 的探针监听 message，通过 DOM 事件交给 ISOLATED world 的桥，再批量送到 service worker 的环形缓冲，最后进入 DevTools 面板和 popup。</desc>
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+    </marker>
+    <style>
+      .t { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; }
+      .title { font-size: 24px; font-weight: 600; fill: #e2e8f0; }
+      .detail { font-size: 18px; fill: #94a3b8; }
+      .label { font-size: 16px; fill: #7dd3fc; font-weight: 500; }
+      .arrow-label { font-size: 16px; fill: #94a3b8; }
+      .mono { font-family: "SF Mono", Menlo, Monaco, "Cascadia Code", monospace; }
+    </style>
+  </defs>
+
+  <rect x="0" y="0" width="900" height="420" rx="18" fill="#0b1220"/>
+
+  <!-- The page: every frame, before page scripts -->
+  <rect x="24" y="24" width="852" height="150" rx="14" fill="#0f172a" stroke="#1e293b" stroke-width="1.5"/>
+  <text class="t label" x="42" y="52">页面 · 每个 frame · document_start</text>
+
+  <rect x="40" y="66" width="356" height="86" rx="10" fill="#101a2e" stroke="#2563eb" stroke-width="1.3"/>
+  <text class="t title" x="58" y="102">probe.js</text>
+  <text class="t detail" x="58" y="130">MAIN world · 只监听，不包装</text>
+
+  <rect x="504" y="66" width="356" height="86" rx="10" fill="#151329" stroke="#7c3aed" stroke-width="1.3"/>
+  <text class="t title" x="522" y="102">bridge.js</text>
+  <text class="t detail" x="522" y="130">ISOLATED world · 批量转发</text>
+
+  <line x1="398" y1="109" x2="492" y2="109" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+  <text class="t arrow-label" x="445" y="94" text-anchor="middle">CustomEvent</text>
+  <text class="t arrow-label" x="445" y="140" text-anchor="middle">JSON 字符串</text>
+
+  <!-- Probe/bridge to worker -->
+  <line x1="682" y1="176" x2="682" y2="196" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+  <text class="t arrow-label" x="698" y="192">chrome.runtime</text>
+
+  <rect x="24" y="204" width="852" height="72" rx="10" fill="#151a26" stroke="#d97706" stroke-width="1.3"/>
+  <text class="t title" x="42" y="234">service worker</text>
+  <text class="t detail" x="42" y="260">打标签 · 每 tab 2000 条环形缓冲 · 400ms 落 storage.session</text>
+
+  <!-- Worker to UI -->
+  <line x1="450" y1="278" x2="450" y2="298" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+  <text class="t arrow-label" x="466" y="294">port</text>
+
+  <rect x="24" y="306" width="580" height="86" rx="10" fill="#0d1b1a" stroke="#10b981" stroke-width="1.3"/>
+  <text class="t title" x="42" y="342">DevTools panel</text>
+  <text class="t detail" x="42" y="370">列表 · 详情 · 搜索 · 导出</text>
+
+  <rect x="620" y="306" width="256" height="86" rx="10" fill="#111827" stroke="#334155" stroke-width="1.3"/>
+  <text class="t title" x="638" y="342">popup</text>
+  <text class="t detail" x="638" y="370">每 tab 开关 · 总开关</text>
+</svg>

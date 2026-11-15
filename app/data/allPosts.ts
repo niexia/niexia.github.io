@@ -6,6 +6,7 @@ import { metadata as mvcMvpMvvmMetaData } from "../posts/design/mvc-mvp-mvvm/pag
 import { metadata as theArtOfReadableCodeMetaData } from "../posts/design/the-art-of-readable-code/page.mdx";
 import { metadata as duanyongpingInvestmentMetaData } from "../posts/investment/duanyongping-investment/page.mdx";
 import { metadata as changiconMetaData } from "../posts/product/changicon/page.mdx";
+import { metadata as postmessageCatcherMetaData } from "../posts/product/postmessage-catcher/page.mdx";
 import { metadata as ajaxMetaData } from "../posts/tech/ajax/page.mdx";
 import { metadata as asyncVsDeferMetaData } from "../posts/tech/async-vs-defer/page.mdx";
 import { metadata as browserReflowVsRepaintMetaData } from "../posts/tech/browser-reflow-vs-repaint/page.mdx";
@@ -59,6 +60,10 @@ export const allPosts = [
   {
     url: '/posts/product/changicon',
     metadata: changiconMetaData
+  },
+  {
+    url: '/posts/product/postmessage-catcher',
+    metadata: postmessageCatcherMetaData
   },
   {
     url: '/posts/tech/ajax',

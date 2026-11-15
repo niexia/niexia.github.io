@@ -118,7 +118,11 @@ const components = {
     const filteredChildren = React.Children.toArray(children).filter(
       (child) => !(typeof child === 'string' && child.trim() === '')
     );
-    return <table {...props}>{filteredChildren}</table>;
+    return (
+      <div className="overflow-x-auto">
+        <table {...props}>{filteredChildren}</table>
+      </div>
+    );
   },
   thead: ({ children, ...props }: TheadProps) => {
     const filteredChildren = React.Children.toArray(children).filter(
