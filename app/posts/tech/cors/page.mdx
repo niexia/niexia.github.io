@@ -18,42 +18,17 @@ export const metadata = {
 
 下表给出了相对 `http://store.company.com/dir/page.html` 同源检测的示例：
 
-<table>
-  <thead>
-    <tr>
-      <th>URL</th>
-      <th style={{ textAlign: 'center' }}>结果</th>
-      <th>原因</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><code>http://store.company.com/dir2/other.html</code></td>
-      <td style={{ textAlign: 'center' }}>成功</td>
-      <td>只有路径不同</td>
-    </tr>
-    <tr>
-      <td><code>http://store.company.com/dir/inner/another.html</code></td>
-      <td style={{ textAlign: 'center' }}>成功</td>
-      <td>只有路径不同</td>
-    </tr>
-    <tr>
-      <td><code>https://store.company.com/secure.html</code></td>
-      <td style={{ textAlign: 'center' }}>失败</td>
-      <td>不同协议 ( https 和 http )</td>
-    </tr>
-    <tr>
-      <td><code>http://store.company.com:81/dir/etc.html</code></td>
-      <td style={{ textAlign: 'center' }}>失败</td>
-      <td>不同端口 ( http:// 80 是默认的)</td>
-    </tr>
-    <tr>
-      <td><code>http://news.company.com/dir/other.html</code></td>
-      <td style={{ textAlign: 'center' }}>失败</td>
-      <td>不同域名 ( news 和 store )</td>
-    </tr>
-  </tbody>
-</table>
+
+
+| URL | 结果 | 原因 |
+| --- | :---: | --- |
+| `http://store.company.com/dir2/other.html` | 成功 | 只有路径不同 |
+| `http://store.company.com/dir/inner/another.html` | 成功 | 只有路径不同 |
+| `https://store.company.com/secure.html` | 失败 | 不同协议 ( https 和 http ) |
+| `http://store.company.com:81/dir/etc.html` | 失败 | 不同端口 ( http:// 80 是默认的) |
+| `http://news.company.com/dir/other.html` | 失败 | 不同域名 ( news 和 store ) |
+
+
 
 同源策略限制了一下行为：
 

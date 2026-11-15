@@ -142,15 +142,92 @@ input[type='email'] {
 
 table {
   width: 100%;
+  min-width: 32rem;
   border-collapse: collapse;
-  margin: 1rem 0;
-  border: 1px solid var(--color-gray-600);
+  margin: 1.5rem 0;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  border-bottom: 1px solid var(--color-zinc-300);
 }
 
-table th,
-table td {
-  padding: 0.5rem;
+thead {
+  border-top: 1px solid var(--color-zinc-300);
+  border-bottom: 1px solid var(--color-zinc-300);
+  background-color: rgb(0 0 0 / 0.025);
+}
+
+th {
+  padding: 0.7rem 0.9rem;
   text-align: left;
-  border: 1px solid var(--color-gray-600);
-  word-wrap: break-word;
+  vertical-align: bottom;
+  font-weight: 600;
+  color: var(--color-zinc-900);
+}
+
+td {
+  padding: 0.75rem 0.9rem;
+  text-align: left;
+  vertical-align: top;
+  color: var(--color-zinc-700);
+  border-bottom: 1px solid var(--color-zinc-200);
+}
+
+tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+tbody td:first-child {
+  font-weight: 500;
+  color: var(--color-zinc-900);
+}
+
+tbody tr:hover {
+  background-color: rgb(0 0 0 / 0.02);
+}
+
+th[align="center"],
+td[align="center"] {
+  text-align: center;
+}
+
+th[align="right"],
+td[align="right"] {
+  text-align: right;
+}
+
+table code {
+  font-size: 0.8125rem;
+  padding: 0.1em 0.35em;
+  white-space: nowrap;
+}
+
+.dark table {
+  border-bottom-color: var(--color-zinc-800);
+}
+
+.dark thead {
+  border-top-color: var(--color-zinc-800);
+  border-bottom-color: var(--color-zinc-700);
+  background-color: rgb(255 255 255 / 0.04);
+}
+
+.dark th {
+  color: var(--color-zinc-100);
+}
+
+.dark td {
+  color: var(--color-zinc-300);
+  border-bottom-color: var(--color-zinc-800);
+}
+
+.dark tbody td:first-child {
+  color: var(--color-zinc-100);
+}
+
+.dark tbody tr:hover {
+  background-color: rgb(255 255 255 / 0.03);
+}
+
+.dark table code {
+  background-color: var(--color-zinc-800);
 }

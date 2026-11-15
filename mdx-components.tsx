@@ -119,7 +119,12 @@ const components = {
       (child) => !(typeof child === 'string' && child.trim() === '')
     );
     return (
-      <div className="overflow-x-auto">
+      <div
+        className="overflow-x-auto focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+        role="region"
+        aria-label="Table"
+        tabIndex={0}
+      >
         <table {...props}>{filteredChildren}</table>
       </div>
     );
