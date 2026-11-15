@@ -1,27 +1,26 @@
-"use client"
+import type { Metadata } from "next";
+import { allPosts } from "../data/allPosts";
+import { PageIntro } from "../components/Editorial";
+import { PostArchive } from "../components/PostArchive";
+import { siteUrl } from "../lib/site";
 
-import { compareDesc, } from 'date-fns'
-import { allPosts } from '../data/allPosts'
-import { PostCard } from '../components/Postcard'
-import { Tag } from '../components/Tag'
-import { useMemo, useState } from 'react'
+export const metadata: Metadata = {
+  title: "The archive",
+  description:
+    "Every note on Yang Jin's blog, newest first and grouped by year. Browse the full archive or filter it by subject.",
+  alternates: { canonical: `${siteUrl}/posts` },
+};
 
-export default function Posts() {
-  const posts = allPosts.sort((a, b) => compareDesc(new Date(a.metadata.date), new Date(b.metadata.date)))
-  const tags = posts.flatMap((post) => post.metadata.tag ?? [])
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const filteredPosts = useMemo(() => {
-    return selectedTags.length
-      ? posts.filter((post) => selectedTags.some((tag) => post.metadata.tag?.includes(tag)))
-      : posts;
-  }, [selectedTags, posts])
-
+export default function PostsPage() {
   return (
-    <div className="mx-auto">
-      <Tag options={tags} value={selectedTags} onChange={setSelectedTags} checkable multiple showCount className="mb-4" />
-      {filteredPosts.map((post, idx) => (
-        <PostCard key={idx} {...post} />
-      ))}
+    <div className="mx-auto w-full max-w-6xl">
+      <PageIntro
+        eyebrow="Index"
+        title="The archive"
+        meta={`${allPosts.length} notes · since 2017`}
+        description="Everything I have published, newest first. Browse by year, or narrow the archive down to the subjects you care about."
+      />
+      <PostArchive />
     </div>
-  )
+  );
 }

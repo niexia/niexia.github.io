@@ -1,39 +1,61 @@
-"use client"
-
 import Link from "next/link";
 import Image from "next/image";
 import { ThemeToggle } from "./ThemeToggle";
 
+const navLinks = [
+  { href: "/posts", label: "Blog", icon: "ri-article-fill" },
+  { href: "/projects", label: "Projects", icon: "ri-lightbulb-fill" },
+  { href: "/Links", label: "Links", icon: "ri-links-fill" },
+];
+
+const iconLinks = [
+  { href: "https://x.com/yangjinfe", label: "X (Twitter)", icon: "ri-twitter-fill" },
+  { href: "https://github.com/niexia", label: "GitHub", icon: "ri-github-fill" },
+  { href: "/rss.xml", label: "RSS feed", icon: "ri-rss-line", hideOnMobile: true },
+];
+
 const NavBar = () => {
   return (
-    <header>
-      <Link href="/" className="absolute"><Image src="/logo.png" width={32} height={32} alt="logo" /></Link>
-      <nav className="grid grid-cols-[auto_max-content] gap-4 w-full py-2">
-        <div></div>
-        <div className="grid grid-cols-[repeat(7,auto)] gap-4">
-          <Link href="/posts" title="Blog">
-            <span className="hidden md:inline">Blog</span>
-            <i className="ri-article-fill md:hidden"></i>
+    <header className="relative mx-auto w-full max-w-6xl">
+      <Link
+        href="/"
+        aria-label="Yang Jin — home"
+        className="absolute left-0 top-1/2 -translate-y-1/2"
+      >
+        <Image src="/logo.png" width={32} height={32} alt="" className="h-8 w-8 rounded-full" />
+      </Link>
+      <nav
+        aria-label="Main navigation"
+        className="flex items-center justify-end gap-2.5 py-2 sm:gap-4 md:gap-5"
+      >
+        {navLinks.map((link) => (
+          <Link
+            key={link.href}
+            href={link.href}
+            title={link.label}
+            aria-label={link.label}
+            className="inline-flex h-8 w-8 items-center justify-center transition-colors duration-200 hover:text-accent md:h-auto md:w-auto"
+          >
+            <span className="hidden md:inline">{link.label}</span>
+            <i className={`${link.icon} md:hidden`} aria-hidden="true" />
           </Link>
-          <Link href="/projects" title="Projects">
-            <span className="hidden md:inline">Projects</span>
-            <i className="ri-lightbulb-fill md:hidden"></i>
-          </Link>
-          <Link href="/Links" title="Links">
-            <span className="hidden md:inline">Links</span>
-            <i className="ri-links-fill md:hidden"></i>
-          </Link>
-          <a href="https://x.com/yangjinfe" target="_blank" title="X">
-            <i className="ri-twitter-fill" />
+        ))}
+        {iconLinks.map((link) => (
+          <a
+            key={link.href}
+            href={link.href}
+            title={link.label}
+            aria-label={link.label}
+            target={link.href.startsWith("http") ? "_blank" : undefined}
+            rel={link.href.startsWith("http") ? "noopener noreferrer" : undefined}
+            className={`${
+              link.hideOnMobile ? "hidden sm:inline-flex" : "inline-flex"
+            } h-8 w-8 items-center justify-center transition-colors duration-200 hover:text-accent`}
+          >
+            <i className={link.icon} aria-hidden="true" />
           </a>
-          <a href="https://github.com/niexia" target="_blank" title="Github">
-            <i className="ri-github-fill" />
-          </a>
-          {/* <a href="/feed.xml" target="_blank" title="RSS">
-            <div className="font-size:1.25rem; margin: 0 -0.125rem;" />
-          </a> */}
-          <ThemeToggle></ThemeToggle>
-        </div>
+        ))}
+        <ThemeToggle />
       </nav>
     </header>
   );

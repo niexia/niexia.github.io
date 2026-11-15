@@ -1,29 +1,22 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
-
 export const ThemeToggle = () => {
-  const [isDark, setIsDark] = useState(false);
-
-  useEffect(() => {
-    setIsDark(document.documentElement.classList.contains("dark"));
-  }, []);
-
   const toggleDark = () => {
-    const currentDarkMode = !isDark;
-    document.documentElement.classList.toggle("dark", currentDarkMode);
-    localStorage.theme = currentDarkMode ? "dark" : "light";
-    setIsDark(currentDarkMode);
+    const isDark = !document.documentElement.classList.contains("dark");
+    document.documentElement.classList.toggle("dark", isDark);
+    localStorage.theme = isDark ? "dark" : "light";
   };
 
   return (
-    <a
-      className="select-none cursor-pointer"
-      title="Toggle Theme"
+    <button
+      type="button"
+      className="inline-flex h-8 w-8 cursor-pointer select-none items-center justify-center transition-colors duration-200 hover:text-accent"
+      title="Toggle theme"
+      aria-label="Toggle color theme"
       onClick={toggleDark}
     >
-      <i className={isDark ? "ri-sun-line" : "ri-moon-line"} />
-    </a>
+      <i className="ri-moon-line dark:hidden" aria-hidden="true" />
+      <i className="ri-sun-line hidden dark:inline" aria-hidden="true" />
+    </button>
   );
 };

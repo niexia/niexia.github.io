@@ -63,9 +63,15 @@ export default function RootLayout({
         <meta name="google-site-verification" content="gogjeUvgmxhMwuD2GEIWiR3tjeiYHGJRZVIRLWmZBHM" />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`} suppressHydrationWarning>
-        <div className="min-h-screen flex flex-col pt-0 md:pt-8 p-8 dark:bg-zinc-950 bg-white text-gray-900 dark:text-zinc-200">
+        <div className="min-h-screen flex flex-col p-5 sm:p-8 md:pt-8 bg-background text-foreground">
+          <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:absolute focus:left-5 focus:top-5 focus:z-50 focus:rounded-sm focus:bg-zinc-900 focus:px-3 focus:py-2 focus:text-sm focus:text-white dark:focus:bg-zinc-100 dark:focus:text-zinc-900"
+          >
+            Skip to content
+          </a>
           <NavBar />
-          <main className="max-w-[60ch] md:max-w-[80ch] mx-auto w-full space-y-6 flex-grow">
+          <main id="main-content" tabIndex={-1} className="w-full flex-grow">
             {children}
           </main>
           <Footer />
@@ -80,25 +86,31 @@ export default function RootLayout({
 
 function Footer() {
   const links = [
-    { name: '@yangjinfe', url: 'https://x.com/yangjinfe' },
-    { name: 'linkedin', url: 'https://www.linkedin.com/in/yangjinfe' },
-    { name: 'github', url: 'https://github.com/niexia' }
+    { name: 'X / @yangjinfe', url: 'https://x.com/yangjinfe' },
+    { name: 'LinkedIn', url: 'https://www.linkedin.com/in/yangjinfe' },
+    { name: 'GitHub', url: 'https://github.com/niexia' },
   ];
 
   return (
-    <footer className="mt-12 text-center">
-      <div className="flex justify-center space-x-4 tracking-tight">
-        {links.map((link) => (
-          <a
-            key={link.name}
-            href={link.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-gray-400 dark:text-gray-500 hover:text-blue-500 transition-colors duration-200"
-          >
-            {link.name}
+    <footer className="mt-16">
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 border-t border-zinc-300 pt-6 text-xs text-zinc-500 dark:border-zinc-800 dark:text-zinc-400 sm:flex-row sm:items-center sm:justify-between">
+        <p>© {new Date().getFullYear()} Yang Jin</p>
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+          {links.map((link) => (
+            <a
+              key={link.name}
+              href={link.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="transition-colors duration-200 hover:text-accent"
+            >
+              {link.name}
+            </a>
+          ))}
+          <a href="/rss.xml" className="transition-colors duration-200 hover:text-accent">
+            RSS
           </a>
-        ))}
+        </div>
       </div>
       <ScrollToTop />
     </footer>

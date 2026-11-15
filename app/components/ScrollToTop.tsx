@@ -34,11 +34,11 @@ function ScrollToTop() {
   return (
   <>
     {showToTop && (
-      <button title="scroll to top"
+      <button title="scroll to top" aria-label="Scroll to top"
         className="hidden xl:block fixed bottom-8 right-6 rounded-full p-1 hover:cursor-pointer shadow-lg hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors duration-200"
         onClick={toTop}
       >
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="block w-8 h-8">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" aria-hidden="true" className="block w-8 h-8">
           <path strokeLinecap="round" strokeLinejoin="round" d="M15 13.5l-3-3-3 3" />
         </svg>
       </button>
