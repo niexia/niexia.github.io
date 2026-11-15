@@ -1,0 +1,212 @@
+export const metadata = {
+  title: 'Changicon：给每个标签页一张你认得出的脸',
+  description: '从拥挤的标签栏到本地优先的 Chrome 扩展：Changicon 的产品取舍、favicon 改写方案与发布流程。',
+  date: '2026-11-15',
+  tag: ['产品设计', 'Chrome 扩展'],
+  duration: '12min',
+}
+
+# Changicon：给每个标签页一张你认得出的脸
+
+> 给每个标签页一张你认得出的脸。
+
+`Changicon` 是我最近写的一个 Chrome 扩展。它把任意网页的 favicon 换成你选的 emoji、最多两个字符的文字、一个 Lucide 图标，或者一张自己上传的图片。你可以只改当前页面，也可以改整个站点。
+
+- Chrome Web Store：[Changicon](https://chromewebstore.google.com/detail/changicon/pcnnpfojchdoapfnaanpibdkjbdmglhi)
+- 源码：[niexia/customize-tab-icon](https://github.com/niexia/customize-tab-icon)
+- 隐私说明：[docs/privacy.md](https://github.com/niexia/customize-tab-icon/blob/main/docs/privacy.md)
+
+![Changicon 弹窗与自定义图标后的标签栏](/changicon/hero.png)
+
+## 起因：标签页最后只剩一个图标
+
+每天的工作是从一排标签页开始的：文档、PR、后台、监控、聊天窗口。开着开着，Chrome 会把它们压缩到只剩图标和几个字；而大部分网站的 favicon 在 16px 下几乎一样——几个蓝色圆点，或者一个字母。
+
+垂直标签、标签组、会话管理都能解决一部分问题，但它们要求你改变工作方式：先分组，再命名，再保持整理的习惯。大多数时候我做不到。
+
+favicon 不一样。它是浏览器一直显示、你却很少注意的地方。既然网站用它来放品牌，我也可以用它来放自己的识别标记。
+
+于是有了 Changicon。
+
+## 它具体做什么
+
+四种输入，生成同一件事：一个用于标签页的图标。
+
+| 输入 | 生成结果 | 说明 |
+| --- | --- | --- |
+| Emoji | 128px PNG | 完整 emoji 库，支持搜索 |
+| 文字 | 128px PNG | 最多 2 个字符，自动缩放 |
+| Lucide 图标 | SVG | 搜索后直接使用 |
+| 上传图片 | 128px PNG | PNG/JPG/WebP/GIF/SVG，≤ 5MB |
+
+作用域有两个：
+
+- **This page**：只影响当前页面，key 是 `host + pathname`，忽略 query 和 hash。
+- **Whole site**：影响整个可注册域，包含子域；页面级图标仍然优先。
+
+改完之后图标立刻生效，不需要刷新。重置会恢复上一层的图标：没有站点图标时回到网站原本的 favicon，有站点图标时先回到站点图标。如果页面本来没有 icon link，则保留一个指向原始 favicon 的 link。这个细节后面会讲。
+
+<div style={{ display: 'flex', justifyContent: 'center' }}>
+  <img src="/changicon/popup-dark.png" alt="Changicon 弹窗：图标来源、作用域和背景设置" width={320} />
+</div>
+
+一些我会实际使用的场景：
+
+- Gmail 多账号：`/mail/u/0` 和 `/mail/u/1` 用不同字母，切换时不用看邮箱地址。
+- 同一个后台的不同路径、不同子域，用不同 emoji 标出环境，降低点错的概率。
+- 长期开着的文档、看板、监控，用固定文字徽章。
+- 临时调研的一组页面，用同一个 emoji 标记，关掉时一眼能认出来。
+
+![整站图标：同一域名下的所有页面共享一个图标](/changicon/whole-site.png)
+
+## 几个产品上的取舍
+
+### 只解决识别，不接管标签管理
+
+Changicon 不移动、不分组、不关闭标签页，也不替代任何标签管理工具。它只改一个东西：这个页面在标签栏里长什么样。
+
+把范围缩小有一个直接好处：行为容易解释。扩展不读页面正文、表单、Cookie 或网络请求，只读写 `<link rel="icon">` 的属性。用户不需要理解一套新的工作流，也不需要把标签页交给另一个系统管理。
+
+### 页面优先于站点
+
+站点级图标解决“整站统一”的问题，页面级图标解决“这一页是例外”的问题。两者同时存在时，页面图标赢。
+
+这个优先级也决定了重置行为：在存在站点图标的情况下重置页面图标，恢复的是站点图标，而不是网站原始 favicon。用户需要再重置一次站点图标，才会回到网站自己的图标。这比“重置永远回到原始状态”更符合分层模型，也更可预测。
+
+应用站点图标时，会清掉该站点下已有的页面级图标，让整站保持一致。顺序上，先确保当前标签页应用成功，再删除页面覆盖；失败时不会把用户已有的配置先删掉。
+
+### 重置必须真的还原
+
+这是整个扩展里最容易被低估的部分。
+
+最直接的做法是把 `<link rel="icon">` 的 `href` 改掉，重置时再改回来。但“改回来”需要一个地方保存原值。Changicon 在第一次覆盖前，把每个 icon link 的 `href`、`type`、`sizes`、`media` 记录到 `data-changicon-original` 里；重置时逐项恢复，而不是删除节点。
+
+页面本来没有 `<link rel="icon">` 时更麻烦。扩展需要自己创建一个 `#changicon-favicon`。重置时如果直接把它删掉，Chromium 在某些页面上会继续显示自定义图标——因为浏览器会回退到隐式的 `/favicon.ico`，直接删除 link 不一定能让标签页刷新回原图标。所以这种情况下保留 link，把 `href` 指回原始的 favicon URL 或 `/favicon.ico`，让浏览器重新请求一次。
+
+> 还原，而不是删除。
+
+还有一个小情况：自定义图标生效期间，网站自己换了 favicon。这时新的 `href` 会被记录为“原始值”，之后重置恢复的是网站最新的图标，而不是扩展安装时的旧图标。
+
+### 本地优先
+
+图标在设备上生成，以 data URL 的形式存进 `chrome.storage.local`。没有账号、没有同步、没有分析、没有网络请求，也没有远程代码。
+
+代价也很明确：
+
+- 图标不会跨设备同步，换浏览器或换 profile 就没了。
+- `chrome.storage.local` 有 10MB 配额，虽然 128px 的图标通常只有 2–20KB，但存很多站点后仍然要留意。
+- 为了能修改任意页面的 favicon，扩展需要 `*://*/*` 的站点访问权限。这是商店审核最敏感的一项，也是这类工具绕不开的成本。
+
+我选择把成本说清楚，而不是用“智能”或“云同步”把它藏起来。扩展申请的权限只有四项：`storage`、`activeTab`、`scripting` 和站点访问；content script 只碰 favicon link。
+
+## 技术实现
+
+### 技术栈
+
+WXT 0.20 负责 MV3 的 manifest、入口、构建和打包；界面是 React 19、shadcn/ui（Radix）和 Tailwind CSS 4；类型和纯逻辑用 TypeScript + Vitest 覆盖。
+
+整体只有两个运行时角色，加上一个共享的存储层：
+
+| 角色 | 运行位置 | 职责 |
+| --- | --- | --- |
+| Popup | 用户打开扩展时 | 读取当前标签页，生成图标，写入存储，通知当前页和其他匹配的标签页 |
+| Content script | 每个 `http(s)` 页面 | 读取有效图标，改写 `<link rel="icon">`，监听 URL、存储和站点自身的变化 |
+| `chrome.storage.local` | 扩展存储 | 保存图标 data URL、原始 favicon 和偏好设置 |
+
+一次应用的流程是：Popup 生成图标并写入 storage，然后给当前标签页发送 `setWebsiteIcon`；content script 改写 link 之后，popup 再逐个通知其他打开的、属于同一作用域的标签页。
+
+没有 background service worker。所有操作都由用户打开 popup 触发，不需要一个常驻进程；少一个进程，也少一层消息路由和权限面。
+
+唯一的例外是安装或更新前就已经打开的标签页：它们没有声明式的 content script。这时 popup 用 `chrome.scripting.executeScript` 把清单里的 content script 注入进去，然后重试一次消息。用户不需要为了用扩展而刷新所有页面。
+
+### 存储键就是协议
+
+popup 和 content script 之间没有共享内存，它们靠 storage key 协作：
+
+```
+icon:{host}{pathname}            页面图标
+icon-original:{host}{pathname}   页面原始 favicon
+icon-domain:{siteHost}           站点图标
+icon-original-domain:{siteHost}  站点原始 favicon
+changicon-theme                  主题
+changicon-background             白底 / 透明
+changicon-scope                  page / domain
+```
+
+`host` 包含端口，但忽略协议，所以 `http://example.com/a` 和 `https://example.com/a` 共享同一个页面图标。`siteHost` 是可注册域：`news.example.co.uk` 会归到 `example.co.uk`。IP、`localhost` 和没有点的 host 会退回完整 host。
+
+读取时就是一条优先级链（简化成伪代码）：
+
+```ts
+const effectiveIcon =
+  (await getPageIcon(url)) ??
+  (await getSiteIcon(url)) ??
+  null
+```
+
+真实的实现还要处理原始图标、迁移和 watcher，但核心就是这个 `??`。
+
+### 改写 favicon 的三个坑
+
+**1. SPA 和网站自己的更新。** 单页应用切路由不会触发页面加载，很多网站还会在运行时替换 favicon。content script 监听 WXT 的 `wxt:locationchange`，在 `pushState` / `replaceState` / `popstate` 后重新计算当前 URL 该用哪个图标；同时用 `MutationObserver` 观察 `<head>` 里的 icon link，如果网站把我们的图标改掉了，就再写回去。
+
+这个观察器只在“当前有自定义图标”时生效，扩展更新或卸载时断开，避免和网站互相打架，也避免无意义地长期观察 DOM。
+
+**2. 图标类型。** 文字、emoji 和上传图片生成 PNG data URL；Lucide 图标生成 SVG data URL。写回 link 时，SVG 标成 `type="image/svg+xml" sizes="any"`，PNG 标成 `type="image/png"` 且不声明固定 `sizes`——旧版本可能存过 32px 的图标，声明 128px 反而不准确。
+
+**3. 不能改的页面。** `chrome://`、`chrome-extension://`、Chrome Web Store 和 PDF 阅读器不允许 content script 运行，popup 会直接提示“这个页面不能自定义”，而不是静默失败。目前也只处理顶层 frame，iframe 里的 favicon 不会改。
+
+### 站点级图标与注册域
+
+站点级图标的关键不是“存一个域名”，而是“哪个域名算一个站点”。
+
+`www.example.com`、`news.example.com` 和 `example.com` 应该共享一个图标，所以 key 用的是可注册域 `example.com`，而不是完整 host。`news.example.co.uk` 则归到 `example.co.uk`。项目里内置了一份常见多级后缀表，而不是完整的 Public Suffix List；少见的后缀可能会被当成“最后两段”，这是已知限制。
+
+从 1.0 的按 host 存储迁移到 1.1 的按注册域存储时，需要一次数据迁移。迁移是幂等的，带 marker，popup 和 content script 都会在读取前执行；已有 key 优先，不会被旧值覆盖。
+
+### 图标是怎么生成的
+
+所有生成都在 popup 里完成，不经过网络：
+
+- 统一画布 128px，白底模式下留 16px 内边距，圆角半径是 `size / 4`。
+- 文字最多 2 个 code point；白底模式会缩小字号直到放下，透明模式则把字形的墨迹边界缩放到 94%。
+- Emoji 用 emoji-mart，`lazy` 加载；图标用 Lucide，搜索后把 SVG 克隆出来，必要时扩展 `viewBox` 加内边距。
+- 上传图片限制 5MB，支持 cover（裁切填满）和 contain（完整显示并留边）两种模式，最后裁成圆角。
+
+## 工程化与发布
+
+个人项目能不能长期维护，通常不取决于功能，而取决于“改完之后敢不敢发”。
+
+Changicon 把检查收敛成一个命令：
+
+```bash
+pnpm check   # tsc + eslint + vitest + wxt build
+```
+
+CI 在 push 到 main 和 PR 上跑同一套检查。发布时打 `v*` tag，GitHub Actions 会校验 tag 与 `package.json` 版本一致、重新检查、打包 zip，并把 changelog 对应条目作为 release notes 附加到 GitHub Release 上。版本号和 changelog 由 changelogen 根据 Conventional Commits 生成；文档里的发布标记、商店素材和 changelog 是否一致，由 Vitest 里的一条测试守着——这类“文档漂移”问题，靠人记是记不住的。
+
+商店截图也不是手工 PSD。脚本会构建真实的 popup，用 mock 的 `chrome.*` 环境在无头 Chrome 里操作它，截取真实 UI 后再合成 1280×800 的商店图。这样截图和真实界面不会分叉；代价是 mock 只覆盖 popup 实际调用的 API。
+
+Chrome Web Store 的提交目前是手动的。旧的 v1.1 API 在 2026 年 10 月退役，WXT 0.20 的 `wxt submit` 不能再用；新的 v2 需要 service account，暂时不值得为一个小扩展引入。手动上传几次之后，流程反而更可控。
+
+## 已知限制
+
+- 只支持顶层 frame。
+- `chrome://`、扩展页、Chrome Web Store、PDF 阅读器不能自定义。
+- 没有跨设备同步，存储上限 10MB。
+- 多级后缀表不是完整 PSL，冷门后缀可能识别不准。
+- favicon 如果用 canvas 绘制或不通过 `<link>` 声明，可能覆盖不了。
+- 页面级 key 忽略 query 和 hash，只在这两者上不同的 URL 会共享图标。
+- 界面目前是英文。
+
+这些限制里，有些是 Chrome 的平台边界，有些是刻意不做的功能。知道边界在哪里，比假装没有边界更有用。
+
+## 最后
+
+Changicon 很小。它不改变你管理标签页的方式，也不试图成为一个平台。它只是把每天几百次的“这个标签页是哪个”的成本降低一点：给每个标签页一张你认得出的脸。
+
+- [Chrome Web Store 安装](https://chromewebstore.google.com/detail/changicon/pcnnpfojchdoapfnaanpibdkjbdmglhi)
+- [GitHub 源码](https://github.com/niexia/customize-tab-icon)
+- [隐私说明](https://github.com/niexia/customize-tab-icon/blob/main/docs/privacy.md)
+
+项目是 MIT 协议。如果它帮你省下了一次点错标签页的时间，欢迎把它推荐给同样开着几十个标签页的人；有问题或想法，也欢迎在 [Issues](https://github.com/niexia/customize-tab-icon/issues) 里聊。

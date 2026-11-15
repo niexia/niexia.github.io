@@ -5,6 +5,7 @@ import { metadata as aPhilosophyOfSoftwareDesignMetaData } from "../posts/design
 import { metadata as mvcMvpMvvmMetaData } from "../posts/design/mvc-mvp-mvvm/page.mdx";
 import { metadata as theArtOfReadableCodeMetaData } from "../posts/design/the-art-of-readable-code/page.mdx";
 import { metadata as duanyongpingInvestmentMetaData } from "../posts/investment/duanyongping-investment/page.mdx";
+import { metadata as changiconMetaData } from "../posts/product/changicon/page.mdx";
 import { metadata as ajaxMetaData } from "../posts/tech/ajax/page.mdx";
 import { metadata as asyncVsDeferMetaData } from "../posts/tech/async-vs-defer/page.mdx";
 import { metadata as browserReflowVsRepaintMetaData } from "../posts/tech/browser-reflow-vs-repaint/page.mdx";
@@ -54,6 +55,10 @@ export const allPosts = [
   {
     url: '/posts/investment/duanyongping-investment',
     metadata: duanyongpingInvestmentMetaData
+  },
+  {
+    url: '/posts/product/changicon',
+    metadata: changiconMetaData
   },
   {
     url: '/posts/tech/ajax',
